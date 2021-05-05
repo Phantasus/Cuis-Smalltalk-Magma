@@ -1,0 +1,1 @@
+'From Squeak5.2 of 13 December 2018 [latest update: #18225] on 5 May 2021 at 9:44 pm'!!Object methodsFor: '*ma-collections-btree' stamp: 'avi 5/1/2005 14:10'!isTreeSet	^ false! !

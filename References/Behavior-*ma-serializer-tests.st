@@ -1,0 +1,1 @@
+'From Squeak5.2 of 13 December 2018 [latest update: #18225] on 5 May 2021 at 9:43:01 pm'!!Behavior methodsFor: '*ma-serializer-tests' stamp: 'cmm 11/23/2004 21:20'!maEquivalentForSerializationTest: anObject using: alreadyComparedDictionary halt: shouldHalt	^ self == anObject! !

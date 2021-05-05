@@ -1,0 +1,1 @@
+'From Squeak5.2 of 13 December 2018 [latest update: #18225] on 5 May 2021 at 9:44:42 pm'!!Symbol methodsFor: '*ma-serializer-tests' stamp: 'cmm 12/1/2004 16:39'!maEquivalentForSerializationTest: aSymbol using: alreadyComparedDictionary halt: aBoolean	aSymbol isSymbol ifFalse: [ ^ false ].	^ self == aSymbol! !

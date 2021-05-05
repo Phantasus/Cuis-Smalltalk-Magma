@@ -1,0 +1,1 @@
+'From Squeak5.2 of 13 December 2018 [latest update: #18225] on 5 May 2021 at 9:43:39 pm'!!Object methodsFor: '*writebarrier' stamp: 'avi 10/7/2004 03:13'!isBehindWriteBarrier	^ false ! !

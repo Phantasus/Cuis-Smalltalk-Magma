@@ -1,0 +1,1 @@
+'From Squeak5.2 of 13 December 2018 [latest update: #18225] on 5 May 2021 at 9:43:44 pm'!!Object methodsFor: '*magma-squeak-client' stamp: 'cmm 5/8/2016 19:31'!isMagmaWorld	^ false! !

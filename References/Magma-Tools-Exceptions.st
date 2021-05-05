@@ -1,0 +1,1 @@
+MagmaUserError subclass: #MagmaToolsUserError	instanceVariableNames: ''	classVariableNames: ''	poolDictionaries: ''	category: 'Magma-Tools-Exceptions'!MagmaWarning subclass: #MagmaToolsWarning	instanceVariableNames: ''	classVariableNames: ''	poolDictionaries: ''	category: 'Magma-Tools-Exceptions'!

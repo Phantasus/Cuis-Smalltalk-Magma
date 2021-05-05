@@ -1,0 +1,1 @@
+'From Squeak5.2 of 13 December 2018 [latest update: #18225] on 5 May 2021 at 9:44:03 pm'!!Object methodsFor: '*ma-client-server-core' stamp: 'cmm 10/28/2008 16:36'!wantsResponse	"Until protocol is established, we must only use types of objects that are part of the original serializer.  The initial request for protocol establishment is a simple hard-coded String."	^ true! !

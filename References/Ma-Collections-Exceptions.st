@@ -1,0 +1,1 @@
+MaUserError subclass: #MaHashIndexUserError	instanceVariableNames: ''	classVariableNames: ''	poolDictionaries: ''	category: 'Ma-Collections-Exceptions'!MaSoftwareError subclass: #MaSpecialCollectionsSoftwareError	instanceVariableNames: ''	classVariableNames: ''	poolDictionaries: ''	category: 'Ma-Collections-Exceptions'!

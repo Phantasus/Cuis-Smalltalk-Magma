@@ -1,0 +1,1 @@
+'From Squeak5.2 of 13 December 2018 [latest update: #18225] on 5 May 2021 at 9:43:46 pm'!!Object methodsFor: '*magma-server' stamp: 'cmm 10/22/2006 15:01'!maIsTransactional	^ false! !
