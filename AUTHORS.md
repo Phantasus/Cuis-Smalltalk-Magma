@@ -154,3 +154,37 @@ The filedout classes sha256sum were:
     e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  References/WriteBarrier-Collections.st
     8e6d83f245a195fd85d3feb0f25fef0d90b33b9d5955e3e77bd790d738efb591  References/WriteBarrier-Core.st
     0f634b39063e29ac32cb90682e5031c986acd5b4ebcca66715493dac3efee491  References/WriteBarrier-Tests.st
+
+# Copying of monticello packages 6. May 2021
+
+As the extensions were not exported by the by hand approach, I today copied over the
+monticello packages into `References/packages` the previous fileouts were moved into
+`References/by-hand-fileout_20210505`. 
+
+The below monticello packages were copied onto which further porting efforts
+by Josef Philip Bernhart (jpb) or others will continue.
+
+The `sha256sum`s are:
+
+    95e01ffe3265c971be5215d39edb96793ad5f922cbc44fd7d410262764962409  References/packages/BrpExtensions-cmm.15.mcz
+    c2044e8f7a9c6638faa2ae0a821f92537b3c75a8ff55c78483acc19cd0abef7b  References/packages/Ma-Ascii-Report-cmm.10.mcz
+    dcfd7297e2a749a825a06388214da4288f4df31dcee7bcbcce8275b5b9ea926a  References/packages/Ma-Client-Server-Core-cmm.286.mcz
+    d34a7e429dda670d8eb9c415e6266e8a48f18be958d5ac4328d8e86552741f14  References/packages/Ma-Client-Server-Tester-cmm.171.mcz
+    3090af1c2b8909bd6a112c43873bba85cd1ea7253203a14bfb6c5410d2b30870  References/packages/Ma-Collections-cmm.163.mcz
+    777598924f203c9f23ce9e4ba13a92d278e2b500d594bb37f14efb672d0097cb  References/packages/Ma-Core-cmm.311.mcz
+    56d97b1f87d44e8b95e48dcfd4b64e706028e988a60be2da32d6ff54915443be  References/packages/Magma-Client-cmm.737.mcz
+    f6579b1041051281aa54d07d9e3e992f237e081840d0e786bf28be0dd5effa9f  References/packages/Magma-Server-cmm.516.mcz
+    a0a2922e8d371fd085985f2987d5cf9f203b1559fcebc9a8fa64b418b91b2206  References/packages/Magma-Squeak-Client-cmm.15.mcz
+    e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  References/packages/Magma-Squeak-Tester-cmm.3.mcz
+    3369d530142fb5ac65443c85cf2dd238932a64dd77389f0d04e80edbda903667  References/packages/Magma-Tester-cmm.428.mcz
+    dfaf05af9d7c105ff3cc98c00e9971c2e0b513cff23f78f4bbdf57eba8b0f9bd  References/packages/Magma-Tools-cmm.76.mcz
+    8e9f5c0e64f48ac924e51f1c0f4ce913c4b5826be4e82f4cc7eee68cf7210915  References/packages/Ma-Installer-Core-cmm.104.mcz
+    5fda81bcad7c0cf7e34a14f0b9c76811b4a9e74e60b53b769dd7f8b9e3dcb657  References/packages/Ma-Search-cmm.58.mcz
+    f3dbc39fc048b36a9b4a1c5158f00fcdd449a07daee0e4e65e90da243359b056  References/packages/Ma-Serializer-Core-cmm.338.mcz
+    b27820f8693619130b65f29c8fdef0062c5613956f995a4be59b2d8665fd2af8  References/packages/Ma-Serializer-Squeak-Core-cmm.2.mcz
+    90f24dfb936eaa73b922e7adfc4feb25bc529127f3a4087d18e0965b69411c81  References/packages/Ma-Serializer-Tests-cmm.45.mcz
+    316efcb06d3afe98fbbdd9e9eecc86e16d3a8c2b00f3822e1325db77c236fd69  References/packages/Ma-Squeak-Core-cmm.1.mcz
+    e714dda34b7196a19d7c5edc680cdaf3e0e8147739c61742e17f94fc90e64475  References/packages/Ma-Statistics-cmm.36.mcz
+    8d2370aa14236b2975a878b0ef7b582c26a192458905f08ad432d51f70d852a4  References/packages/PlotMorph-cmm.33.mcz
+    804482021f85744a93a41b80d900f3a086865187cc1130f4445c485ceca2d6d0  References/packages/SOLHashTables-cmm.17.mcz
+    52c43488c9fe271aeb0e5d468f38cf65585b8806b7295a7e91b2ca497a466a0b  References/packages/WriteBarrier-cmm.49.mcz
