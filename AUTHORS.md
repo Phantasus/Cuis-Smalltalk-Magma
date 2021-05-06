@@ -188,3 +188,11 @@ The `sha256sum`s are:
     8d2370aa14236b2975a878b0ef7b582c26a192458905f08ad432d51f70d852a4  References/packages/PlotMorph-cmm.33.mcz
     804482021f85744a93a41b80d900f3a086865187cc1130f4445c485ceca2d6d0  References/packages/SOLHashTables-cmm.17.mcz
     52c43488c9fe271aeb0e5d468f38cf65585b8806b7295a7e91b2ca497a466a0b  References/packages/WriteBarrier-cmm.49.mcz
+
+# Authors of SOLHashtables (6. May 2021)
+
+The original authors of the `SOLHashTables` package where 
+Chris Muller (cmm) and Tom Rushworth (tbr). As written above
+the sha256sum was:
+
+> 804482021f85744a93a41b80d900f3a086865187cc1130f4445c485ceca2d6d0
