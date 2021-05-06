@@ -1,7 +1,8 @@
-'From Cuis 5.0 [latest update: #4588] on 6 May 2021 at 6:17:31 pm'!
-'Description SOLHashTable
+'From Cuis 5.0 [latest update: #4588] on 7 May 2021 at 12:05:03 am'!
+'Description Implements Split-Ordered Lists: Lock-Free Extensible Hash Tables (SOLHashTables)
+as described in the paper "Split-Ordered Lists: Lock-Free Extensible Hash Tables" by Ori Shalev and Nir Shavit, in the Journal of the ACM, Vol. 53, No. 3, May 2006, pp 379-405.
 
-License: MIT
+License: MIT / Squeak License
 Original Authors: Chris Muller (cmm), Tom Rushworth (tbr)
 Author: Josef Philip Bernhart
 
@@ -13,7 +14,8 @@ Permission is hereby granted, free of charge, to any person obtaining a copy of 
 The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.'!
-!provides: 'SOLHashTables' 1 3!
+!provides: 'SOLHashTables' 1 4!
+SystemOrganization addCategory: 'SOLHashTables-Tests'!
 SystemOrganization addCategory: 'SOLHashTables'!
 
 
@@ -25,6 +27,16 @@ Association subclass: #SOLHashNode
 	category: 'SOLHashTables'!
 !classDefinition: 'SOLHashNode class' category: 'SOLHashTables'!
 SOLHashNode class
+	instanceVariableNames: ''!
+
+!classDefinition: #SOLHashNodeTest category: 'SOLHashTables-Tests'!
+TestCase subclass: #SOLHashNodeTest
+	instanceVariableNames: 'usedClass'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'SOLHashTables-Tests'!
+!classDefinition: 'SOLHashNodeTest class' category: 'SOLHashTables-Tests'!
+SOLHashNodeTest class
 	instanceVariableNames: ''!
 
 !classDefinition: #SOLHashFrame category: 'SOLHashTables'!
@@ -190,6 +202,12 @@ dummy
 
 	^0 = ((self key) bitAnd: 1)! !
 
+!SOLHashNode methodsFor: 'accessing' stamp: 'jpb 5/6/2021 22:26:42'!
+isDummyNode
+	"Return true if receiver is a dummy node."
+
+	^0 = ((self key) bitAnd: 1)! !
+
 !SOLHashNode methodsFor: 'accessing' stamp: 'tbr 4/1/2010 08:23'!
 next
 	^next! !
@@ -198,7 +216,7 @@ next
 next: aNode
 	next _ aNode! !
 
-!SOLHashNode methodsFor: 'private' stamp: 'tbr 4/1/2010 13:52'!
+!SOLHashNode methodsFor: 'initialization' stamp: 'tbr 4/1/2010 13:52'!
 initialize: nextNode
 	"See the class methods for proper creation and initialization."
 	next _ nextNode! !
@@ -211,13 +229,59 @@ key: anInteger
 key: anInteger value: anObject
 	^(super key: anInteger value: anObject) initialize: nil! !
 
-!SOLHashFrame methodsFor: 'private' stamp: 'cmm 4/9/2011 17:15'!
+!SOLHashNodeTest methodsFor: 'as yet unclassified' stamp: 'jpb 5/6/2021 22:32:41'!
+setUp
+	usedClass _ SOLHashNode ! !
+
+!SOLHashNodeTest methodsFor: 'as yet unclassified' stamp: 'jpb 5/6/2021 22:39:11'!
+testCreatingWithJustAKey
+	| node |
+	
+	node _ usedClass key: 'my-fancy-key'.
+	
+	self assert: 'my-fancy-key' equals: node key.
+	self assert: node value isNil.
+	self assert: node next isNil.
+	
+	node next: 3.
+	self assert: 3 equals: node next.! !
+
+!SOLHashNodeTest methodsFor: 'as yet unclassified' stamp: 'jpb 5/6/2021 22:38:53'!
+testCreatingWithKeyValue
+	| node |
+	
+	node _ usedClass key: 'my-fancy-key' value: 2.
+	
+	self assert: 'my-fancy-key' equals: node key.
+	self assert: 2 equals: node value.
+	self assert: node next isNil.
+	
+	node next: 3.
+	self assert: 3 equals: node next.! !
+
+!SOLHashNodeTest methodsFor: 'as yet unclassified' stamp: 'jpb 5/6/2021 22:47:25'!
+testDummyNodeTesting
+	| node |
+	
+	node _ usedClass key: 0.
+	
+	"Legacy interface, used by magma (the Squeak OOP database) #dummy"
+	self assert: node dummy.
+	
+	"New interface, for better readability"
+	self assert: node isDummyNode.
+	
+	node _ usedClass key: 1.
+	self assert: node dummy not.
+	self assert: node isDummyNode not.! !
+
+!SOLHashFrame methodsFor: 'node access' stamp: 'cmm 4/9/2011 17:15'!
 advance
 	prev _ curr.
 	curr _ next.
 	next _ next ifNotNil: [ next next ]! !
 
-!SOLHashFrame methodsFor: 'private' stamp: 'cmm 4/13/2011 18:16'!
+!SOLHashFrame methodsFor: 'node access' stamp: 'cmm 4/13/2011 18:16'!
 detach
 	"Delete the node at curr from the list, and return the extracted node."
 	| detached |
@@ -227,7 +291,7 @@ detach
 	next _ curr ifNotNil: [ curr next ].
 	^ detached! !
 
-!SOLHashFrame methodsFor: 'private' stamp: 'tbr 4/3/2010 18:45'!
+!SOLHashFrame methodsFor: 'node access' stamp: 'tbr 4/3/2010 18:45'!
 insert: newNode
 	"Insert newNode between prev and curr and return the inserted node"
 
@@ -241,7 +305,7 @@ insert: newNode
 	prev next: newNode.
 	^newNode! !
 
-!SOLHashFrame methodsFor: 'private' stamp: 'cmm 4/11/2011 15:30'!
+!SOLHashFrame methodsFor: 'node access' stamp: 'cmm 4/11/2011 15:30'!
 locate: startKey in: aNode
 	"search down linked list of SOLHashNodes starting with (aNode next) for a node that matches srchKey and srchVal.
 	 Return true if found and set  prev,curr,next to point to the 3 nodes in sequence in the list with curr being the found node.
@@ -263,7 +327,7 @@ locate: startKey in: aNode
 		self advance].
 	^false! !
 
-!SOLHashFrame methodsFor: 'private' stamp: 'cmm 4/9/2011 15:31'!
+!SOLHashFrame methodsFor: 'node access' stamp: 'cmm 4/9/2011 15:31'!
 set: aSOLHashNode
 	prev _ aSOLHashNode.
 	curr _ prev next.
@@ -420,7 +484,7 @@ keyCollisions
 				    [prevKey _ currKey]]].
 	^num! !
 
-!SOLHashTable methodsFor: 'debugging' stamp: 'tbr 4/3/2010 18:14'!
+!SOLHashTable methodsFor: 'debugging' stamp: 'jpb 5/6/2021 23:14:26'!
 pathForDummy: dummyNode
 	"Return a string containg a comma separated list of SOLHashSegment indexes leading to the bucket starting at dummyNode.
 	 If you try this on a regular node you may hit uninitialized buckets or segments."
@@ -428,18 +492,20 @@ pathForDummy: dummyNode
 	| frwdKey seg depth path sx |
 	frwdKey _ self bitReverse: (dummyNode key).
 	seg _ buckets.
-	(nil = seg) ifTrue:
-	    [depth _ 0.
-		path _ '']
-	ifFalse:
-	    [depth _ seg depth.
-		sx _ (frwdKey bitShift: ((segBits * depth) negated)) bitAnd: segMask.
-		path _ sx printString].
-	[0 < depth] whileTrue:
-	    [depth _ depth - 1.
+	
+	(nil = seg)
+		ifTrue: [ depth _ 0. path _ '']
+		ifFalse: [
+			depth _ seg depth.
+			sx _ (frwdKey bitShift: ((segBits * depth) negated)) bitAnd: segMask.
+			path _ sx printString ].
+	
+	[0 < depth] whileTrue: [
+		depth _ depth - 1.
 		seg _ seg bucketAt: sx.
 		sx _ (frwdKey bitShift: ((segBits * depth) negated)) bitAnd: segMask.
 		path _ path, ',', (sx printString)].
+	
 	^path! !
 
 !SOLHashTable methodsFor: 'debugging' stamp: 'tbr 4/2/2010 14:49'!
@@ -448,7 +514,7 @@ regularNodesDo: aBlock
 
 	self allNodesDo: [ :node | (node dummy) ifFalse: [aBlock value: node]]! !
 
-!SOLHashTable methodsFor: 'debugging' stamp: 'tbr 4/6/2010 15:47'!
+!SOLHashTable methodsFor: 'debugging' stamp: 'jpb 5/6/2021 23:12:52'!
 showBucketSizeHistogram
 	"Write a bucket size histogram to the transcript."
 
@@ -459,6 +525,7 @@ showBucketSizeHistogram
 	numCollisions _ 0.
 	prevKey _ 0.
 	currKey _ 0.
+	
 	"Run through the node list, counting bucket sizes."
 	self allNodesDo:
 	    [ :node |
@@ -474,20 +541,33 @@ showBucketSizeHistogram
 			    [numCollisions _ numCollisions + 1]
 			ifFalse:
 			    [prevKey _ currKey]]].
+	
 	(numDummies > 0) ifTrue:
 	    ["We're at the end of the last bucket, add an observation to the histogram."
 		histogram at: numNodes put: ((histogram at: numNodes ifAbsent: [0]) + 1)].
+	
 	"We have the histogram data, now display it."
-	Transcript cr; show: '---------- SOLHashTable bucket size histogram, ';
-	             show: numDummies printString; show: ' buckets, ';
-	             show: numElements printString; show: ' values ';
-	             show: numCollisions printString; show: ' collisions'; cr;
-	             show: ' size :  count'; cr..
+	Transcript 
+		newLine;
+		show: '---------- SOLHashTable bucket size histogram, ';
+		show: numDummies printString;
+		show: ' buckets, ';
+		show: numElements printString;
+		show: ' values ';
+		show: numCollisions printString;
+		show: ' collisions'; newLine;
+		show: ' size :  count';
+		newLine.
+	
 	(histogram keysSortedSafely) do:
 	    [ :key |
-		Transcript show: (key printPaddedWith: $  to: 5); show: ' :'; show: ((histogram at: key) printPaddedWith: $  to: 8); cr].! !
+		Transcript
+			show: (key printStringBase: 10 length: 5 padded: false);
+			show: ' :';
+			show: ((histogram at: key) printStringBase: 16 length: 8 padded: false);
+			newLine ].! !
 
-!SOLHashTable methodsFor: 'debugging' stamp: 'tbr 4/3/2010 18:30'!
+!SOLHashTable methodsFor: 'debugging' stamp: 'jpb 5/6/2021 23:07:59'!
 showNodeList
 	"Write the entire list of nodes to the transcript.
 	 It's not a good idea to do this for large tables."
@@ -495,21 +575,38 @@ showNodeList
 	| seg depth nx |
 	seg _ buckets.
 	(nil = seg) ifTrue: [depth _ 0] ifFalse: [depth _ 1 + seg depth].
-	Transcript cr; show: '---------- SOLHashTable height='; show: depth; show: ' size='; show: self size; cr.
+	
+	Transcript
+		newLine;
+		show: '---------- SOLHashTable height=';
+		show: depth;
+		show: ' size=';
+		show: self size;
+		newLine.
+
 	nx _ 0.
+	
 	self allNodesDo:
 	    [ :node |
 		(node dummy) ifTrue:
 		    ["Show the dummy node, no value."
-			Transcript show: nx; show: ' hash='; show: ((self hashKey: (node key)) printPaddedWith: $0 to: 8 base: 16);
-			             show: ' rvrs='; show: (node key printPaddedWith: $0 to: 8 base: 16); show: ' dummy, [', (self pathForDummy: node), ']';
-			             cr]
+			Transcript
+				show: nx;
+				show: ' hash=';
+				show: ((self hashKey: (node key)) printStringBase: 16 nDigits: 8);
+				show: ' rvrs='; show: (node key printStringBase: 16 nDigits: 8);
+				show: ' dummy, [', (self pathForDummy: node), ']';
+				newLine ]
 		ifFalse:
 		    ["Show a regular node."
-			Transcript show: nx; show: ' hash='; show: ((self hashKey: (node key)) printPaddedWith: $0 to: 8 base: 16);
-			             show: ' rvrs='; show: (node key printPaddedWith: $0 to: 8 base: 16); show: ' -> ';
-			             show: node value printString;
-			             cr].
+			Transcript
+				show: nx;
+				show: ' hash=';
+				show: ((self hashKey: (node key)) printStringBase: 16 nDigits: 8);
+				show: ' rvrs='; show: (node key printStringBase: 16 nDigits: 8);
+				show: ' -> ';
+				show: node value printString;
+				newLine].
 		nx _ nx + 1]! !
 
 !SOLHashTable methodsFor: 'enumerating' stamp: 'tbr 4/2/2010 14:47'!
@@ -535,10 +632,11 @@ do: aBlock
 
 	self valuesDo: aBlock! !
 
-!SOLHashTable methodsFor: 'enumerating' stamp: 'cmm 4/11/2011 13:40'!
+!SOLHashTable methodsFor: 'enumerating' stamp: 'jpb 5/6/2021 23:14:46'!
 from: hashKey do: aBlock until: untilBlock 
 	"For each Object from hashKey and higher, value aBlock as long as untilBlock evaluates true for the same object.."
 	self find: hashKey.
+	
 	frame
 		do:
 			[ : eachNode | eachNode dummy ifFalse: [ aBlock value: eachNode ] ]
@@ -563,16 +661,87 @@ valuesDo: aBlock
 
 	self regularNodesDo: [ :node | aBlock value: node value]! !
 
-!SOLHashTable methodsFor: 'private' stamp: 'cmm 4/13/2011 11:35'!
-bitReverse: anUnsignedInt 
-	^ keyBits = 28
-		ifTrue: [ self class bitReverse29: anUnsignedInt ]
-		ifFalse:
-			[ keyBits = 31
-				ifTrue: [ self class bitReverse32: anUnsignedInt ]
-				ifFalse: [ anUnsignedInt bitReverse: keyBits + 1 ] ]! !
+!SOLHashTable methodsFor: 'key access' stamp: 'cmm 4/14/2011 13:01'!
+dummyKey: frwdKey 
+	28 = keyBits ifTrue: [ ^ self class dummyKey29: frwdKey ].
+	31 = keyBits ifTrue: [ ^ self class dummyKey32: frwdKey ].
+	^ self class
+		dummyKey: frwdKey
+		bits: keyBits+1! !
 
-!SOLHashTable methodsFor: 'private' stamp: 'tbr 4/3/2010 17:05'!
+!SOLHashTable methodsFor: 'key access' stamp: 'cmm 4/11/2011 17:00'!
+find: hashKey 
+	"Return the stored value matching hashKey and srchVal if present, otherwise nil."
+	^ frame
+		find: (self regularKey: hashKey)
+		in: (self headNodeFor: hashKey)! !
+
+!SOLHashTable methodsFor: 'key access' stamp: 'cmm 4/14/2011 13:07'!
+hashKey: rvrsKey 
+	28 = keyBits ifTrue: [ ^ self class hashKey29: rvrsKey ].
+	31 = keyBits ifTrue: [ ^ self class hashKey32: rvrsKey ].
+	^ self class
+		hashKey: rvrsKey
+		bits: keyBits+1! !
+
+!SOLHashTable methodsFor: 'key access' stamp: 'cmm 4/14/2011 11:13'!
+headNodeFor: hashKey 
+	| bucketNumber |
+	^ (self bucketAt: (bucketNumber _ hashKey bitAnd: keyMask)) ifNil: [ self initializeBucket: bucketNumber ]! !
+
+!SOLHashTable methodsFor: 'key access' stamp: 'cmm 4/11/2011 17:30'!
+keyBits
+	^ keyBits! !
+
+!SOLHashTable methodsFor: 'key access' stamp: 'tbr 4/3/2010 11:48'!
+keyMask
+	^keyMask! !
+
+!SOLHashTable methodsFor: 'key access' stamp: 'cmm 4/14/2011 15:17'!
+regularKey: frwdKey 
+	28 = keyBits ifTrue: [ ^ self class regularKey29: frwdKey ].
+	31 = keyBits ifTrue: [ ^ self class regularKey32: frwdKey ].
+	^ self class
+		regularKey: frwdKey
+		bits: keyBits + 1! !
+
+!SOLHashTable methodsFor: 'resizing' stamp: 'cmm 4/11/2011 13:35'!
+checkSize
+	"Consider expanding the table, based on numElements, approxLoadFactor and number of buckets (from keyMask)."
+	numElements > (keyMask + 1 * approxLoadFactor) ifTrue: [ self widen ]! !
+
+!SOLHashTable methodsFor: 'resizing' stamp: 'cmm 4/23/2011 12:09'!
+deepen
+	"Deepen the segment tree by one layer, putting the old tree in bucket 0 of the new segment."
+	| oldBuckets newBuckets |
+	oldBuckets _ buckets.
+	newBuckets _ self hashSegmentClass 
+		depth: oldBuckets depth + 1
+		owner: self.
+	newBuckets
+		bucketAt: 0
+		put: oldBuckets.
+	buckets _ newBuckets! !
+
+!SOLHashTable methodsFor: 'resizing' stamp: 'tbr 4/3/2010 17:11'!
+widen
+	"Double the number of available buckets.
+	 This does not initialize any of the new buckets, that happens lazily, as they are filled."
+
+	| oldBuckets depth maxBuckets numBuckets |
+	"Before we can actually double the number of buckets, we need to see if the doubled number will fit into our current segment tree."
+	oldBuckets _ buckets.
+	depth _ oldBuckets depth.
+	maxBuckets _ 1 bitShift: segBits*(depth+1).
+	numBuckets _ 2*(keyMask+1).
+	(maxBuckets < numBuckets) ifTrue:
+	    ["We need a deeper segment tree."
+		self deepen].
+	"The segment tree is big enough, double the available buckets by adding a bit to the keyMask."
+	keyMask _ numBuckets - 1.
+	! !
+
+!SOLHashTable methodsFor: 'bucket access' stamp: 'jpb 5/6/2021 23:15:56'!
 bucketAt: bucketNum
 	"Return the dummy SOLHashNode that is the head of bucket bucketNum.
 	 Return nil if the containing segment is not yet present or the bucket has not been initialized."
@@ -587,10 +756,11 @@ bucketAt: bucketNum
 			^seg bucketAt: bucketNum].
 		"Not at the bottom, this segment points at segments with depth one less."
 		seg _ seg bucketAt: (bucketNum bitShift: ((depth * segBits) negated))].
+	
 	"We ran out of segments before reaching the bottom."
 	^nil! !
 
-!SOLHashTable methodsFor: 'private' stamp: 'cmm 4/23/2011 12:09'!
+!SOLHashTable methodsFor: 'bucket access' stamp: 'cmm 4/23/2011 12:09'!
 bucketAt: bucketNum putNode: node
 	"Set the dummy SOLHashNode that is the head of bucket bucketNum and return the node.
 	 Instantiate any missing segments needed to do so."
@@ -622,66 +792,7 @@ bucketAt: bucketNum putNode: node
 	"We ran out of segments before reaching the bottom."
 	^nil! !
 
-!SOLHashTable methodsFor: 'private' stamp: 'cmm 4/11/2011 13:35'!
-checkSize
-	"Consider expanding the table, based on numElements, approxLoadFactor and number of buckets (from keyMask)."
-	numElements > (keyMask + 1 * approxLoadFactor) ifTrue: [ self widen ]! !
-
-!SOLHashTable methodsFor: 'private' stamp: 'cmm 4/23/2011 12:09'!
-deepen
-	"Deepen the segment tree by one layer, putting the old tree in bucket 0 of the new segment."
-	| oldBuckets newBuckets |
-	oldBuckets _ buckets.
-	newBuckets _ self hashSegmentClass 
-		depth: oldBuckets depth + 1
-		owner: self.
-	newBuckets
-		bucketAt: 0
-		put: oldBuckets.
-	buckets _ newBuckets! !
-
-!SOLHashTable methodsFor: 'private' stamp: 'cmm 4/14/2011 13:01'!
-dummyKey: frwdKey 
-	28 = keyBits ifTrue: [ ^ self class dummyKey29: frwdKey ].
-	31 = keyBits ifTrue: [ ^ self class dummyKey32: frwdKey ].
-	^ self class
-		dummyKey: frwdKey
-		bits: keyBits+1! !
-
-!SOLHashTable methodsFor: 'private' stamp: 'cmm 4/11/2011 17:00'!
-find: hashKey 
-	"Return the stored value matching hashKey and srchVal if present, otherwise nil."
-	^ frame
-		find: (self regularKey: hashKey)
-		in: (self headNodeFor: hashKey)! !
-
-!SOLHashTable methodsFor: 'private' stamp: 'cmm 4/9/2011 17:29'!
-frame
-	^ frame ifNil: [ frame _ SOLHashFrame new ]! !
-
-!SOLHashTable methodsFor: 'private' stamp: 'cmm 4/14/2011 13:07'!
-hashKey: rvrsKey 
-	28 = keyBits ifTrue: [ ^ self class hashKey29: rvrsKey ].
-	31 = keyBits ifTrue: [ ^ self class hashKey32: rvrsKey ].
-	^ self class
-		hashKey: rvrsKey
-		bits: keyBits+1! !
-
-!SOLHashTable methodsFor: 'private' stamp: 'cmm 4/23/2011 12:08'!
-hashSegmentClass
-	^ SOLHashSegment ! !
-
-!SOLHashTable methodsFor: 'private' stamp: 'cmm 4/14/2011 11:13'!
-headNodeFor: hashKey 
-	| bucketNumber |
-	^ (self bucketAt: (bucketNumber _ hashKey bitAnd: keyMask)) ifNil: [ self initializeBucket: bucketNumber ]! !
-
-!SOLHashTable methodsFor: 'private' stamp: 'tbr 4/3/2010 11:49'!
-height
-	buckets ifNil: [^0].
-	^(buckets depth) + 1! !
-
-!SOLHashTable methodsFor: 'private' stamp: 'tbr 4/6/2010 15:44'!
+!SOLHashTable methodsFor: 'bucket access' stamp: 'jpb 5/6/2021 23:15:26'!
 initializeBucket: bucketNum
 	"Each bucket in the table points at a dummy SOLHashNode, so we want to create the dummy and insert it into the appropriate spot.
 	 We look for the parent bucket to find the closest place to perform the insertion.
@@ -690,64 +801,55 @@ initializeBucket: bucketNum
 	| parent dummy parentNum |
 	parent _ nil.
 	parentNum _ 0.
+	
 	(0 ~= bucketNum) ifTrue:
 	    ["There is a parent node to look for."
 		parentNum _ SOLHashTable bitParent: bucketNum.
 		(parent _ self bucketAt: parentNum) ifNil:
 		    ["Parent bucket has not been initialized yet either,  Do so recursively."
 			parent _ self initializeBucket: parentNum]].
+	
 	"Create the dummy node."
 	dummy _ frame insertDummy: (self dummyKey: bucketNum) in: parent.
+	
 	"Transcript cr; show: '+++++ initiaizing bucket ',(bucketNum printString),' key#',(dummy key printStringRadix:16); cr."
 	^self bucketAt: bucketNum putNode: dummy
 	! !
 
-!SOLHashTable methodsFor: 'private' stamp: 'cmm 4/11/2011 17:30'!
-keyBits
-	^ keyBits! !
+!SOLHashTable methodsFor: 'hooks' stamp: 'cmm 4/9/2011 17:29'!
+frame
+	^ frame ifNil: [ frame _ SOLHashFrame new ]! !
 
-!SOLHashTable methodsFor: 'private' stamp: 'tbr 4/3/2010 11:48'!
-keyMask
-	^keyMask! !
+!SOLHashTable methodsFor: 'hooks' stamp: 'cmm 4/23/2011 12:08'!
+hashSegmentClass
+	^ SOLHashSegment ! !
 
-!SOLHashTable methodsFor: 'private' stamp: 'cmm 4/8/2014 22:25'!
+!SOLHashTable methodsFor: 'hooks' stamp: 'cmm 4/8/2014 22:25'!
 newPointersCollection
 	"Subclasses may override as necessary."
 	^ OrderedCollection new! !
 
-!SOLHashTable methodsFor: 'private' stamp: 'cmm 4/14/2011 15:17'!
-regularKey: frwdKey 
-	28 = keyBits ifTrue: [ ^ self class regularKey29: frwdKey ].
-	31 = keyBits ifTrue: [ ^ self class regularKey32: frwdKey ].
-	^ self class
-		regularKey: frwdKey
-		bits: keyBits + 1! !
+!SOLHashTable methodsFor: 'bit manipulation' stamp: 'cmm 4/13/2011 11:35'!
+bitReverse: anUnsignedInt 
+	^ keyBits = 28
+		ifTrue: [ self class bitReverse29: anUnsignedInt ]
+		ifFalse:
+			[ keyBits = 31
+				ifTrue: [ self class bitReverse32: anUnsignedInt ]
+				ifFalse: [ anUnsignedInt bitReverse: keyBits + 1 ] ]! !
 
-!SOLHashTable methodsFor: 'private' stamp: 'tbr 4/2/2010 12:29'!
+!SOLHashTable methodsFor: 'bit manipulation' stamp: 'tbr 4/3/2010 11:49'!
+height
+	buckets ifNil: [^0].
+	^(buckets depth) + 1! !
+
+!SOLHashTable methodsFor: 'bit manipulation' stamp: 'tbr 4/2/2010 12:29'!
 segBits
 	^segBits! !
 
-!SOLHashTable methodsFor: 'private' stamp: 'tbr 4/2/2010 12:30'!
+!SOLHashTable methodsFor: 'bit manipulation' stamp: 'tbr 4/2/2010 12:30'!
 segMask
 	^segMask! !
-
-!SOLHashTable methodsFor: 'private' stamp: 'tbr 4/3/2010 17:11'!
-widen
-	"Double the number of available buckets.
-	 This does not initialize any of the new buckets, that happens lazily, as they are filled."
-
-	| oldBuckets depth maxBuckets numBuckets |
-	"Before we can actually double the number of buckets, we need to see if the doubled number will fit into our current segment tree."
-	oldBuckets _ buckets.
-	depth _ oldBuckets depth.
-	maxBuckets _ 1 bitShift: segBits*(depth+1).
-	numBuckets _ 2*(keyMask+1).
-	(maxBuckets < numBuckets) ifTrue:
-	    ["We need a deeper segment tree."
-		self deepen].
-	"The segment tree is big enough, double the available buckets by adding a bit to the keyMask."
-	keyMask _ numBuckets - 1.
-	! !
 
 !SOLHashTable methodsFor: 'initialize-release' stamp: 'cmm 4/10/2011 19:27'!
 initializeFrame
@@ -774,7 +876,7 @@ bitParent: anUnsignedInteger
 	(0 = anUnsignedInteger) ifTrue: [^0].
 	^ anUnsignedInteger bitXor: (1 bitShift: ((anUnsignedInteger highBit) - 1))! !
 
-!SOLHashTable class methodsFor: 'bit-manipulation' stamp: 'cmm 4/11/2011 17:37'!
+!SOLHashTable class methodsFor: 'bit-manipulation' stamp: 'jpb 5/6/2021 23:54:02'!
 bitReverse29: anUnsignedInteger
 	"Return the low order 29-bit reversed value of anUnsignedInteger.
 	 Someone with more Squeak skill than I should improve this.
@@ -782,14 +884,16 @@ bitReverse29: anUnsignedInteger
 	| rvrs n frwd |
 	frwd _ anUnsignedInteger.
 	rvrs _ 0.
+	
 	0 to: 6 do:
 	    [:i | n _ frwd bitAnd: 16rF.
 		frwd _ frwd bitShift: -4.
 		n _ Elbbyn at: (1+n).
 		rvrs _ (rvrs bitShift: 4) bitOr: n].
+	
 	"28 bits done, now the 29th."
 	rvrs _ (rvrs bitShift: 1) bitOr: (frwd bitAnd: 1).
-	^rvrs as31BitSmallInt! !
+	^self find31BitIntegerWith: rvrs! !
 
 !SOLHashTable class methodsFor: 'bit-manipulation' stamp: 'cmm 4/11/2011 17:37'!
 bitReverse32: anUnsignedInteger
@@ -805,6 +909,15 @@ bitReverse32: anUnsignedInteger
 		n _ Elbbyn at: (1+n).
 		rvrs _ (rvrs bitShift: 4) bitOr: n].
 	^rvrs! !
+
+!SOLHashTable class methodsFor: 'bit-manipulation' stamp: 'jpb 5/6/2021 23:52:53'!
+find31BitIntegerWith: number
+
+	"31bit small integers re-implementation"
+	number highBit > 31 ifTrue: [ self error: 'more than 31 bits can not fit in a hash' ].
+	number highBit = 31 ifTrue: [ ^number - 16r80000000 ].	
+	
+	^number! !
 
 !SOLHashTable class methodsFor: 'private' stamp: 'cmm 4/13/2011 21:46'!
 defaultLoadFactor
@@ -835,12 +948,12 @@ dummyKey: frwdKey bits: keyBitsPlusOne
 	"Construct a dummy list node key from a hash segment key."
 	^ (frwdKey bitAnd: (1 bitShift: keyBitsPlusOne-1)-1) bitReverse: keyBitsPlusOne! !
 
-!SOLHashTable class methodsFor: 'key-construction' stamp: 'tbr 4/3/2010 18:22'!
+!SOLHashTable class methodsFor: 'key-construction' stamp: 'jpb 5/6/2021 23:55:00'!
 hashKey29: rvrsKey
 	"Construct a hash key from a list node key (where list node keys are bitReversed).
 	 This method strips off the 'regular key' bit, so you can't distinguish regular keys from dummies."
 
-	^((self bitReverse29: rvrsKey) bitAnd: 16rFFFFFFF) as31BitSmallInt! !
+	^self find31BitIntegerWith: ((self bitReverse29: rvrsKey) bitAnd: 16rFFFFFFF)! !
 
 !SOLHashTable class methodsFor: 'key-construction' stamp: 'tbr 4/3/2010 18:23'!
 hashKey32: rvrsKey
@@ -855,11 +968,11 @@ hashKey: rvrsKey bits: keyBitsPlusOne
 	 This method strips off the 'regular key' bit, so you can't distinguish regular keys from dummies."
 	^(rvrsKey bitReverse: keyBitsPlusOne) bitAnd: (1 bitShift: keyBitsPlusOne-1)-1! !
 
-!SOLHashTable class methodsFor: 'key-construction' stamp: 'tbr 4/4/2010 08:15'!
+!SOLHashTable class methodsFor: 'key-construction' stamp: 'jpb 5/6/2021 23:55:28'!
 regularKey29: frwdKey
 	"Construct a regular list node key from a hash segment key."
 
-	^self bitReverse29: ((frwdKey bitOr: 16r10000000) as31BitSmallInt)! !
+	^self find31BitIntegerWith: (self bitReverse29: ((frwdKey bitOr: 16r10000000)))! !
 
 !SOLHashTable class methodsFor: 'key-construction' stamp: 'tbr 4/3/2010 18:15'!
 regularKey32: frwdKey
@@ -893,9 +1006,12 @@ new
 		segBits: self defaultSegBits
 		keyBits: 28! !
 
-!ByteArray methodsFor: '*solhashtables' stamp: 'cmm 4/10/2011 19:18'!
+!ByteArray methodsFor: '*solhashtables' stamp: 'jpb 5/6/2021 23:53:28'!
 murmurHashNeutral28
-	^ (self murmurHashNeutral32 bitAnd: 268435455) as31BitSmallInt! !
+	| newHash |
+	newHash _ (self murmurHashNeutral32 bitAnd: 16rFFFFFFF).
+	
+	^SOLHashTable find31BitIntegerWith: newHash.! !
 
 !ByteArray methodsFor: '*solhashtables' stamp: 'cmm 4/10/2011 19:18'!
 murmurHashNeutral31
