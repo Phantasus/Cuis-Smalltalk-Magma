@@ -1,4 +1,4 @@
-'From Cuis 5.0 [latest update: #4588] on 7 May 2021 at 1:00:36 am'!
+'From Cuis 5.0 [latest update: #4588] on 7 May 2021 at 9:53:29 am'!
 'Description I am a general object serialization and materialization framework.  Currently, I convert objects to ByteArrays and back.  I am used by both the "Ma client server" and "Magma" packages.  I offer a lot of flexibility in the way objects are serialized and materialized, even to the way the object graphs are traversed during serialization.
 
 The major class is MaObjectSerializer, see it for more information.  It utilizes a MaOidManager, a MaClassIdManager, and a MaObjectGraphTraversalStrategy to create a MaSerializedGraphBuffer, the final object that wraps the ByteArray.
@@ -7,7 +7,9 @@ The major class is MaObjectSerializer, see it for more information.  It utilizes
 License: MIT
 Original Author: Chris Muller (cmm)
 Author: Josef Philip Bernhart (jpb)'!
-!provides: 'Ma-Serializer-Core' 1 1!
+!provides: 'Ma-Serializer-Core' 1 4!
+!requires: 'Ma-Core' 1 1 nil!
+!requires: 'SOLHashTables' 1 4 nil!
 SystemOrganization addCategory: 'Ma-Serializer-Core'!
 
 
@@ -19,6 +21,56 @@ SharedPool subclass: #MaSerializerConstants
 	category: 'Ma-Serializer-Core'!
 !classDefinition: 'MaSerializerConstants class' category: 'Ma-Serializer-Core'!
 MaSerializerConstants class
+	instanceVariableNames: ''!
+
+!classDefinition: #MaObjectSerializationSoftwareError category: 'Ma-Serializer-Core'!
+MaSoftwareError subclass: #MaObjectSerializationSoftwareError
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Ma-Serializer-Core'!
+!classDefinition: 'MaObjectSerializationSoftwareError class' category: 'Ma-Serializer-Core'!
+MaObjectSerializationSoftwareError class
+	instanceVariableNames: ''!
+
+!classDefinition: #MaObjectSerializationUserError category: 'Ma-Serializer-Core'!
+MaUserError subclass: #MaObjectSerializationUserError
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Ma-Serializer-Core'!
+!classDefinition: 'MaObjectSerializationUserError class' category: 'Ma-Serializer-Core'!
+MaObjectSerializationUserError class
+	instanceVariableNames: ''!
+
+!classDefinition: #MaObjectSerializationWarning category: 'Ma-Serializer-Core'!
+MaWarning subclass: #MaObjectSerializationWarning
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Ma-Serializer-Core'!
+!classDefinition: 'MaObjectSerializationWarning class' category: 'Ma-Serializer-Core'!
+MaObjectSerializationWarning class
+	instanceVariableNames: ''!
+
+!classDefinition: #MaIncomingChangeSetNotification category: 'Ma-Serializer-Core'!
+MaNotification subclass: #MaIncomingChangeSetNotification
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Ma-Serializer-Core'!
+!classDefinition: 'MaIncomingChangeSetNotification class' category: 'Ma-Serializer-Core'!
+MaIncomingChangeSetNotification class
+	instanceVariableNames: ''!
+
+!classDefinition: #MaTraverseProxyNotification category: 'Ma-Serializer-Core'!
+MaNotification subclass: #MaTraverseProxyNotification
+	instanceVariableNames: 'proxy path'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Ma-Serializer-Core'!
+!classDefinition: 'MaTraverseProxyNotification class' category: 'Ma-Serializer-Core'!
+MaTraverseProxyNotification class
 	instanceVariableNames: ''!
 
 !classDefinition: #MaObjectGraphTraversalStrategy category: 'Ma-Serializer-Core'!
@@ -42,7 +94,7 @@ MaStatHistory class
 	instanceVariableNames: ''!
 
 !classDefinition: #MaBufferPositionMap category: 'Ma-Serializer-Core'!
-ProtoObject subclass: #MaBufferPositionMap
+MaObject subclass: #MaBufferPositionMap
 	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
@@ -52,7 +104,7 @@ MaBufferPositionMap class
 	instanceVariableNames: ''!
 
 !classDefinition: #MaClassIdManager category: 'Ma-Serializer-Core'!
-ProtoObject subclass: #MaClassIdManager
+MaObject subclass: #MaClassIdManager
 	instanceVariableNames: 'classesById idsByClass nextClassId classDefinitionsById inImageDefinitions minimumClasses mutable'
 	classVariableNames: ''
 	poolDictionaries: ''
@@ -62,7 +114,7 @@ MaClassIdManager class
 	instanceVariableNames: ''!
 
 !classDefinition: #MaGlobalReference category: 'Ma-Serializer-Core'!
-ProtoObject subclass: #MaGlobalReference
+MaObject subclass: #MaGlobalReference
 	instanceVariableNames: 'globalName'
 	classVariableNames: ''
 	poolDictionaries: ''
@@ -91,38 +143,8 @@ MaClassReference subclass: #MaClassDefinition
 MaClassDefinition class
 	instanceVariableNames: ''!
 
-!classDefinition: #MaIncomingChangeSetNotification category: 'Ma-Serializer-Core'!
-ProtoObject subclass: #MaIncomingChangeSetNotification
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Ma-Serializer-Core'!
-!classDefinition: 'MaIncomingChangeSetNotification class' category: 'Ma-Serializer-Core'!
-MaIncomingChangeSetNotification class
-	instanceVariableNames: ''!
-
-!classDefinition: #MaMinimalObject category: 'Ma-Serializer-Core'!
-ProtoObject subclass: #MaMinimalObject
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Ma-Serializer-Core'!
-!classDefinition: 'MaMinimalObject class' category: 'Ma-Serializer-Core'!
-MaMinimalObject class
-	instanceVariableNames: ''!
-
-!classDefinition: #MaMutatingProxy category: 'Ma-Serializer-Core'!
-MaMinimalObject subclass: #MaMutatingProxy
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Ma-Serializer-Core'!
-!classDefinition: 'MaMutatingProxy class' category: 'Ma-Serializer-Core'!
-MaMutatingProxy class
-	instanceVariableNames: ''!
-
 !classDefinition: #MaObjectBuffer category: 'Ma-Serializer-Core'!
-ProtoObject subclass: #MaObjectBuffer
+MaObject subclass: #MaObjectBuffer
 	instanceVariableNames: 'byteArray startPos'
 	classVariableNames: 'BufferClasses BufferPositionMaps'
 	poolDictionaries: 'MaSerializerConstants'
@@ -211,38 +233,8 @@ MaVariableBuffer subclass: #MaVariableWordBuffer
 MaVariableWordBuffer class
 	instanceVariableNames: ''!
 
-!classDefinition: #MaObjectSerializationSoftwareError category: 'Ma-Serializer-Core'!
-ProtoObject subclass: #MaObjectSerializationSoftwareError
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Ma-Serializer-Core'!
-!classDefinition: 'MaObjectSerializationSoftwareError class' category: 'Ma-Serializer-Core'!
-MaObjectSerializationSoftwareError class
-	instanceVariableNames: ''!
-
-!classDefinition: #MaObjectSerializationUserError category: 'Ma-Serializer-Core'!
-ProtoObject subclass: #MaObjectSerializationUserError
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Ma-Serializer-Core'!
-!classDefinition: 'MaObjectSerializationUserError class' category: 'Ma-Serializer-Core'!
-MaObjectSerializationUserError class
-	instanceVariableNames: ''!
-
-!classDefinition: #MaObjectSerializationWarning category: 'Ma-Serializer-Core'!
-ProtoObject subclass: #MaObjectSerializationWarning
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Ma-Serializer-Core'!
-!classDefinition: 'MaObjectSerializationWarning class' category: 'Ma-Serializer-Core'!
-MaObjectSerializationWarning class
-	instanceVariableNames: ''!
-
 !classDefinition: #MaObjectSerializer category: 'Ma-Serializer-Core'!
-ProtoObject subclass: #MaObjectSerializer
+MaObject subclass: #MaObjectSerializer
 	instanceVariableNames: 'oidManager classIdManager preMadeObjectBuffers graphBuffer createProxyBlock traversalStrategy amBusy preferences bpMapIndex'
 	classVariableNames: ''
 	poolDictionaries: ''
@@ -252,7 +244,7 @@ MaObjectSerializer class
 	instanceVariableNames: ''!
 
 !classDefinition: #MaObjectSerializerPreferences category: 'Ma-Serializer-Core'!
-ProtoObject subclass: #MaObjectSerializerPreferences
+MaObject subclass: #MaObjectSerializerPreferences
 	instanceVariableNames: 'preSerializers postSerializers postMaterializers'
 	classVariableNames: 'WeakIdentityKeyDictionaryClass WeakValueDictionaryClass'
 	poolDictionaries: ''
@@ -262,7 +254,7 @@ MaObjectSerializerPreferences class
 	instanceVariableNames: ''!
 
 !classDefinition: #MaOidCalculator category: 'Ma-Serializer-Core'!
-ProtoObject subclass: #MaOidCalculator
+MaObject subclass: #MaOidCalculator
 	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: 'MaSerializerConstants'
@@ -272,13 +264,43 @@ MaOidCalculator class
 	instanceVariableNames: ''!
 
 !classDefinition: #MaOidManager category: 'Ma-Serializer-Core'!
-ProtoObject subclass: #MaOidManager
+MaObject subclass: #MaOidManager
 	instanceVariableNames: 'objects oids nextOid'
 	classVariableNames: ''
 	poolDictionaries: 'MaSerializerConstants'
 	category: 'Ma-Serializer-Core'!
 !classDefinition: 'MaOidManager class' category: 'Ma-Serializer-Core'!
 MaOidManager class
+	instanceVariableNames: ''!
+
+!classDefinition: #MaSerializedGraphBuffer category: 'Ma-Serializer-Core'!
+MaObject subclass: #MaSerializedGraphBuffer
+	instanceVariableNames: 'byteArray'
+	classVariableNames: 'SizeWarningThreshold'
+	poolDictionaries: ''
+	category: 'Ma-Serializer-Core'!
+!classDefinition: 'MaSerializedGraphBuffer class' category: 'Ma-Serializer-Core'!
+MaSerializedGraphBuffer class
+	instanceVariableNames: ''!
+
+!classDefinition: #MaMinimalObject category: 'Ma-Serializer-Core'!
+ProtoObject subclass: #MaMinimalObject
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Ma-Serializer-Core'!
+!classDefinition: 'MaMinimalObject class' category: 'Ma-Serializer-Core'!
+MaMinimalObject class
+	instanceVariableNames: ''!
+
+!classDefinition: #MaMutatingProxy category: 'Ma-Serializer-Core'!
+MaMinimalObject subclass: #MaMutatingProxy
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Ma-Serializer-Core'!
+!classDefinition: 'MaMutatingProxy class' category: 'Ma-Serializer-Core'!
+MaMutatingProxy class
 	instanceVariableNames: ''!
 
 !classDefinition: #MaSerializationStat category: 'Ma-Serializer-Core'!
@@ -291,41 +313,18 @@ ProtoObject subclass: #MaSerializationStat
 MaSerializationStat class
 	instanceVariableNames: ''!
 
-!classDefinition: #MaSerializedGraphBuffer category: 'Ma-Serializer-Core'!
-ProtoObject subclass: #MaSerializedGraphBuffer
-	instanceVariableNames: 'byteArray'
-	classVariableNames: 'SizeWarningThreshold'
-	poolDictionaries: ''
-	category: 'Ma-Serializer-Core'!
-!classDefinition: 'MaSerializedGraphBuffer class' category: 'Ma-Serializer-Core'!
-MaSerializedGraphBuffer class
-	instanceVariableNames: ''!
-
-!classDefinition: #MaTraverseProxyNotification category: 'Ma-Serializer-Core'!
-ProtoObject subclass: #MaTraverseProxyNotification
-	instanceVariableNames: 'proxy path'
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Ma-Serializer-Core'!
-!classDefinition: 'MaTraverseProxyNotification class' category: 'Ma-Serializer-Core'!
-MaTraverseProxyNotification class
-	instanceVariableNames: ''!
-
 
 !MaSerializerConstants commentStamp: 'cmm 12/2/2014 17:01' prior: 0!
 Package-level constants.!
 
-!MaBufferPositionMap commentStamp: 'cmm 8/26/2008 02:36' prior: 0!
+!MaBufferPositionMap commentStamp: '<historical>' prior: 0!
 This is an abstraction for the attributes available on a MaObjectBuffer.  Subclasses may override and extend.!
 
-!MaClassIdManager commentStamp: 'cmm 6/11/2004 16:53' prior: 0!
+!MaClassIdManager commentStamp: '<historical>' prior: 0!
 classDefinitionsById -- all versions of all classes that I know about
  inImageDefinitions -- the in-image version of each class I know about.!
 
-!MaMinimalObject commentStamp: 'cmm 1/13/2005 14:25' prior: 0!
-I am the main superclass for objects with a minimal api.  I am meant to have just enough api to be able to develop and debug.!
-
-!MaObjectBuffer commentStamp: 'cmm 11/13/2014 17:00' prior: 0!
+!MaObjectBuffer commentStamp: '<historical>' prior: 0!
 This class encapsulates a single object into its byteArray.  The 0-based buffer positions of my fields are:
 
 	0 = oid (6 bytes)
@@ -415,7 +414,7 @@ My buffer fields are (these are 0-based indexes):
 !MaVariableWordBuffer commentStamp: 'cmm 8/26/2008 00:33' prior: 0!
 I encapsulate objects that represented as a series of words (2-byte numbers).  These types are useful for multimedia like sounds.!
 
-!MaObjectSerializer commentStamp: 'cmm 8/3/2011 17:46' prior: 0!
+!MaObjectSerializer commentStamp: '<historical>' prior: 0!
 A MaObjectSerializer serializes any object into a bytes and back.  Transforming an object into bytes is useful for storing it on disk or sending it over the network.
 
 A primary feature of this serializer is that it stores in a first-class buffer format.  There is a hierarchy of buffers for storing the various kinds of objects:  named inst-vars, indexed-vars, named + indexed, bytes, words, and a special one for CompiledMethods and MethodContexts.
@@ -423,7 +422,7 @@ A primary feature of this serializer is that it stores in a first-class buffer f
 First-class buffers allows object graphs to be "walked" similarly to the way the standard Smalltalk object-model is walked.
 !
 
-!MaOidCalculator commentStamp: 'cmm 12/3/2014 10:48' prior: 0!
+!MaOidCalculator commentStamp: '<historical>' prior: 0!
 The oid ranges are as follows:
 
 The range from (0 to: SmallInteger maxVal - SmallInteger minVal) are reserved for:  user objects, the non-integral atomics including 65536 characters and space for 4000000 new-object oids (bigger than any transaction should ever be!!).  We should allow a few thousand for future-use as well.
@@ -458,8 +457,11 @@ atomics | chars | new objects          |    user objects             | Floats | 
 	SmallIntegers
 !
 
-!MaSerializedGraphBuffer commentStamp: 'cmm 6/10/2009 09:32' prior: 0!
+!MaSerializedGraphBuffer commentStamp: '<historical>' prior: 0!
 I represent a serialized graph of objects.  Normally entire graphs are serialized but a #toCreateProxies: block may be specified for materialization so that the graph will be terminated with proxy objects.!
+
+!MaMinimalObject commentStamp: 'cmm 1/13/2005 14:25' prior: 0!
+I am the main superclass for objects with a minimal api.  I am meant to have just enough api to be able to develop and debug.!
 
 !MaClassReference methodsFor: 'accessing' stamp: 'cmm 1/1/2003 23:52'!
 name
@@ -487,18 +489,6 @@ instanceVariablesString
 !MaClassDefinition methodsFor: 'private' stamp: 'cmm 5/18/2004 00:35'!
 sharedPoolsString
 	^ self stringForVariables: poolDictionaryNames! !
-
-!MaMinimalObject methodsFor: 'printing'!
-printOn: aStream
-	"Append to the argument, aStream, a sequence of characters that  
-	identifies the receiver."
-
-	| title |
-	title _ self class name.
-	aStream
-		nextPutAll: (title first isVowel ifTrue: ['an '] ifFalse: ['a ']);
-		nextPutAll: title
-! !
 
 !MaObjectBuffer methodsFor: 'access' stamp: 'cmm 10/30/2004 16:00'!
 classVersion
@@ -543,6 +533,18 @@ postCopy
 	super postCopy.
 	self trimByteArray ! !
 
+!MaMinimalObject methodsFor: 'printing'!
+printOn: aStream
+	"Append to the argument, aStream, a sequence of characters that  
+	identifies the receiver."
+
+	| title |
+	title _ self class name.
+	aStream
+		nextPutAll: (title first isVowel ifTrue: ['an '] ifFalse: ['a ']);
+		nextPutAll: title
+! !
+
 !MaSerializerConstants class methodsFor: 'as yet unclassified' stamp: 'cmm 12/3/2014 10:57'!
 initialize
 	OidForNil _ MaOidCalculator oidForNil.
@@ -560,6 +562,32 @@ initialize
 	"Hardcoded values to smooth transition to 64-bit Squeak..??  Although I guess it will still dispatch to the wrong class for serialization/materialization."
 	FirstSmallIntegerOid _  281472829227008 "MaOidCalculator oidForInteger: SmallInteger minVal".
 	LastSmallIntegerOid _ 281474976710655 "MaOidCalculator oidForInteger: SmallInteger minVal".! !
+
+!MaIncomingChangeSetNotification methodsFor: 'as yet unclassified' stamp: 'cmm 2/3/2005 21:22'!
+defaultAction
+	"The ChangeSet will be created if it does not exist.  Resume with true to instruct Magma to file in the code with the ChangeSet."
+
+	self resume: false! !
+
+!MaTraverseProxyNotification methodsFor: 'accessing' stamp: 'cmm 11/20/2016 16:53'!
+path
+	^ path! !
+
+!MaTraverseProxyNotification methodsFor: 'accessing' stamp: 'cmm 1/30/2005 20:27'!
+proxy
+	^ proxy! !
+
+!MaTraverseProxyNotification methodsFor: 'initialize-release' stamp: 'cmm 11/22/2016 14:33'!
+setPath: anOrderedCollection proxy: aMaMutatingProxy
+	path _ anOrderedCollection.
+	proxy _ aMaMutatingProxy! !
+
+!MaTraverseProxyNotification class methodsFor: 'create' stamp: 'cmm 11/22/2016 14:37'!
+path: anOrderedCollection proxy: aMaMutatingProxy 
+	^ self new
+		setPath: anOrderedCollection
+		proxy: aMaMutatingProxy ;
+		yourself! !
 
 !MaObjectGraphTraversalStrategy methodsFor: 'private' stamp: 'cmm 5/2/2005 22:13'!
 initialize
@@ -981,28 +1009,31 @@ initialize
 	self classDefinitionsById: Dictionary new.
 	self initializeMinimumClasses! !
 
-!MaClassIdManager methodsFor: 'private' stamp: 'jpb 5/7/2021 00:50:04'!
+!MaClassIdManager methodsFor: 'private' stamp: 'cmm 5/19/2018 17:04'!
 initializeMinimumClasses
 	| legacyDefinitions minimumClassDefs |
 	legacyDefinitions _ OrderedCollection new.
 	"In Squeak 3.9, there were only 14 minimumClasses numbered from (101 to: 114).  115 was the first user class-id, but as-of Squeak 4.1, the hierarchy changed and HashedCollection is extra and would try to occupy 115 when initializing the minimumClasses.  This made me realize minimumClasses could change, and therefore needed some buffer space.  Therefore, I made HashedCollection 90 and set the first user classId up to 1000 so it won't happen again!!"
-				
+	(Smalltalk classNamed: #HashedCollection)
+		ifNil: [ Array empty ]
+		ifNotNilDo: 
+			[ : cls | 
+			legacyDefinitions add:
+				((self newDefinitionNamed: cls name)
+					id: 90 ;
+					yourself) ].
 	minimumClasses _ self class minimumClasses.
-	
 	self legacyClassMap do: 
 		[ : each | 
 		legacyDefinitions add:
 			((self newDefinitionNamed: each value name)
 				id: each key ;
 				yourself) ].
-			
 	"Reserve those legacy id's first."
 	minimumClassDefs _ legacyDefinitions collect: [ : each | self primAddClassDefinition: each ].
 	nextClassId _ 1000.
-	
 	"Now add them using the normal API so that their superlcass defs will get defined too."
 	minimumClassDefs do: [ : each | self addClassDefinition: each ].
-	
 	"Finally, make sure any that were added as minimumClasses since those legacy ones are also included."
 	minimumClasses do: [ : each | (self hasClassDefinitionFor: each) ifFalse: [ self addNewClass: each ] ]! !
 
@@ -1378,156 +1409,6 @@ className: aSymbol
 	^(super className: aSymbol)
 		initializeFrom: (Smalltalk classNamed: aSymbol) ;
 		yourself! !
-
-!MaIncomingChangeSetNotification methodsFor: 'as yet unclassified' stamp: 'cmm 2/3/2005 21:22'!
-defaultAction
-	"The ChangeSet will be created if it does not exist.  Resume with true to instruct Magma to file in the code with the ChangeSet."
-
-	self resume: false! !
-
-!MaMinimalObject methodsFor: 'Public methods'!
-= anObject 
-	"Answer whether the receiver and the argument represent the same 
-	object. If = is redefined in any subclass, consider also redefining the 
-	message hash."
-
-	^self == anObject! !
-
-!MaMinimalObject methodsFor: 'Public methods'!
-~= anObject
-
-	"Answer a Boolean which is false when the receiver and anObject
-	 are equivalent, and true otherwise."
-
-	^(self = anObject) not! !
-
-!MaMinimalObject methodsFor: 'Public methods' stamp: 'cmm 12/23/2010 15:03'!
-subclassResponsibility
-	"This message sets up a framework for the behavior of the class' subclasses.
-	Announce that the subclass should have implemented this message."
-	self error: 'My subclass should have overridden ' , thisContext sender selector printString! !
-
-!MaMinimalObject methodsFor: 'printing' stamp: 'kph 7/14/2007 05:48'!
-asExplorerString
-	^ self printString! !
-
-!MaMinimalObject methodsFor: 'printing' stamp: 'cmm 12/25/2002 00:41'!
-printString
-	"Answer a String whose characters are a description of the receiver. 
-	If you want to print without a character limit, use fullPrintString."
-
-	^String streamContents: [ :s | self printOn: s ]! !
-
-!MaMinimalObject methodsFor: 'actions' stamp: 'cmm 1/13/2005 13:46'!
-becomeForward: otherObject copyHash: copyHash
-	"Primitive. All variables in the entire system that used to point to the receiver now point to the argument.
-	If copyHash is true, the argument's identity hash bits will be set to those of the recevier.
-	Fails if either argument is a SmallInteger."
-
-	(Array with: self)
-		elementsForwardIdentityTo:
-			(Array with: otherObject)
-				copyHash: copyHash! !
-
-!MaMinimalObject methodsFor: 'accessing' stamp: 'cmm 8/10/2011 16:19'!
-class
-
-	"Answer a Class which is the receiver's class"
-
-	<primitive: 111>
-	self primitiveFailed
-! !
-
-!MaMinimalObject methodsFor: 'private' stamp: 'cmm 7/1/2012 17:05'!
-iconOrThumbnailOfSize: aNumberOrPoint 
-	"To support the ObjectExplorer.  Answer an appropiate form to represent the receiver."
-	^ nil! !
-
-!MaMinimalObject methodsFor: 'private' stamp: 'cmm 12/25/2002 00:42'!
-primitiveFailed
-	"Announce that a primitive has failed and there is no appropriate 
-	Smalltalk code to run."
-
-	self error: 'a primitive has failed'! !
-
-!MaMinimalObject methodsFor: 'debugging' stamp: 'cmm 12/1/2004 14:28'!
-inspect
-	"Create and schedule an Inspector in which the user can examine the receiver's variables."
-
-	self inspectorClass openOn: self withEvalPane: true
-! !
-
-!MaMinimalObject methodsFor: 'debugging' stamp: 'cmm 12/1/2004 14:28'!
-inspectorClass
-
-	^ Inspector! !
-
-!MaMinimalObject methodsFor: 'testing' stamp: 'cmm 5/4/2005 11:15'!
-isBehindWriteBarrier
-	"Proxy's don't change anyway.."
-
-	^ false! !
-
-!MaMinimalObject methodsFor: 'testing' stamp: 'cmm 5/23/2011 14:20'!
-isLiteral
-	"Answer whether the receiver has a literal text form recognized by the compiler."
-	^ false! !
-
-!MaMinimalObject methodsFor: 'testing' stamp: 'cmm 2/15/2005 10:45'!
-isMorph
-	"this is here to satisfy CommandHistory."
-
-	^ false! !
-
-!MaMutatingProxy methodsFor: 'private' stamp: 'cmm 10/25/2010 13:29'!
-doesNotUnderstand: aMessage 
-	self subclassResponsibility! !
-
-!MaMutatingProxy methodsFor: 'private' stamp: 'cmm 1/13/2005 13:45'!
-maIsMutatingProxy
-
-	^ true! !
-
-!MaMutatingProxy methodsFor: 'private' stamp: 'cmm 10/25/2010 13:29'!
-respondsTo: aMessage 
-	"this is so that respondsTo can be used on proxies without realizing the object needed for explorers which send respondsTo: #explorerContents"
-	^ (self class canUnderstand: aMessage) or: [ self realObjectIfMutatingProxy respondsTo: aMessage ]! !
-
-!MaMutatingProxy methodsFor: 'ide support' stamp: 'cmm 10/25/2010 12:58'!
-explorerContents
-	| proxy |
-	proxy _ self printString.
-	^ Array with:
-		(ObjectExplorerWrapper
-			with: self realObjectIfMutatingProxy
-			name: proxy asString
-			model: self realObjectIfMutatingProxy)! !
-
-!MaMutatingProxy methodsFor: 'ide support' stamp: 'kph 7/14/2007 05:49'!
-hasContentsInExplorer
-
-	^true! !
-
-!MaMutatingProxy methodsFor: 'testing' stamp: 'cmm 10/25/2010 13:28'!
-maRealObjectIsReified
-	self subclassResponsibility! !
-
-!MaMutatingProxy methodsFor: 'accessing' stamp: 'cmm 4/23/2013 10:07'!
-maWantsPostMaterialization
-	^ self realObjectIfMutatingProxy maWantsPostMaterialization! !
-
-!MaMutatingProxy methodsFor: 'accessing' stamp: 'cmm 10/25/2010 13:08'!
-realObjectIfMutatingProxy
-	self subclassResponsibility! !
-
-!MaMutatingProxy methodsFor: 'accessing' stamp: 'cmm 1/17/2014 14:02'!
-realObjectIfReified
-	"Only answer my realObject if its reified, otherwise nil."
-	^ self maRealObjectIsReified ifTrue: [ self realObjectIfMutatingProxy ]! !
-
-!MaMutatingProxy methodsFor: 'accessing' stamp: 'cmm 10/25/2010 13:32'!
-setRealObjectTo: anObject
-	self subclassResponsibility! !
 
 !MaObjectBuffer methodsFor: 'access' stamp: 'cmm 8/25/2008 22:43'!
 bpMap
@@ -2992,7 +2873,7 @@ setUpClassDefinitionProcessing
 				receiver: classIdManager
 				selector: #addClassDefinition:)! !
 
-!MaObjectSerializer methodsFor: 'initializing' stamp: 'jpb 5/7/2021 00:43:05'!
+!MaObjectSerializer methodsFor: 'initializing' stamp: 'cmm 4/16/2018 20:11'!
 setUpPreAndPostProcessing
 	"Initiailize the pre and post-materializers for classes that come with standard Squeak.  Base Squeak uses one of two methods for serializing objects; ReferenceStream and ImageSegments.  MaObjectSerialization more-closely resembles ReferenceStream.  While the setup for these processors is based on the behavior in those other two frameworks, there are bound to be some minor differences."
 	self setUpClassDefinitionProcessing.
@@ -3021,6 +2902,12 @@ preferences
 preferences
 	afterMaterializingAny: #ScriptEditorMorph
 	do: [ : aScriptEditorMorph | aScriptEditorMorph class = BooleanScriptEditor ifFalse: [ aScriptEditorMorph unhibernate ] ]."
+	preferences 
+		beforeSerializingAny: #TTCFont
+		do: 
+			[ : aTTCFont | 
+			aTTCFont flushCache.
+			thisContext home removeSelf ].
 
 	"preferences
 		beforeSerializingAny: #Wonderland
@@ -3771,45 +3658,6 @@ oidOf: anObject is: anInteger
 		at: anObject
 		put: anInteger! !
 
-!MaSerializationStat methodsFor: 'enumerate' stamp: 'cmm 5/7/2008 15:20'!
-historysDo: aBlock 
-	{ 
-		houseCleaningTimeHistory.
-		timeToMaterializeHistory.
-		timeToSerializeHistory
-	 } do: aBlock! !
-
-!MaSerializationStat methodsFor: 'historys' stamp: 'cmm 5/9/2008 17:04'!
-houseCleaningTimeHistory
-	"MaObjectSerializers must do house-cleaning to maintain good performance but this, itself, consumes a bit of time, which is tracked by this stat."
-	^houseCleaningTimeHistory! !
-
-!MaSerializationStat methodsFor: 'historys' stamp: 'cmm 5/9/2008 17:03'!
-timeToMaterializeHistory
-	"The time spent materializing objects.  In a client-server application, this means materializing requests on the server or responses on the client."
-	^timeToMaterializeHistory! !
-
-!MaSerializationStat methodsFor: 'historys' stamp: 'cmm 5/9/2008 17:03'!
-timeToSerializeHistory
-	"The time spent serializing objects.  In a client-server application, this means serializing requests on the client or responses on the server."
-	^timeToSerializeHistory! !
-
-!MaSerializationStat methodsFor: 'initialize-release' stamp: 'cmm 5/7/2008 17:38'!
-initialize
-	super initialize.
-	houseCleaningTimeHistory _ MaStatHistory name: 'House Cleaning Times'.
-	timeToMaterializeHistory _ MaStatHistory name: 'Time Spent Materializing'.
-	timeToSerializeHistory _ MaStatHistory name: 'Time Spent Serializing'! !
-
-!MaSerializationStat methodsFor: 'ui-support' stamp: 'cmm 4/27/2009 20:50'!
-serializationStats
-	"Statistics related to local serialization and materialization of objects."
-	^ { 
-		timeToSerializeHistory.
-		timeToMaterializeHistory.
-		houseCleaningTimeHistory
-	 }! !
-
 !MaSerializedGraphBuffer methodsFor: 'private' stamp: 'cmm 8/10/2010 14:03'!
 bufferPositionsDo: oneArgBlock 
 	"Value oneArgBlock with the value of the starting position of each
@@ -4052,25 +3900,188 @@ unreasonablePhysicalSize
 	"An arbitrary limit at this time, we need *something* to check to prevent unreasonable allocation attempts."
 	^ 150000000! !
 
-!MaTraverseProxyNotification methodsFor: 'accessing' stamp: 'cmm 11/20/2016 16:53'!
-path
-	^ path! !
+!MaMinimalObject methodsFor: 'Public methods'!
+= anObject 
+	"Answer whether the receiver and the argument represent the same 
+	object. If = is redefined in any subclass, consider also redefining the 
+	message hash."
 
-!MaTraverseProxyNotification methodsFor: 'accessing' stamp: 'cmm 1/30/2005 20:27'!
-proxy
-	^ proxy! !
+	^self == anObject! !
 
-!MaTraverseProxyNotification methodsFor: 'initialize-release' stamp: 'cmm 11/22/2016 14:33'!
-setPath: anOrderedCollection proxy: aMaMutatingProxy
-	path _ anOrderedCollection.
-	proxy _ aMaMutatingProxy! !
+!MaMinimalObject methodsFor: 'Public methods'!
+~= anObject
 
-!MaTraverseProxyNotification class methodsFor: 'create' stamp: 'cmm 11/22/2016 14:37'!
-path: anOrderedCollection proxy: aMaMutatingProxy 
-	^ self new
-		setPath: anOrderedCollection
-		proxy: aMaMutatingProxy ;
-		yourself! !
+	"Answer a Boolean which is false when the receiver and anObject
+	 are equivalent, and true otherwise."
+
+	^(self = anObject) not! !
+
+!MaMinimalObject methodsFor: 'Public methods' stamp: 'cmm 12/23/2010 15:03'!
+subclassResponsibility
+	"This message sets up a framework for the behavior of the class' subclasses.
+	Announce that the subclass should have implemented this message."
+	self error: 'My subclass should have overridden ' , thisContext sender selector printString! !
+
+!MaMinimalObject methodsFor: 'printing' stamp: 'kph 7/14/2007 05:48'!
+asExplorerString
+	^ self printString! !
+
+!MaMinimalObject methodsFor: 'printing' stamp: 'cmm 12/25/2002 00:41'!
+printString
+	"Answer a String whose characters are a description of the receiver. 
+	If you want to print without a character limit, use fullPrintString."
+
+	^String streamContents: [ :s | self printOn: s ]! !
+
+!MaMinimalObject methodsFor: 'actions' stamp: 'cmm 1/13/2005 13:46'!
+becomeForward: otherObject copyHash: copyHash
+	"Primitive. All variables in the entire system that used to point to the receiver now point to the argument.
+	If copyHash is true, the argument's identity hash bits will be set to those of the recevier.
+	Fails if either argument is a SmallInteger."
+
+	(Array with: self)
+		elementsForwardIdentityTo:
+			(Array with: otherObject)
+				copyHash: copyHash! !
+
+!MaMinimalObject methodsFor: 'accessing' stamp: 'cmm 8/10/2011 16:19'!
+class
+
+	"Answer a Class which is the receiver's class"
+
+	<primitive: 111>
+	self primitiveFailed
+! !
+
+!MaMinimalObject methodsFor: 'private' stamp: 'cmm 7/1/2012 17:05'!
+iconOrThumbnailOfSize: aNumberOrPoint 
+	"To support the ObjectExplorer.  Answer an appropiate form to represent the receiver."
+	^ nil! !
+
+!MaMinimalObject methodsFor: 'private' stamp: 'cmm 12/25/2002 00:42'!
+primitiveFailed
+	"Announce that a primitive has failed and there is no appropriate 
+	Smalltalk code to run."
+
+	self error: 'a primitive has failed'! !
+
+!MaMinimalObject methodsFor: 'debugging' stamp: 'cmm 12/1/2004 14:28'!
+inspect
+	"Create and schedule an Inspector in which the user can examine the receiver's variables."
+
+	self inspectorClass openOn: self withEvalPane: true
+! !
+
+!MaMinimalObject methodsFor: 'debugging' stamp: 'cmm 12/1/2004 14:28'!
+inspectorClass
+
+	^ Inspector! !
+
+!MaMinimalObject methodsFor: 'testing' stamp: 'cmm 5/4/2005 11:15'!
+isBehindWriteBarrier
+	"Proxy's don't change anyway.."
+
+	^ false! !
+
+!MaMinimalObject methodsFor: 'testing' stamp: 'cmm 5/23/2011 14:20'!
+isLiteral
+	"Answer whether the receiver has a literal text form recognized by the compiler."
+	^ false! !
+
+!MaMinimalObject methodsFor: 'testing' stamp: 'cmm 2/15/2005 10:45'!
+isMorph
+	"this is here to satisfy CommandHistory."
+
+	^ false! !
+
+!MaMutatingProxy methodsFor: 'private' stamp: 'cmm 10/25/2010 13:29'!
+doesNotUnderstand: aMessage 
+	self subclassResponsibility! !
+
+!MaMutatingProxy methodsFor: 'private' stamp: 'cmm 1/13/2005 13:45'!
+maIsMutatingProxy
+
+	^ true! !
+
+!MaMutatingProxy methodsFor: 'private' stamp: 'cmm 10/25/2010 13:29'!
+respondsTo: aMessage 
+	"this is so that respondsTo can be used on proxies without realizing the object needed for explorers which send respondsTo: #explorerContents"
+	^ (self class canUnderstand: aMessage) or: [ self realObjectIfMutatingProxy respondsTo: aMessage ]! !
+
+!MaMutatingProxy methodsFor: 'ide support' stamp: 'cmm 10/25/2010 12:58'!
+explorerContents
+	| proxy |
+	proxy _ self printString.
+	^ Array with:
+		(ObjectExplorerWrapper
+			with: self realObjectIfMutatingProxy
+			name: proxy asString
+			model: self realObjectIfMutatingProxy)! !
+
+!MaMutatingProxy methodsFor: 'ide support' stamp: 'kph 7/14/2007 05:49'!
+hasContentsInExplorer
+
+	^true! !
+
+!MaMutatingProxy methodsFor: 'testing' stamp: 'cmm 10/25/2010 13:28'!
+maRealObjectIsReified
+	self subclassResponsibility! !
+
+!MaMutatingProxy methodsFor: 'accessing' stamp: 'cmm 4/23/2013 10:07'!
+maWantsPostMaterialization
+	^ self realObjectIfMutatingProxy maWantsPostMaterialization! !
+
+!MaMutatingProxy methodsFor: 'accessing' stamp: 'cmm 10/25/2010 13:08'!
+realObjectIfMutatingProxy
+	self subclassResponsibility! !
+
+!MaMutatingProxy methodsFor: 'accessing' stamp: 'cmm 1/17/2014 14:02'!
+realObjectIfReified
+	"Only answer my realObject if its reified, otherwise nil."
+	^ self maRealObjectIsReified ifTrue: [ self realObjectIfMutatingProxy ]! !
+
+!MaMutatingProxy methodsFor: 'accessing' stamp: 'cmm 10/25/2010 13:32'!
+setRealObjectTo: anObject
+	self subclassResponsibility! !
+
+!MaSerializationStat methodsFor: 'enumerate' stamp: 'cmm 5/7/2008 15:20'!
+historysDo: aBlock 
+	{ 
+		houseCleaningTimeHistory.
+		timeToMaterializeHistory.
+		timeToSerializeHistory
+	 } do: aBlock! !
+
+!MaSerializationStat methodsFor: 'historys' stamp: 'cmm 5/9/2008 17:04'!
+houseCleaningTimeHistory
+	"MaObjectSerializers must do house-cleaning to maintain good performance but this, itself, consumes a bit of time, which is tracked by this stat."
+	^houseCleaningTimeHistory! !
+
+!MaSerializationStat methodsFor: 'historys' stamp: 'cmm 5/9/2008 17:03'!
+timeToMaterializeHistory
+	"The time spent materializing objects.  In a client-server application, this means materializing requests on the server or responses on the client."
+	^timeToMaterializeHistory! !
+
+!MaSerializationStat methodsFor: 'historys' stamp: 'cmm 5/9/2008 17:03'!
+timeToSerializeHistory
+	"The time spent serializing objects.  In a client-server application, this means serializing requests on the client or responses on the server."
+	^timeToSerializeHistory! !
+
+!MaSerializationStat methodsFor: 'initialize-release' stamp: 'cmm 5/7/2008 17:38'!
+initialize
+	super initialize.
+	houseCleaningTimeHistory _ MaStatHistory name: 'House Cleaning Times'.
+	timeToMaterializeHistory _ MaStatHistory name: 'Time Spent Materializing'.
+	timeToSerializeHistory _ MaStatHistory name: 'Time Spent Serializing'! !
+
+!MaSerializationStat methodsFor: 'ui-support' stamp: 'cmm 4/27/2009 20:50'!
+serializationStats
+	"Statistics related to local serialization and materialization of objects."
+	^ { 
+		timeToSerializeHistory.
+		timeToMaterializeHistory.
+		houseCleaningTimeHistory
+	 }! !
 
 !ProtoObject methodsFor: '*ma-serializer-core' stamp: 'cmm 1/16/2005 13:39'!
 maAsStorageObject
