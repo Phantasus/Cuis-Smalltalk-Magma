@@ -1,4 +1,4 @@
-'From Cuis 5.0 [latest update: #4588] on 7 May 2021 at 9:53:29 am'!
+'From Cuis 5.0 [latest update: #4588] on 7 May 2021 at 10:10:43 am'!
 'Description I am a general object serialization and materialization framework.  Currently, I convert objects to ByteArrays and back.  I am used by both the "Ma client server" and "Magma" packages.  I offer a lot of flexibility in the way objects are serialized and materialized, even to the way the object graphs are traversed during serialization.
 
 The major class is MaObjectSerializer, see it for more information.  It utilizes a MaOidManager, a MaClassIdManager, and a MaObjectGraphTraversalStrategy to create a MaSerializedGraphBuffer, the final object that wraps the ByteArray.
@@ -7,7 +7,7 @@ The major class is MaObjectSerializer, see it for more information.  It utilizes
 License: MIT
 Original Author: Chris Muller (cmm)
 Author: Josef Philip Bernhart (jpb)'!
-!provides: 'Ma-Serializer-Core' 1 4!
+!provides: 'Ma-Serializer-Core' 1 5!
 !requires: 'Ma-Core' 1 1 nil!
 !requires: 'SOLHashTables' 1 4 nil!
 SystemOrganization addCategory: 'Ma-Serializer-Core'!
@@ -301,16 +301,6 @@ MaMinimalObject subclass: #MaMutatingProxy
 	category: 'Ma-Serializer-Core'!
 !classDefinition: 'MaMutatingProxy class' category: 'Ma-Serializer-Core'!
 MaMutatingProxy class
-	instanceVariableNames: ''!
-
-!classDefinition: #MaSerializationStat category: 'Ma-Serializer-Core'!
-ProtoObject subclass: #MaSerializationStat
-	instanceVariableNames: 'timeToSerializeHistory timeToMaterializeHistory houseCleaningTimeHistory'
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Ma-Serializer-Core'!
-!classDefinition: 'MaSerializationStat class' category: 'Ma-Serializer-Core'!
-MaSerializationStat class
 	instanceVariableNames: ''!
 
 
@@ -4043,45 +4033,6 @@ realObjectIfReified
 !MaMutatingProxy methodsFor: 'accessing' stamp: 'cmm 10/25/2010 13:32'!
 setRealObjectTo: anObject
 	self subclassResponsibility! !
-
-!MaSerializationStat methodsFor: 'enumerate' stamp: 'cmm 5/7/2008 15:20'!
-historysDo: aBlock 
-	{ 
-		houseCleaningTimeHistory.
-		timeToMaterializeHistory.
-		timeToSerializeHistory
-	 } do: aBlock! !
-
-!MaSerializationStat methodsFor: 'historys' stamp: 'cmm 5/9/2008 17:04'!
-houseCleaningTimeHistory
-	"MaObjectSerializers must do house-cleaning to maintain good performance but this, itself, consumes a bit of time, which is tracked by this stat."
-	^houseCleaningTimeHistory! !
-
-!MaSerializationStat methodsFor: 'historys' stamp: 'cmm 5/9/2008 17:03'!
-timeToMaterializeHistory
-	"The time spent materializing objects.  In a client-server application, this means materializing requests on the server or responses on the client."
-	^timeToMaterializeHistory! !
-
-!MaSerializationStat methodsFor: 'historys' stamp: 'cmm 5/9/2008 17:03'!
-timeToSerializeHistory
-	"The time spent serializing objects.  In a client-server application, this means serializing requests on the client or responses on the server."
-	^timeToSerializeHistory! !
-
-!MaSerializationStat methodsFor: 'initialize-release' stamp: 'cmm 5/7/2008 17:38'!
-initialize
-	super initialize.
-	houseCleaningTimeHistory _ MaStatHistory name: 'House Cleaning Times'.
-	timeToMaterializeHistory _ MaStatHistory name: 'Time Spent Materializing'.
-	timeToSerializeHistory _ MaStatHistory name: 'Time Spent Serializing'! !
-
-!MaSerializationStat methodsFor: 'ui-support' stamp: 'cmm 4/27/2009 20:50'!
-serializationStats
-	"Statistics related to local serialization and materialization of objects."
-	^ { 
-		timeToSerializeHistory.
-		timeToMaterializeHistory.
-		houseCleaningTimeHistory
-	 }! !
 
 !ProtoObject methodsFor: '*ma-serializer-core' stamp: 'cmm 1/16/2005 13:39'!
 maAsStorageObject
