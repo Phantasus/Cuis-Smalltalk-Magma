@@ -9,6 +9,38 @@ entry is at the bottom. And people mention the author of the entry
 by his shortcut. Also people add their shortcuts to the list of
 authors at the end of the file.
 
+
+# 7. May 2021 (jpb)
+
+Today I extracted the client and server into packages. I harshly
+ripped out the monticello functionality, as this is not needed
+in Cuis. And also any further Squeak dependency, which
+were created in a loaded cuis `SqueakCompability` package and
+then discarded.
+
+Magma modifies everything about a Smalltalk system and the so
+called "well-factored code" means in reality code which was stuck
+too often into packages, I don't understand the codebase when
+it's all over the place. So I mostly merged the classes into 
+in my opinion easier AND LESS categories.
+
+The Server also depended on things in the client package, which
+it shouldn't. Also the server had depedencies on the magma
+collections package, which was not included. I think focusing
+on the packages:
+
+1. `Ma-Client-Server-Core`
+2. `Magma-Client`
+3. `Magma-Server`
+4. `Ma-Serializer-Core`
+5. `SOLHashTables`
+6. `Ma-Core`
+
+is already more than enough. Maybe now getting tests running,
+as far as I have seen now, there are not many tests for the existing
+packages. The only tests I wrote were for the `SOLHashTables`.
+
+
 # 6. May 2021 (jpb)
 
 In the morning I got mail from Chris Muller, who welcomed the porting
