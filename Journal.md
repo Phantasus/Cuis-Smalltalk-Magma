@@ -28,6 +28,11 @@ need to be added again, as they depended on classes in the collections
 package. Which seems to hold the datastructures which are actually serialized
 to "disk" by the server.
 
+So I got finally my hands on the first actual tests, the magma collections
+tests (155 total), meant that only 21 errors (134 passed), which is quiet
+good when I consider it, that I'm still in the dark about the overall
+structure and the exact interactions of these classes.
+
 
 # 7. May 2021 (jpb)
 
