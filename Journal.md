@@ -10,6 +10,25 @@ by his shortcut. Also people add their shortcuts to the list of
 authors at the end of the file.
 
 
+# 8. May 2021 (jpb)
+
+In the morning I extracted the `Ma-Collections` package and 
+smashed again the different categories mostly into one collections
+package, as I found the distinction in private, number, dictionaries
+or canonicalization collections not helpful. Maybe a distinction of
+abstract, ordered, weak, unordered, etc. like Cuis does it is more
+helpful. Atleast now the hierarchy is better visible in the class
+pane of the system browser.
+
+Added the ma collections package as a dependency for the server-client-core,
+could be in theory moved to the server. I'm unsure about the connection.
+
+Now the deleted classes which were present in the `Magma-Server` package
+need to be added again, as they depended on classes in the collections
+package. Which seems to hold the datastructures which are actually serialized
+to "disk" by the server.
+
+
 # 7. May 2021 (jpb)
 
 Today I extracted the client and server into packages. I harshly
