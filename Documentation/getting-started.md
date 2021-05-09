@@ -13,9 +13,8 @@ in what mode would your magma be running and follow these steps:
 ## Step 1: Creating a repository
 To create a repository, you must provide two things:
 
-    a path to the directory magma may use to keep and maintain its files
-    the root object of the repository 
-
+1. a path to the directory magma may use to keep and maintain its files
+2. the root object of the repository 
 
 Magma maintains a single directory on the filesystem for each
 repository. When creating or opening Magma repositories, specify a
