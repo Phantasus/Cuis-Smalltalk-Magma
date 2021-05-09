@@ -1,11 +1,9 @@
 # Eliminate all wasteful processing
-
 The key to good performance with Magma is to not do wasteful
 processing. Smalltalk favors dynamic agility over speed, which
 provides both the ability and need to avoid unnecessary processing.
 
 # Optimize Caching
-
 When an application is running Magma code it is not running its own
 code. Magma code is run when objects which are not in memory (e.g., a
 Proxy) are accessed by the application. The `MagmaSession` does not
@@ -98,7 +96,7 @@ With a connected Magma session, evaluate:
 
 ```smalltalk
  mySession cachedObjectCount
-```
+``
 
 This number reprensents how many entries Magma has in its
 IdentityDictionaries. Magma tries to avoid the performance issues
@@ -146,17 +144,15 @@ MagmaHashTable uses an internal MagmaSolHashTable, which, internally
 uses a MagmaArray. MagmaArray is the fastest large-collection possible
 with Magma (and what PreallocatedDictionary is based on).
 
-
-# About MagmaCollection Performance
-
+About MagmaCollection Performance
 By contrast, MagmaCollections are somewhat "tacked on" to Magma. They
-use a special file-structure on the server side that provides `O(log n)`
+use a special file-structure on the server side that provides O(log n)
 (where n is the chosen record-size) access. However, they are the
 collection that provides server-side query processing. So if
 relational-style querying is absolutely needed, they can be one
 option.
 
-`MagmaCollections` have fair read performance, but adding and removing
+MagmaCollections have fair read performance, but adding and removing
 objects is very slow. In theory, starting with an empty
 MagmaCollection, the rate-of-insertion will deteriorate somewhat
 before settling on a relatively fixed rate, IF you have a good
@@ -168,7 +164,7 @@ costly to keep adding more of that key because a linear search for the
 insertion. So, for example, when you build a simple keyword index,
 consider eliminating prepositions such as "the" and "at".
 
-Removing from `MagmaCollections` is even more expensive than
+Removing from MagmaCollections is even more expensive than
 insertions. Avoid using this operation for performance-intensive
 operations.
 
