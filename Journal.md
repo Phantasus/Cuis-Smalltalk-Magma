@@ -9,6 +9,23 @@ entry is at the bottom. And people mention the author of the entry
 by his shortcut. Also people add their shortcuts to the list of
 authors at the end of the file.
 
+# 9. May 2021 (jpb)
+
+Today I got the `Ma-Collections` tests running and the `MaHashIndexTester`
+test, this last testcase takes hours as it writes out in the filesystem
+an index file in different keys and record formats and then inserts
+values into and verifies them, this seems to take time. I'm unsure
+about the behaviour, as I haven't yet read and fully understood
+the test.
+
+The code of the `Ma-Collections` tests failed previously, because
+they expected that basic collections like `Dictionary` behaved
+in a Squeak way, but we are in Cuis, here things are different.
+
+I added from the swiki (Squeak wiki) different documentation
+pages, so that should the wiki go down, there is still a minimal
+documentation of the rough behaviour of magma.
+
 
 # 8. May 2021 (jpb)
 
