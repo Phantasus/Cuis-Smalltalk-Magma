@@ -9,10 +9,23 @@ entry is at the bottom. And people mention the author of the entry
 by his shortcut. Also people add their shortcuts to the list of
 authors at the end of the file.
 
+# 10. May 2021 (jpb)
+
+As I asked Chris Muller (cmm) why the test takes longer I got the
+answer, that it's supposed to take longer and that he may rewrite
+it at some time. I disabled it, with an if statement and an assert,
+as the Cuis TestCase lacks a `skip` method, that could be an extension.
+Which I did with all the `MaHashIndexTester` tests, as the rest takes
+about 1 to 5 minutes. They all passed, but for a unit testsuite that is
+a little bit too long, in theory they should be part of an integration
+or system testsuite.
+
+
 # 9. May 2021 (jpb)
 
 Today I got the `Ma-Collections` tests running and the `MaHashIndexTester`
-test, this last testcase takes hours as it writes out in the filesystem
+test, this last testcase takes hours, to more precise that seems to be
+the `#testFullDepthKeyInsertionThenPullOu` test, as it writes out in the filesystem
 an index file in different keys and record formats and then inserts
 values into and verifies them, this seems to take time. I'm unsure
 about the behaviour, as I haven't yet read and fully understood

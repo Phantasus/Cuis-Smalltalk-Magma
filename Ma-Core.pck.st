@@ -1,10 +1,10 @@
-'From Cuis 5.0 [latest update: #4588] on 7 May 2021 at 9:53:02 am'!
+'From Cuis 5.0 [latest update: #4588] on 10 May 2021 at 6:16:06 am'!
 'Description Core of magma object oriented database
 
 License: MIT
 Original Author: Chris Muller (cmm)
 Author: Josef Philip Bernhart (jpb)'!
-!provides: 'Ma-Core' 1 1!
+!provides: 'Ma-Core' 1 3!
 SystemOrganization addCategory: 'Ma-Core'!
 
 
@@ -493,18 +493,20 @@ environmentDirectory
 suite
 	^ suite! !
 
-!MaTestCase methodsFor: 'file management' stamp: 'cmm 12/5/2002 23:11'!
+!MaTestCase methodsFor: 'file management' stamp: 'jpb 5/10/2021 06:15:51'!
 deleteFilesNamed: aCollection
 
-	aCollection do:
-		[ :each |
-		StandardFileStream allInstances do:
-			[ :eachStream |
+	aCollection do: 	[ :each |
+		| fileEntry |
+		fileEntry _ each asFileEntry.
+		
+		StandardFileStream allInstances do: [ :eachStream |
 			eachStream fullName = each ifTrue:
 				[ self notify: 'closing a rogue FileStream for ', eachStream fullName.
 				eachStream close ] ].
-		self notify: 'deleting file ', each.
-		(FileDirectory forFileName: each) deleteFileNamed: each ]! !
+		
+		self notify: 'deleting file ', fileEntry asString.
+		 fileEntry delete ]! !
 
 !MaTestCase methodsFor: 'private' stamp: 'cmm 1/5/2013 10:10'!
 notify: aString 
