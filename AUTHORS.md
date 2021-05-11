@@ -14,7 +14,7 @@ The affected reference files where extracted on 5th May 2021
 by Josef Philip Bernhart (jpb) for later porting efforts
 and put into the References directory. 
 
-They were extracted by using the Squea5.2 version of the
+They were extracted by using the Squeak5.2 version of the
 SqueakMap configuration.
 
 As mentioned in the Skwiki entry:
