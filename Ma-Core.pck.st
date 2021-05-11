@@ -1,10 +1,10 @@
-'From Cuis 5.0 [latest update: #4588] on 11 May 2021 at 3:58:36 am'!
+'From Cuis 5.0 [latest update: #4579] on 11 May 2021 at 4:59:26 pm'!
 'Description Core of magma object oriented database
 
 License: MIT
 Original Author: Chris Muller (cmm)
 Author: Josef Philip Bernhart (jpb)'!
-!provides: 'Ma-Core' 1 4!
+!provides: 'Ma-Core' 1 6!
 SystemOrganization addCategory: 'Ma-Core'!
 
 
@@ -590,6 +590,34 @@ testAppend
 copyright
 	^ 'Copyright ', Date today year asString , ', Muller Automation LLC,, All Rights Reserved.'! !
 
+!MaAttributableObject methodsFor: 'copying' stamp: 'cmm 2/3/2016 17:39'!
+attributesNotToDeepCopy
+	^ (self attributeNamed: #attributesNotToDeepCopy) ifNil: [ Array empty ]! !
+
+!MaAttributableObject methodsFor: 'copying' stamp: 'cmm 2/3/2016 17:40'!
+attributesNotToDeepCopy: anArray
+	^ (self attributeNamed: #attributesNotToDeepCopy) ifNil: [ Array empty ]! !
+
+!MaAttributableObject methodsFor: 'copying' stamp: 'cmm 2/3/2016 11:02'!
+attributesToDeepCopy
+	"Subclasses override."
+	^ (attributes
+		ifNil: [ Array empty ]
+		ifNotNil: [ attributes keys ]) copyWithoutAll: self attributesNotToDeepCopy! !
+
+!MaAttributableObject methodsFor: 'copying' stamp: 'cmm 7/4/2013 20:25'!
+veryDeepInner: aDeepCopier 
+	super veryDeepInner: aDeepCopier.
+	attributes _ attributes copy.
+	self attributesToDeepCopy do:
+		[ : eachAttribute | attributes
+			at: eachAttribute
+			ifPresent:
+				[ : value | attributes
+					at: eachAttribute
+					put: (value veryDeepCopyWith: aDeepCopier) ]
+			ifAbsent: [ self error: eachAttribute , ' is not an attribute.' ] ]! !
+
 !MaAttributableObject methodsFor: 'attributes' stamp: 'cmm 4/9/2010 14:43'!
 attributeNamed: aString 
 	^ attributes ifNotNil: 
@@ -624,34 +652,6 @@ removeAttributeNamed: aString
 			ifAbsent: [ nil ].
 		attributes ifEmpty: [ attributes _ nil ].
 		answer ]! !
-
-!MaAttributableObject methodsFor: 'copying' stamp: 'cmm 2/3/2016 17:39'!
-attributesNotToDeepCopy
-	^ (self attributeNamed: #attributesNotToDeepCopy) ifNil: [ Array empty ]! !
-
-!MaAttributableObject methodsFor: 'copying' stamp: 'cmm 2/3/2016 17:40'!
-attributesNotToDeepCopy: anArray
-	^ (self attributeNamed: #attributesNotToDeepCopy) ifNil: [ Array empty ]! !
-
-!MaAttributableObject methodsFor: 'copying' stamp: 'cmm 2/3/2016 11:02'!
-attributesToDeepCopy
-	"Subclasses override."
-	^ (attributes
-		ifNil: [ Array empty ]
-		ifNotNil: [ attributes keys ]) copyWithoutAll: self attributesNotToDeepCopy! !
-
-!MaAttributableObject methodsFor: 'copying' stamp: 'cmm 7/4/2013 20:25'!
-veryDeepInner: aDeepCopier 
-	super veryDeepInner: aDeepCopier.
-	attributes _ attributes copy.
-	self attributesToDeepCopy do:
-		[ : eachAttribute | attributes
-			at: eachAttribute
-			ifPresent:
-				[ : value | attributes
-					at: eachAttribute
-					put: (value veryDeepCopyWith: aDeepCopier) ]
-			ifAbsent: [ self error: eachAttribute , ' is not an attribute.' ] ]! !
 
 !MaAttributableObject methodsFor: 'remember/restore' stamp: 'cmm 12/7/2009 17:02'!
 rememberAttributes
@@ -2687,8 +2687,9 @@ string
 subStrings
 	^ self string subStrings! !
 
-!MauiPage methodsFor: 'access' stamp: 'cmm 11/19/2007 20:56'!
+!MauiPage methodsFor: 'access' stamp: 'jpb 5/11/2021 16:59:25'!
 text
+	"Returns text"
 	^ text! !
 
 !MauiPage methodsFor: 'access' stamp: 'cmm 12/20/2007 23:18'!
@@ -3108,6 +3109,25 @@ highlighted
 			(self luminance > 0.5
 				ifTrue: [ -0.15 ]
 				ifFalse: [ 0.15 ])! !
+
+!UndefinedObject methodsFor: '*ma-core' stamp: 'cmm 11/7/2018 20:57'!
+commandOutput: aString
+	"Execute aString as a command to the Linux host.  A redirect of stdout to a randomly named file is automatically appended (e.g., ' > _cmd-9p9o9v6lrwb3dtwy1bgs75nri.out') so the output of the command can be scooped up and returned here.
+	Example: 
+		OSProcess commandOutput: 'hostname' "
+	^ (self commandToOutput: [ : fn | aString, ' > ', fn ]) withBlanksTrimmed! !
+
+!UndefinedObject methodsFor: '*ma-core' stamp: 'cmm 11/7/2018 20:55'!
+commandToOutput: oneArgBlock
+	"The receiver passes the name of a temporary file to be used for the command output to oneArgBlock.  The user crafts their command to output to that file name, whose contents are then returned upon completion and the file automatically deleted afterward.  This covers the vast majority of uses of OSProcess command:.
+	Example: 
+		OSProcess cmd: [ : fn | 'hostname > ', fn ]"
+	| filename |
+	filename _ FileDirectory default fullNameFor: '_cmd-' , UUID new asString36 , '.out'.
+	self waitForCommand: (oneArgBlock value: filename).
+	^ [ FileStream
+		fileNamed: filename
+		do: [ : stream | stream contents withBlanksTrimmed ] ] ensure: [ FileDirectory default deleteFileNamed: filename ]! !
 
 !UndefinedObject methodsFor: '*ma-core' stamp: 'cmm 10/31/2009 12:31'!
 hand
@@ -3759,17 +3779,6 @@ messagePartsWithIndexDo: twoArgBlock
 		[ : each | twoArgBlock
 			value: each
 			value: (index _ index + 1) ]! !
-
-!ByteString methodsFor: '*ma-core' stamp: 'cmm 11/10/2005 20:48'!
-maAlphabeticalNext
-	"Answer the next higher String.  This is useful in indexing systems to search for left-side matching strings."
-	| nextValue stream |
-	nextValue _ (self asByteArray inject: 0 into: [ :sum :each | sum * 256 + each ]) + 1.
-	stream _ WriteStream on: ByteArray new.
-	nextValue digitLength to: 1 by: -1 do:
-		[ : digitIndex |
-		stream nextPut: (nextValue digitAt: digitIndex) ].
-	^ stream contents asString! !
 
 !ByteArray methodsFor: '*ma-core' stamp: 'cbc 8/8/2016 10:08'!
 hostNumber
@@ -4469,375 +4478,6 @@ maAddFile: filename as: anotherFileName
 	Smalltalk isLinux ifTrue: [ member saveLinuxPermissions ].
 	^ member! !
 
-!BlockContext methodsFor: '*ma-core' stamp: 'cmm 3/23/2003 22:40'!
-maOn: exc1 do: block1 on: exc2 do: block2
-
-	^[
-		[ self value ]
-			on: exc1
-			do: block1 ]
-
-		on: exc2
-		do: block2! !
-
-!BlockContext methodsFor: '*ma-core' stamp: 'cmm 3/23/2003 22:43'!
-maOn: exc1 do: block1 on: exc2 do: block2 on: exc3 do: block3
-
-	^[
-		[ self value ]
-			on: exc1
-			do: block1 ]
-
-		maOn: exc2
-		do: block2
-
-		on: exc3
-		do: block3! !
-
-!FileDirectory methodsFor: '*ma-core' stamp: 'cmm 2/20/2009 16:02'!
-asFileDirectory
-	^ self! !
-
-!FileDirectory methodsFor: '*ma-core' stamp: 'cmm 2/18/2009 15:03'!
-directoryName
-	"Answer the directory to shell to for this item."
-	^self pathName! !
-
-!FileDirectory methodsFor: '*ma-core' stamp: 'cmm 3/23/2007 12:12'!
-maCopyFileNamed: sourceFilename toDirectory: aFileDirectory 
-	| sourceStream |
-	sourceStream _ (self readOnlyFileNamed: sourceFilename) binary.
-	^ aFileDirectory 
-		putFile: sourceStream
-		named: (aFileDirectory localNameFor: sourceFilename)! !
-
-!FileDirectory methodsFor: '*ma-core' stamp: 'cmm 3/19/2009 22:10'!
-maDetectFile: whereBlock ifFound: foundBlock ifNone: noneBlock 
-	^ (self maFindEntries: whereBlock) 
-		ifEmpty: noneBlock
-		ifNotEmptyDo: [ : results | foundBlock value: results anyOne ]! !
-
-!FileDirectory methodsFor: '*ma-core' stamp: 'cmm 4/8/2002 20:52'!
-maEntriesMatching: pat
-	"FileDirectory default fileNamesMatching: '*'"
-
-	^ self entries select: [ :each | pat match: each name ]
-! !
-
-!FileDirectory methodsFor: '*ma-core' stamp: 'cmm 4/21/2009 13:45'!
-maFileNamed: aString do: oneArgBlock 
-	"A convenient accessing method for accessing a file without having to open and close yourself.  The oneArgBlock argument is the fileStream."
-	| fileStream |
-	fileStream _ StandardFileStream fileNamed: (self fullNameFor: aString).
-	fileStream ifNil: [ MaEnvironmentError signal: 'Could not open ' , aString , ' in use?' ].
-	^ [ oneArgBlock value: fileStream ] ensure: [ fileStream close ]! !
-
-!FileDirectory methodsFor: '*ma-core' stamp: 'cmm 12/4/2007 22:44'!
-maFindEntries: oneArgBlock 
-	"Traverse my directory and answer an OrderedCollection of DirectoryEntry's whose path of DirectoryEntry's causes oneArgBlock to value true."
-	| answer |
-	answer _ OrderedCollection new.
-	self directoryTreeDo: [ : path | (oneArgBlock value: path) ifTrue: [ answer add: path last ] ].
-	^ answer! !
-
-!FileDirectory methodsFor: '*ma-core' stamp: 'cmm 9/20/2007 17:31'!
-maFindEntriesMatching: substring 
-	"Traverse my directory and answer an OrderedCollection of DirectoryEntry's whose names contain substring."
-	"This method focuses on user-convenience; eschewing complex wild-card matching in favor of 'type-and-go'.  But without punishing engineers who still want to use wild-card matching."
-	| usePatternMatch |
-	usePatternMatch _ substring includesAnyOf: #($* $# ).
-	^ self maFindEntries: 
-		[ : path | 
-		path last name in: 
-			[ : theName | 
-			usePatternMatch 
-				ifTrue: [ substring match: theName ]
-				ifFalse: 
-					[ theName 
-						includesSubstring: substring
-						caseSensitive: false ] ] ]! !
-
-!FileDirectory methodsFor: '*ma-core' stamp: 'cmm 7/7/2015 15:16'!
-maNameFor: filename relativeTo: containingDirectory 
-	"Assume that I am contained somewhere in the tree of containingDirectory.  Answer the semi-qualified name for filename, qualified from containingDirectory down to this location."
-	| fullName |
-	fullName _ self fullNameFor: filename.
-	^ fullName = containingDirectory pathName
-		ifTrue: [ String empty ]
-		ifFalse:
-			[ fullName
-				copyFrom: containingDirectory pathName size + 2
-				to: fullName size ]! !
-
-!FileDirectory class methodsFor: '*ma-core' stamp: 'cmm 4/21/2009 22:12'!
-maDirectoryEntryFor: fullyQualifiedFilename 
-	"Given fullyQualifiedFilename, answer a DirectoryEntryFile if fullyQualifiedFilename is a file, or a DirectoryEntryDirectory if it refers to a directory."
-	^ (FileDirectory on: fullyQualifiedFilename) in: [ : fd | fd containingDirectory entryAt: fd localName ]! !
-
-!PackageInfo methodsFor: '*ma-core' stamp: 'cmm 3/20/2009 16:26'!
-calculatePrerequisitesUsingMap: map 
-	^ map at: self! !
-
-!PackageInfo methodsFor: '*ma-core' stamp: 'cmm 12/22/2016 19:04'!
-dependentPackageInfos
-	| answer |
-	answer _ Set new.
-	self externalUsers do: [ : each | each key packageInfo ifNotNilDo: [ : pi | answer add: pi ] ].
-	self externalSubclasses do: [ : each | each packageInfo ifNotNilDo: [ : pi | answer add: pi ] ].
-	^ answer asArray! !
-
-!PackageInfo methodsFor: '*ma-core' stamp: 'cmm 3/21/2009 18:22'!
-packageNames
-	"My name and the names of the all direct and indirect prerequistes."
-	^ self allPrerequisitePackageNames
-		add: self packageName ;
-		yourself! !
-
-!PackageInfo methodsFor: '*ma-core' stamp: 'cmm 3/18/2009 21:06'!
-repositories
-	^ self workingCopy repositoryGroup repositories! !
-
-!PackageInfo methodsFor: '*ma-core' stamp: 'cmm 9/7/2013 11:13'!
-whyNeeded: anotherPackage 
-	| answer |
-	answer _ OrderedCollection new.
-	anotherPackage externalUsers do: 
-		[ : each | 
-		each key packageInfo ifNotNilDo: [ : pi | pi = self ifTrue: [ answer add: each ] ] ].
-	anotherPackage externalSubclasses do: 
-		[ : each | 
-		each packageInfo ifNotNilDo: [ : pi | pi = self ifTrue: [ answer add: each ] ] ].
-	^ answer! !
-
-!SecureHashAlgorithm methodsFor: '*ma-core' stamp: 'cmm 6/9/2005 11:55'!
-maHashMessage: aStringOrByteArray from: startPos to: stopPos
-	"Hash the given message using the Secure Hash Algorithm."
-
-	^ self
-		maHashStream: 
-			((ReadStream on: aStringOrByteArray asByteArray)
-				position: startPos-1 ;
-				yourself)
-		to: stopPos! !
-
-!SecureHashAlgorithm methodsFor: '*ma-core' stamp: 'cmm 2/24/2013 16:30'!
-maHashStream: aPositionableStream to: endPosition
-	"Hash the contents of the given stream from the current position to endPosition using the Secure Hash Algorithm. The SHA algorithm is defined in FIPS PUB 180-1. It is also described on p. 442 of 'Applied Cryptography: Protocols, Algorithms, and Source Code in C' by Bruce Scheier, Wiley, 1996."
-	"SecureHashAlgorithm new hashStream: (ReadStream on: 'foo')"
-
-	| startPosition buf bitLength |
-	self initializeTotals.
-
-	"(SecureHashAlgorithm new hashMessage: '') radix: 16 	
-	=> 'DA39A3EE5E6B4B0D3255BFEF95601890AFD80709'"
-	aPositionableStream position >= endPosition ifTrue: [self processFinalBuffer: #() bitLength: 0].
-
-	startPosition _ aPositionableStream position.
-	[aPositionableStream position >= endPosition] whileFalse: [
-		buf _ aPositionableStream next: (64 min: (endPosition-aPositionableStream position)).
-		((aPositionableStream position >= endPosition) not and: [buf size = 64])
-			ifTrue: [self processBuffer: buf]
-			ifFalse: [
-				bitLength _ ((aPositionableStream position min: endPosition) - startPosition) * 8.
-				self processFinalBuffer: buf bitLength: bitLength]].
-
-	^ self finalHash
-! !
-
-!ServerDirectory methodsFor: '*ma-core' stamp: 'cmm 4/4/2007 09:43'!
-assureAbsence
-	self exists ifTrue: [ self recursiveDelete ]! !
-
-!ServerDirectory methodsFor: '*ma-core' stamp: 'cmm 4/4/2007 17:20'!
-maCopyFileNamed: sourceFilename toDirectory: aFileDirectory 
-	| sourceStream |
-	sourceStream _ (self readOnlyFileNamed: sourceFilename) binary.
-	^ [ aFileDirectory 
-		putFile: sourceStream
-		named: (aFileDirectory localNameFor: sourceFilename) ]
-
-		ensure: [ sourceStream close ]! !
-
-!SketchMorph methodsFor: '*ma-core' stamp: 'cmm 3/31/2016 14:10'!
-colorPixels: aBlock 
-	self form colorPixels: aBlock! !
-
-!SketchMorph methodsFor: '*ma-core' stamp: 'cmm 3/31/2016 14:16'!
-erasePixels: aBlock 
-	self colorPixels:
-		[ : each | (aBlock value: (self form colorAt: each)) ifTrue: [ Color transparent ] ]! !
-
-!SmalltalkImage methodsFor: '*ma-core' stamp: 'cmm 1/2/2013 15:04'!
-changesEntry
-	^ FileDirectory default entryAt: (FileDirectory localNameFor: Smalltalk changesName)! !
-
-!SmalltalkImage methodsFor: '*ma-core' stamp: 'cmm 12/29/2014 15:30'!
-defaultMaxMemory
-	"Images can be up to 1GB (512MB on Windows) when the -memory parameter is not specified."
-	^ self isRunningSpur
-		ifTrue: [ 3800000000 ]
-		ifFalse:
-			[ Smalltalk platformName = 'Win32'
-				ifTrue: [ 500000000 ]
-				ifFalse: [ 1000000000 ] ]! !
-
-!SmalltalkImage methodsFor: '*ma-core' stamp: 'cmm 11/13/2015 13:15'!
-hasMagma
-	"Answer whether some version of Magma is installed on this system."
-	^ Smalltalk hasClassNamed: #MagmaSession! !
-
-!SmalltalkImage methodsFor: '*ma-core' stamp: 'cmm 6/18/2011 14:25'!
-hasMaui
-	"Answer whether some version of Maui is installed on this system."
-	^ Smalltalk hasClassNamed: #MauiWorld! !
-
-!SmalltalkImage methodsFor: '*ma-core' stamp: 'cmm 7/18/2016 16:05'!
-headlessMitigation
-	"If I'm headless and RFB is present, start an RFBServer on port identified by rfbPort."
-	(Smalltalk classNamed: #RFBServer) ifNotNil:
-		[ : rfbServer | "RFBServer will add 5900 to the port, so we're not using the same port # twice."
-		rfbServer
-			 setEncryptedFullPassword: #[147 229 129 70 7 14 51 97] ;
-			 start: (self rfbPort ifNil: [ 5900 ])-5900 ]! !
-
-!SmalltalkImage methodsFor: '*ma-core' stamp: 'cmm 1/2/2013 15:04'!
-imageEntry
-	^ FileDirectory default entryAt: (FileDirectory localNameFor: Smalltalk imageName)! !
-
-!SmalltalkImage methodsFor: '*ma-core' stamp: 'cmm 11/7/2018 21:08'!
-isLinux
-	^ self platformName = 'unix'! !
-
-!SmalltalkImage methodsFor: '*ma-core' stamp: 'cmm 10/10/2010 21:30'!
-maAuthorInitials
-	^ (Smalltalk hasClassNamed: #Utilities)
-		ifTrue:
-			[ | init |
-			init _ (Smalltalk classNamed: #Utilities) authorInitialsPerSe.
-			init isEmptyOrNil
-				ifTrue: [ 'unknown' ]
-				ifFalse: [ init ] ]
-		ifFalse: [ 'unknown' ]! !
-
-!SmalltalkImage methodsFor: '*ma-core' stamp: 'cmm 9/23/2008 14:59'!
-maIsLowOnMemory
-	"Answer whether the VM is within ten-million bytes of available memory.  The goal is to avoid the LowSpace warning."
-	^ self maMemoryAvailable < 10000000! !
-
-!SmalltalkImage methodsFor: '*ma-core' stamp: 'cmm 10/12/2013 18:20'!
-maMaxMemory
-	"If the special argument to the vm, -memory, was provided, use number following it.  Else 450MB."
-	| foundMemoryArg |
-	foundMemoryArg _ false.
-	self optionsDo: 
-		[ : each | 
-		(#('-memory' '-mmap') includes: each)
-			ifTrue: [ foundMemoryArg _ true ]
-			ifFalse: 
-				[ foundMemoryArg ifTrue: 
-					[ | arg |
-					arg _ each.
-					(arg isEmptyOrNil or: [ arg size < 2 ]) ifFalse: 
-						[ | requestedMemory |
-						requestedMemory _ (arg 
-							copyFrom: 1
-							to: arg size - 1) asNumber.
-						requestedMemory > 0 ifTrue: 
-							[ arg last = $k 
-								ifTrue: [ ^ 1000 * requestedMemory ]
-								ifFalse: [ arg last = $m ifTrue: [ ^ 1000000 * requestedMemory ] ] ] ] ] ] ].
-	^ self defaultMaxMemory! !
-
-!SmalltalkImage methodsFor: '*ma-core' stamp: 'cmm 9/23/2008 15:06'!
-maMemoryAvailable
-	"Answer the remaining memory available accessible by this image."
-	^ self maMaxMemory - self maMemoryUsed! !
-
-!SmalltalkImage methodsFor: '*ma-core' stamp: 'cmm 3/1/2013 15:05'!
-maMemoryUsed
-	^ self vmParameterAt: 3! !
-
-!SmalltalkImage methodsFor: '*ma-core' stamp: 'cmm 4/11/2010 18:09'!
-maSaveAs: newName 
-	"Save the image  under that new name."
-	newName ifNil: [ ^ self ].
-	(SourceFiles at: 2) ifNotNil: 
-		[ self
-			closeSourceFiles ;
-			saveChangesInFileNamed: (self fullNameForChangesNamed: newName)	"so copying the changes file will always work" ].
-	self saveImageInFileNamed: (self fullNameForImageNamed: newName)! !
-
-!SmalltalkImage methodsFor: '*ma-core' stamp: 'cmm 7/19/2015 21:00'!
-mitigateIfHeadless
-	self isHeadless ifTrue: [ self headlessMitigation ]! !
-
-!SmalltalkImage methodsFor: '*ma-core' stamp: 'cmm 6/29/2016 17:17'!
-rfbPort
-	"Answer the specified port to be used by the RFB server."
-	#('rfbPort' 'port' ) do:
-		[:eachPortFile | (FileDirectory default fileExists: eachPortFile) and: [^ FileStream
-				fileNamed: eachPortFile
-				do:
-					[:stream | stream contents asInteger]]].
-	^ nil! !
-
-!SmalltalkImage methodsFor: '*ma-core' stamp: 'cmm 3/25/2013 20:24'!
-shortImageName
-	"The name of this image, sans path and extension."
-	^ self imageEntry name copyUpToLast: $.! !
-
-!SolidFillStyle methodsFor: '*ma-core' stamp: 'cmm 12/8/2008 13:41'!
-changeColorIn: aMorph event: evt
-	"Note: This is just a workaround to make sure we don't use the old color inst var"
-	aMorph changeColorTarget: aMorph selector: #fillStyle: originalColor: self hand: evt hand! !
-
-!DirectoryEntryFile methodsFor: '*ma-core-private' stamp: 'cmm 9/13/2007 17:54'!
-contributeStatisticsTo: aDirectoryEntryDirectory 
-	"Add my size information to the cumulative total in aDirectoryEntryDirectory."
-	aDirectoryEntryDirectory addToTotalSize: self fileSize! !
-
-!DirectoryEntryFile methodsFor: '*ma-core' stamp: 'cmm 2/12/2009 18:44'!
-directoryName
-	"Answer the directory to shell to for this item."
-	^ self containingDirectory pathName! !
-
-!DirectoryEntryFile methodsFor: '*ma-core-private' stamp: 'cmm 9/13/2007 17:49'!
-incrementDirectoryOrFileCount: twoElementArray 
-	twoElementArray 
-		at: 2
-		put: (twoElementArray at: 2) + 1! !
-
-!DirectoryEntryFile methodsFor: '*ma-core' stamp: 'cmm 11/7/2018 20:49'!
-linuxPermissions
-	"Answer the linux permissions of the receiver file cut from the first 10 characters of the ls -l listing (e.g.'-rw-------')."
-	^ self lsOutput copyFrom: 1 to: 10! !
-
-!DirectoryEntryFile methodsFor: '*ma-core' stamp: 'cmm 10/11/2009 19:31'!
-localFileName
-	"For compatibility with ZipArchiveMember."
-	^ self name! !
-
-!DirectoryEntryFile methodsFor: '*ma-core' stamp: 'cmm 11/7/2018 20:59'!
-lsOutput
-	"Answer the output of 'ls -l myFullName' in Linux."
-	^ OSProcess commandOutput: 'ls -l ', self fullName! !
-
-!DirectoryEntryFile methodsFor: '*ma-core' stamp: 'cmm 9/20/2007 17:07'!
-totalFileSize
-	"API compatible with DirectoryEntryDirectory>>#totalFileSize, but just answers my fileSize."
-	^ self fileSize! !
-
-!SystemNavigation methodsFor: '*ma-core' stamp: 'cmm 1/2/2005 23:31'!
-maAllMethodReferencesDo: aBlock
-	"Value aBlock for every method in the system."
-	Cursor execute showWhile:
-		[ self
-			allBehaviorsDo:
-				[ : class |
-				class selectorsDo:
-					[ : sel | 
-					aBlock value: (MethodReference class: class selector: sel) ] ] ]! !
-
 !ZipArchive methodsFor: '*ma-core' stamp: 'cmm 10/30/2009 16:36'!
 filesDo: aBlock tempDir: aFileDirectory 
 	"Value aBlock with each DirectoryEntryFile in the receiver, after extracting it to aFileDirectory.  aFileDirectory is deleted after all members are valued."
@@ -4886,25 +4526,6 @@ stream
 !ZipStringMember methodsFor: '*ma-core' stamp: 'cmm 11/7/2018 21:58'!
 stream
 	^ stream! !
-
-!OSProcess class methodsFor: '*ma-core' stamp: 'cmm 11/7/2018 20:57'!
-commandOutput: aString
-	"Execute aString as a command to the Linux host.  A redirect of stdout to a randomly named file is automatically appended (e.g., ' > _cmd-9p9o9v6lrwb3dtwy1bgs75nri.out') so the output of the command can be scooped up and returned here.
-	Example: 
-		OSProcess commandOutput: 'hostname' "
-	^ (self commandToOutput: [ : fn | aString, ' > ', fn ]) withBlanksTrimmed! !
-
-!OSProcess class methodsFor: '*ma-core' stamp: 'cmm 11/7/2018 20:55'!
-commandToOutput: oneArgBlock
-	"The receiver passes the name of a temporary file to be used for the command output to oneArgBlock.  The user crafts their command to output to that file name, whose contents are then returned upon completion and the file automatically deleted afterward.  This covers the vast majority of uses of OSProcess command:.
-	Example: 
-		OSProcess cmd: [ : fn | 'hostname > ', fn ]"
-	| filename |
-	filename _ FileDirectory default fullNameFor: '_cmd-' , UUID new asString36 , '.out'.
-	self waitForCommand: (oneArgBlock value: filename).
-	^ [ FileStream
-		fileNamed: filename
-		do: [ : stream | stream contents withBlanksTrimmed ] ] ensure: [ FileDirectory default deleteFileNamed: filename ]! !
 MaCoreConstants initialize!
 MaCommandLineProcessor initialize!
 MaSingleton initialize!

@@ -1,10 +1,10 @@
-'From Cuis 5.0 [latest update: #4588] on 11 May 2021 at 4:34:21 pm'!
+'From Cuis 5.0 [latest update: #4579] on 11 May 2021 at 5:00:03 pm'!
 'Description Package containing the magma client implementation
 
 License: MIT
 Original Author: Chris Muller (cmm)
 Author: Josef Philip Bernhart (jpb)'!
-!provides: 'Magma-Client' 1 2!
+!provides: 'Magma-Client' 1 3!
 SystemOrganization addCategory: 'Magma-Client'!
 SystemOrganization addCategory: 'Magma-Client-Exceptions'!
 SystemOrganization addCategory: 'Magma-Client-MagmaCollections'!
@@ -29,96 +29,6 @@ MaCorruptionError subclass: #MagmaCorruptionError
 	category: 'Magma-Client-Exceptions'!
 !classDefinition: 'MagmaCorruptionError class' category: 'Magma-Client-Exceptions'!
 MagmaCorruptionError class
-	instanceVariableNames: ''!
-
-!classDefinition: #MagmaEnvironmentError category: 'Magma-Client-Exceptions'!
-MaClientServerEnvironmentError subclass: #MagmaEnvironmentError
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Magma-Client-Exceptions'!
-!classDefinition: 'MagmaEnvironmentError class' category: 'Magma-Client-Exceptions'!
-MagmaEnvironmentError class
-	instanceVariableNames: ''!
-
-!classDefinition: #MagmaDifferentBranch category: 'Magma-Client-Exceptions'!
-MagmaEnvironmentError subclass: #MagmaDifferentBranch
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Magma-Client-Exceptions'!
-!classDefinition: 'MagmaDifferentBranch class' category: 'Magma-Client-Exceptions'!
-MagmaDifferentBranch class
-	instanceVariableNames: ''!
-
-!classDefinition: #MagmaGarbageCollectedObject category: 'Magma-Client-Exceptions'!
-MagmaEnvironmentError subclass: #MagmaGarbageCollectedObject
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Magma-Client-Exceptions'!
-!classDefinition: 'MagmaGarbageCollectedObject class' category: 'Magma-Client-Exceptions'!
-MagmaGarbageCollectedObject class
-	instanceVariableNames: ''!
-
-!classDefinition: #MagmaReadServerTooFarBehind category: 'Magma-Client-Exceptions'!
-MagmaEnvironmentError subclass: #MagmaReadServerTooFarBehind
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Magma-Client-Exceptions'!
-!classDefinition: 'MagmaReadServerTooFarBehind class' category: 'Magma-Client-Exceptions'!
-MagmaReadServerTooFarBehind class
-	instanceVariableNames: ''!
-
-!classDefinition: #MagmaTooFarBehindError category: 'Magma-Client-Exceptions'!
-MagmaEnvironmentError subclass: #MagmaTooFarBehindError
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Magma-Client-Exceptions'!
-!classDefinition: 'MagmaTooFarBehindError class' category: 'Magma-Client-Exceptions'!
-MagmaTooFarBehindError class
-	instanceVariableNames: ''!
-
-!classDefinition: #MagmaUnavailableCommitRecord category: 'Magma-Client-Exceptions'!
-MagmaEnvironmentError subclass: #MagmaUnavailableCommitRecord
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Magma-Client-Exceptions'!
-!classDefinition: 'MagmaUnavailableCommitRecord class' category: 'Magma-Client-Exceptions'!
-MagmaUnavailableCommitRecord class
-	instanceVariableNames: ''!
-
-!classDefinition: #MagmaUnconnectableSessionError category: 'Magma-Client-Exceptions'!
-MagmaEnvironmentError subclass: #MagmaUnconnectableSessionError
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Magma-Client-Exceptions'!
-!classDefinition: 'MagmaUnconnectableSessionError class' category: 'Magma-Client-Exceptions'!
-MagmaUnconnectableSessionError class
-	instanceVariableNames: ''!
-
-!classDefinition: #MagmaWrongCommitNumber category: 'Magma-Client-Exceptions'!
-MagmaUnconnectableSessionError subclass: #MagmaWrongCommitNumber
-	instanceVariableNames: 'expectedCommitNumber'
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Magma-Client-Exceptions'!
-!classDefinition: 'MagmaWrongCommitNumber class' category: 'Magma-Client-Exceptions'!
-MagmaWrongCommitNumber class
-	instanceVariableNames: ''!
-
-!classDefinition: #MagmaWrongServerError category: 'Magma-Client-Exceptions'!
-MagmaEnvironmentError subclass: #MagmaWrongServerError
-	instanceVariableNames: 'correctServer'
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Magma-Client-Exceptions'!
-!classDefinition: 'MagmaWrongServerError class' category: 'Magma-Client-Exceptions'!
-MagmaWrongServerError class
 	instanceVariableNames: ''!
 
 !classDefinition: #MagmaSessionLost category: 'Magma-Client-Exceptions'!
@@ -311,146 +221,6 @@ MagmaWarning subclass: #MagmaTruncationWarning
 MagmaTruncationWarning class
 	instanceVariableNames: ''!
 
-!classDefinition: #MagmaNotification category: 'Magma-Client-Exceptions'!
-MaClientServerNotification subclass: #MagmaNotification
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Magma-Client-Exceptions'!
-!classDefinition: 'MagmaNotification class' category: 'Magma-Client-Exceptions'!
-MagmaNotification class
-	instanceVariableNames: ''!
-
-!classDefinition: #MagmaLinkChange category: 'Magma-Client-Exceptions'!
-MagmaNotification subclass: #MagmaLinkChange
-	instanceVariableNames: 'oldLink newLink'
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Magma-Client-Exceptions'!
-!classDefinition: 'MagmaLinkChange class' category: 'Magma-Client-Exceptions'!
-MagmaLinkChange class
-	instanceVariableNames: ''!
-
-!classDefinition: #MagmaNodeUpdate category: 'Magma-Client-Exceptions'!
-MagmaNotification subclass: #MagmaNodeUpdate
-	instanceVariableNames: 'add remove setPrimary'
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Magma-Client-Exceptions'!
-!classDefinition: 'MagmaNodeUpdate class' category: 'Magma-Client-Exceptions'!
-MagmaNodeUpdate class
-	instanceVariableNames: ''!
-
-!classDefinition: #MagmaProxyMaterialization category: 'Magma-Client-Exceptions'!
-MagmaNotification subclass: #MagmaProxyMaterialization
-	instanceVariableNames: 'materializedObject'
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Magma-Client-Exceptions'!
-!classDefinition: 'MagmaProxyMaterialization class' category: 'Magma-Client-Exceptions'!
-MagmaProxyMaterialization class
-	instanceVariableNames: ''!
-
-!classDefinition: #MagmaRepairNotification category: 'Magma-Client-Exceptions'!
-MagmaNotification subclass: #MagmaRepairNotification
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Magma-Client-Exceptions'!
-!classDefinition: 'MagmaRepairNotification class' category: 'Magma-Client-Exceptions'!
-MagmaRepairNotification class
-	instanceVariableNames: ''!
-
-!classDefinition: #MagmaServerLowOnMemoryNotification category: 'Magma-Client-Exceptions'!
-MagmaNotification subclass: #MagmaServerLowOnMemoryNotification
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Magma-Client-Exceptions'!
-!classDefinition: 'MagmaServerLowOnMemoryNotification class' category: 'Magma-Client-Exceptions'!
-MagmaServerLowOnMemoryNotification class
-	instanceVariableNames: ''!
-
-!classDefinition: #MagmaUserRequirementNotification category: 'Magma-Client-Exceptions'!
-MagmaNotification subclass: #MagmaUserRequirementNotification
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Magma-Client-Exceptions'!
-!classDefinition: 'MagmaUserRequirementNotification class' category: 'Magma-Client-Exceptions'!
-MagmaUserRequirementNotification class
-	instanceVariableNames: ''!
-
-!classDefinition: #MagmaUserRequiredNotification category: 'Magma-Client-Exceptions'!
-MagmaUserRequirementNotification subclass: #MagmaUserRequiredNotification
-	instanceVariableNames: 'session'
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Magma-Client-Exceptions'!
-!classDefinition: 'MagmaUserRequiredNotification class' category: 'Magma-Client-Exceptions'!
-MagmaUserRequiredNotification class
-	instanceVariableNames: ''!
-
-!classDefinition: #MagmaSolHashFrame category: 'Magma-Client-Backend'!
-SOLHashFrame subclass: #MagmaSolHashFrame
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Magma-Client-Backend'!
-!classDefinition: 'MagmaSolHashFrame class' category: 'Magma-Client-Backend'!
-MagmaSolHashFrame class
-	instanceVariableNames: ''!
-
-!classDefinition: #MagmaSolHashSegment category: 'Magma-Client-Backend'!
-SOLHashSegment subclass: #MagmaSolHashSegment
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Magma-Client-Backend'!
-!classDefinition: 'MagmaSolHashSegment class' category: 'Magma-Client-Backend'!
-MagmaSolHashSegment class
-	instanceVariableNames: ''!
-
-!classDefinition: #MagmaSolHashTable category: 'Magma-Client'!
-SOLHashTable subclass: #MagmaSolHashTable
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Magma-Client'!
-!classDefinition: 'MagmaSolHashTable class' category: 'Magma-Client'!
-MagmaSolHashTable class
-	instanceVariableNames: ''!
-
-!classDefinition: #MagmaBufferPositionMap category: 'Magma-Client-Backend'!
-MaBufferPositionMap subclass: #MagmaBufferPositionMap
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Magma-Client-Backend'!
-!classDefinition: 'MagmaBufferPositionMap class' category: 'Magma-Client-Backend'!
-MagmaBufferPositionMap class
-	instanceVariableNames: ''!
-
-!classDefinition: #MagmaClassIdManager category: 'Magma-Client-Backend'!
-MaClassIdManager subclass: #MagmaClassIdManager
-	instanceVariableNames: 'largeCollectionIds'
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Magma-Client-Backend'!
-!classDefinition: 'MagmaClassIdManager class' category: 'Magma-Client-Backend'!
-MagmaClassIdManager class
-	instanceVariableNames: ''!
-
-!classDefinition: #MagmaOidManager category: 'Magma-Client-Backend'!
-MaOidManager subclass: #MagmaOidManager
-	instanceVariableNames: 'newObjects newOids statistics'
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Magma-Client-Backend'!
-!classDefinition: 'MagmaOidManager class' category: 'Magma-Client-Backend'!
-MagmaOidManager class
-	instanceVariableNames: ''!
-
 !classDefinition: #MagmaDataRepair category: 'Magma-Client'!
 MaAttributableObject subclass: #MagmaDataRepair
 	instanceVariableNames: 'location session startBlock enumerateBlock checkBlock doBlock repairBlock mode count lastCommit strongReferences'
@@ -481,404 +251,34 @@ MaAttributableObject subclass: #MagmaRepositoryDefinition
 MagmaRepositoryDefinition class
 	instanceVariableNames: ''!
 
-!classDefinition: #MagmaRepositoryRequest category: 'Magma-Client-Backend'!
-MaClientServerRequest subclass: #MagmaRepositoryRequest
-	instanceVariableNames: 'sessionId console repositoryController failedLocation'
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Magma-Client-Backend'!
-!classDefinition: 'MagmaRepositoryRequest class' category: 'Magma-Client-Backend'!
-MagmaRepositoryRequest class
-	instanceVariableNames: ''!
-
-!classDefinition: #MaAbortTransactionRequest category: 'Magma-Client-Backend'!
-MagmaRepositoryRequest subclass: #MaAbortTransactionRequest
-	instanceVariableNames: 'additionalBuffers'
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Magma-Client-Backend'!
-!classDefinition: 'MaAbortTransactionRequest class' category: 'Magma-Client-Backend'!
-MaAbortTransactionRequest class
-	instanceVariableNames: ''!
-
-!classDefinition: #MaAbstractReadRequest category: 'Magma-Client-Backend'!
-MagmaRepositoryRequest subclass: #MaAbstractReadRequest
-	instanceVariableNames: 'readStrategy requiredProgress'
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Magma-Client-Backend'!
-!classDefinition: 'MaAbstractReadRequest class' category: 'Magma-Client-Backend'!
-MaAbstractReadRequest class
-	instanceVariableNames: ''!
-
-!classDefinition: #MaAnchorRequest category: 'Magma-Client-Backend'!
-MaAbstractReadRequest subclass: #MaAnchorRequest
+!classDefinition: #MagmaBufferPositionMap category: 'Magma-Client-Backend'!
+MaBufferPositionMap subclass: #MagmaBufferPositionMap
 	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'Magma-Client-Backend'!
-!classDefinition: 'MaAnchorRequest class' category: 'Magma-Client-Backend'!
-MaAnchorRequest class
+!classDefinition: 'MagmaBufferPositionMap class' category: 'Magma-Client-Backend'!
+MagmaBufferPositionMap class
 	instanceVariableNames: ''!
 
-!classDefinition: #MaLargeCollectionSegmentRequest category: 'Magma-Client-Backend'!
-MaAbstractReadRequest subclass: #MaLargeCollectionSegmentRequest
-	instanceVariableNames: 'quantity collectionOid'
+!classDefinition: #MagmaClassIdManager category: 'Magma-Client-Backend'!
+MaClassIdManager subclass: #MagmaClassIdManager
+	instanceVariableNames: 'largeCollectionIds'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'Magma-Client-Backend'!
-!classDefinition: 'MaLargeCollectionSegmentRequest class' category: 'Magma-Client-Backend'!
-MaLargeCollectionSegmentRequest class
+!classDefinition: 'MagmaClassIdManager class' category: 'Magma-Client-Backend'!
+MagmaClassIdManager class
 	instanceVariableNames: ''!
 
-!classDefinition: #MaRefreshSegmentRequest category: 'Magma-Client-Backend'!
-MaLargeCollectionSegmentRequest subclass: #MaRefreshSegmentRequest
-	instanceVariableNames: 'segment expression loadObjects exceptions'
+!classDefinition: #MagmaOidManager category: 'Magma-Client-Backend'!
+MaOidManager subclass: #MagmaOidManager
+	instanceVariableNames: 'newObjects newOids statistics'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'Magma-Client-Backend'!
-!classDefinition: 'MaRefreshSegmentRequest class' category: 'Magma-Client-Backend'!
-MaRefreshSegmentRequest class
-	instanceVariableNames: ''!
-
-!classDefinition: #MaSegmentByIndexRequest category: 'Magma-Client-Backend'!
-MaLargeCollectionSegmentRequest subclass: #MaSegmentByIndexRequest
-	instanceVariableNames: 'lowIndex'
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Magma-Client-Backend'!
-!classDefinition: 'MaSegmentByIndexRequest class' category: 'Magma-Client-Backend'!
-MaSegmentByIndexRequest class
-	instanceVariableNames: ''!
-
-!classDefinition: #MaReadMultipleRequest category: 'Magma-Client-Backend'!
-MaAbstractReadRequest subclass: #MaReadMultipleRequest
-	instanceVariableNames: 'oids'
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Magma-Client-Backend'!
-!classDefinition: 'MaReadMultipleRequest class' category: 'Magma-Client-Backend'!
-MaReadMultipleRequest class
-	instanceVariableNames: ''!
-
-!classDefinition: #MaReadRequest category: 'Magma-Client-Backend'!
-MaAbstractReadRequest subclass: #MaReadRequest
-	instanceVariableNames: 'oid'
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Magma-Client-Backend'!
-!classDefinition: 'MaReadRequest class' category: 'Magma-Client-Backend'!
-MaReadRequest class
-	instanceVariableNames: ''!
-
-!classDefinition: #MaCommitLogRecordRequest category: 'Magma-Client-Backend'!
-MagmaRepositoryRequest subclass: #MaCommitLogRecordRequest
-	instanceVariableNames: 'startingCommitNumber endingCommitNumber'
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Magma-Client-Backend'!
-!classDefinition: 'MaCommitLogRecordRequest class' category: 'Magma-Client-Backend'!
-MaCommitLogRecordRequest class
-	instanceVariableNames: ''!
-
-!classDefinition: #MaWarmBackupUpdateRequest category: 'Magma-Client-Backend'!
-MaCommitLogRecordRequest subclass: #MaWarmBackupUpdateRequest
-	instanceVariableNames: 'requestingLocation'
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Magma-Client-Backend'!
-!classDefinition: 'MaWarmBackupUpdateRequest class' category: 'Magma-Client-Backend'!
-MaWarmBackupUpdateRequest class
-	instanceVariableNames: ''!
-
-!classDefinition: #MaCommitRequest category: 'Magma-Client-Backend'!
-MagmaRepositoryRequest subclass: #MaCommitRequest
-	instanceVariableNames: 'package beginAnother'
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Magma-Client-Backend'!
-!classDefinition: 'MaCommitRequest class' category: 'Magma-Client-Backend'!
-MaCommitRequest class
-	instanceVariableNames: ''!
-
-!classDefinition: #MaDownloadCodeRequest category: 'Magma-Client-Backend'!
-MagmaRepositoryRequest subclass: #MaDownloadCodeRequest
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Magma-Client-Backend'!
-!classDefinition: 'MaDownloadCodeRequest class' category: 'Magma-Client-Backend'!
-MaDownloadCodeRequest class
-	instanceVariableNames: ''!
-
-!classDefinition: #MaGetMcLockerRequest category: 'Magma-Client-Backend'!
-MagmaRepositoryRequest subclass: #MaGetMcLockerRequest
-	instanceVariableNames: 'mcOid'
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Magma-Client-Backend'!
-!classDefinition: 'MaGetMcLockerRequest class' category: 'Magma-Client-Backend'!
-MaGetMcLockerRequest class
-	instanceVariableNames: ''!
-
-!classDefinition: #MaLargeCollectionSizeRequest category: 'Magma-Client-Backend'!
-MagmaRepositoryRequest subclass: #MaLargeCollectionSizeRequest
-	instanceVariableNames: 'collectionOid'
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Magma-Client-Backend'!
-!classDefinition: 'MaLargeCollectionSizeRequest class' category: 'Magma-Client-Backend'!
-MaLargeCollectionSizeRequest class
-	instanceVariableNames: ''!
-
-!classDefinition: #MaKeyIntervalInfoRequest category: 'Magma-Client-Backend'!
-MaLargeCollectionSizeRequest subclass: #MaKeyIntervalInfoRequest
-	instanceVariableNames: 'attribute lowKey highKey'
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Magma-Client-Backend'!
-!classDefinition: 'MaKeyIntervalInfoRequest class' category: 'Magma-Client-Backend'!
-MaKeyIntervalInfoRequest class
-	instanceVariableNames: ''!
-
-!classDefinition: #MaLoadFromReaderRequest category: 'Magma-Client-Backend'!
-MagmaRepositoryRequest subclass: #MaLoadFromReaderRequest
-	instanceVariableNames: 'commitPackage expression sourceCollectionOid distinct'
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Magma-Client-Backend'!
-!classDefinition: 'MaLoadFromReaderRequest class' category: 'Magma-Client-Backend'!
-MaLoadFromReaderRequest class
-	instanceVariableNames: ''!
-
-!classDefinition: #MaLoadProgressRequest category: 'Magma-Client-Backend'!
-MagmaRepositoryRequest subclass: #MaLoadProgressRequest
-	instanceVariableNames: 'collectionOid'
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Magma-Client-Backend'!
-!classDefinition: 'MaLoadProgressRequest class' category: 'Magma-Client-Backend'!
-MaLoadProgressRequest class
-	instanceVariableNames: ''!
-
-!classDefinition: #MaPrimitiveAttributesRequest category: 'Magma-Client-Backend'!
-MagmaRepositoryRequest subclass: #MaPrimitiveAttributesRequest
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Magma-Client-Backend'!
-!classDefinition: 'MaPrimitiveAttributesRequest class' category: 'Magma-Client-Backend'!
-MaPrimitiveAttributesRequest class
-	instanceVariableNames: ''!
-
-!classDefinition: #MaRawBufferRequest category: 'Magma-Client-Backend'!
-MagmaRepositoryRequest subclass: #MaRawBufferRequest
-	instanceVariableNames: 'oid'
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Magma-Client-Backend'!
-!classDefinition: 'MaRawBufferRequest class' category: 'Magma-Client-Backend'!
-MaRawBufferRequest class
-	instanceVariableNames: ''!
-
-!classDefinition: #MaReaderTrunkRequest category: 'Magma-Client-Backend'!
-MagmaRepositoryRequest subclass: #MaReaderTrunkRequest
-	instanceVariableNames: 'collectionOid expression'
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Magma-Client-Backend'!
-!classDefinition: 'MaReaderTrunkRequest class' category: 'Magma-Client-Backend'!
-MaReaderTrunkRequest class
-	instanceVariableNames: ''!
-
-!classDefinition: #MaRefreshRequest category: 'Magma-Client-Backend'!
-MagmaRepositoryRequest subclass: #MaRefreshRequest
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Magma-Client-Backend'!
-!classDefinition: 'MaRefreshRequest class' category: 'Magma-Client-Backend'!
-MaRefreshRequest class
-	instanceVariableNames: ''!
-
-!classDefinition: #MaRemoveSecondaryLocationRequest category: 'Magma-Client-Backend'!
-MagmaRepositoryRequest subclass: #MaRemoveSecondaryLocationRequest
-	instanceVariableNames: 'locationToRemove'
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Magma-Client-Backend'!
-!classDefinition: 'MaRemoveSecondaryLocationRequest class' category: 'Magma-Client-Backend'!
-MaRemoveSecondaryLocationRequest class
-	instanceVariableNames: ''!
-
-!classDefinition: #MaRepositoryConnectionRequest category: 'Magma-Client-Backend'!
-MagmaRepositoryRequest subclass: #MaRepositoryConnectionRequest
-	instanceVariableNames: 'userId magmaVersion commitNumber uuid'
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Magma-Client-Backend'!
-!classDefinition: 'MaRepositoryConnectionRequest class' category: 'Magma-Client-Backend'!
-MaRepositoryConnectionRequest class
-	instanceVariableNames: ''!
-
-!classDefinition: #MaRepositoryDisconnectRequest category: 'Magma-Client-Backend'!
-MagmaRepositoryRequest subclass: #MaRepositoryDisconnectRequest
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Magma-Client-Backend'!
-!classDefinition: 'MaRepositoryDisconnectRequest class' category: 'Magma-Client-Backend'!
-MaRepositoryDisconnectRequest class
-	instanceVariableNames: ''!
-
-!classDefinition: #MaSaveAndExitImageRequest category: 'Magma-Client-Backend'!
-MagmaRepositoryRequest subclass: #MaSaveAndExitImageRequest
-	instanceVariableNames: 'save exit'
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Magma-Client-Backend'!
-!classDefinition: 'MaSaveAndExitImageRequest class' category: 'Magma-Client-Backend'!
-MaSaveAndExitImageRequest class
-	instanceVariableNames: ''!
-
-!classDefinition: #MaServerPerformRequest category: 'Magma-Client-Backend'!
-MagmaRepositoryRequest subclass: #MaServerPerformRequest
-	instanceVariableNames: 'selector arguments'
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Magma-Client-Backend'!
-!classDefinition: 'MaServerPerformRequest class' category: 'Magma-Client-Backend'!
-MaServerPerformRequest class
-	instanceVariableNames: ''!
-
-!classDefinition: #MaTransactionRequest category: 'Magma-Client-Backend'!
-MagmaRepositoryRequest subclass: #MaTransactionRequest
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Magma-Client-Backend'!
-!classDefinition: 'MaTransactionRequest class' category: 'Magma-Client-Backend'!
-MaTransactionRequest class
-	instanceVariableNames: ''!
-
-!classDefinition: #MaWriteRequest category: 'Magma-Client-Backend'!
-MagmaRepositoryRequest subclass: #MaWriteRequest
-	instanceVariableNames: 'commitLogRecord'
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Magma-Client-Backend'!
-!classDefinition: 'MaWriteRequest class' category: 'Magma-Client-Backend'!
-MaWriteRequest class
-	instanceVariableNames: ''!
-
-!classDefinition: #MagmaBeWarmBackupRequest category: 'Magma-Client-Backend'!
-MagmaRepositoryRequest subclass: #MagmaBeWarmBackupRequest
-	instanceVariableNames: 'primaryLocation'
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Magma-Client-Backend'!
-!classDefinition: 'MagmaBeWarmBackupRequest class' category: 'Magma-Client-Backend'!
-MagmaBeWarmBackupRequest class
-	instanceVariableNames: ''!
-
-!classDefinition: #MagmaConnectionsRequest category: 'Magma-Client-Backend'!
-MagmaRepositoryRequest subclass: #MagmaConnectionsRequest
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Magma-Client-Backend'!
-!classDefinition: 'MagmaConnectionsRequest class' category: 'Magma-Client-Backend'!
-MagmaConnectionsRequest class
-	instanceVariableNames: ''!
-
-!classDefinition: #MagmaEnsureCorrectNodeConfiguration category: 'Magma-Client-Backend'!
-MagmaRepositoryRequest subclass: #MagmaEnsureCorrectNodeConfiguration
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Magma-Client-Backend'!
-!classDefinition: 'MagmaEnsureCorrectNodeConfiguration class' category: 'Magma-Client-Backend'!
-MagmaEnsureCorrectNodeConfiguration class
-	instanceVariableNames: ''!
-
-!classDefinition: #MagmaFullBackupRequest category: 'Magma-Client-Backend'!
-MagmaRepositoryRequest subclass: #MagmaFullBackupRequest
-	instanceVariableNames: 'serverPath'
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Magma-Client-Backend'!
-!classDefinition: 'MagmaFullBackupRequest class' category: 'Magma-Client-Backend'!
-MagmaFullBackupRequest class
-	instanceVariableNames: ''!
-
-!classDefinition: #MagmaIdRequest category: 'Magma-Client-Backend'!
-MagmaRepositoryRequest subclass: #MagmaIdRequest
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Magma-Client-Backend'!
-!classDefinition: 'MagmaIdRequest class' category: 'Magma-Client-Backend'!
-MagmaIdRequest class
-	instanceVariableNames: ''!
-
-!classDefinition: #MagmaNoteUnreachableServer category: 'Magma-Client-Backend'!
-MagmaRepositoryRequest subclass: #MagmaNoteUnreachableServer
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Magma-Client-Backend'!
-!classDefinition: 'MagmaNoteUnreachableServer class' category: 'Magma-Client-Backend'!
-MagmaNoteUnreachableServer class
-	instanceVariableNames: ''!
-
-!classDefinition: #MagmaPathNameRequest category: 'Magma-Client-Backend'!
-MagmaRepositoryRequest subclass: #MagmaPathNameRequest
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Magma-Client-Backend'!
-!classDefinition: 'MagmaPathNameRequest class' category: 'Magma-Client-Backend'!
-MagmaPathNameRequest class
-	instanceVariableNames: ''!
-
-!classDefinition: #MagmaReleaseReaderRequest category: 'Magma-Client-Backend'!
-MagmaRepositoryRequest subclass: #MagmaReleaseReaderRequest
-	instanceVariableNames: 'collectionOid'
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Magma-Client-Backend'!
-!classDefinition: 'MagmaReleaseReaderRequest class' category: 'Magma-Client-Backend'!
-MagmaReleaseReaderRequest class
-	instanceVariableNames: ''!
-
-!classDefinition: #MagmaRequestSwapPrimaryDutyRequest category: 'Magma-Client-Backend'!
-MagmaRepositoryRequest subclass: #MagmaRequestSwapPrimaryDutyRequest
-	instanceVariableNames: 'newPrimary'
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Magma-Client-Backend'!
-!classDefinition: 'MagmaRequestSwapPrimaryDutyRequest class' category: 'Magma-Client-Backend'!
-MagmaRequestSwapPrimaryDutyRequest class
-	instanceVariableNames: ''!
-
-!classDefinition: #MagmaServerStatisticsRequest category: 'Magma-Client-Backend'!
-MagmaRepositoryRequest subclass: #MagmaServerStatisticsRequest
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Magma-Client-Backend'!
-!classDefinition: 'MagmaServerStatisticsRequest class' category: 'Magma-Client-Backend'!
-MagmaServerStatisticsRequest class
-	instanceVariableNames: ''!
-
-!classDefinition: #MagmaSwapPrimaryDutyRequest category: 'Magma-Client-Backend'!
-MagmaRepositoryRequest subclass: #MagmaSwapPrimaryDutyRequest
-	instanceVariableNames: 'newPrimary commitNumber branchCode'
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Magma-Client-Backend'!
-!classDefinition: 'MagmaSwapPrimaryDutyRequest class' category: 'Magma-Client-Backend'!
-MagmaSwapPrimaryDutyRequest class
+!classDefinition: 'MagmaOidManager class' category: 'Magma-Client-Backend'!
+MagmaOidManager class
 	instanceVariableNames: ''!
 
 !classDefinition: #MaImmutabilityStrategy category: 'Magma-Client'!
@@ -1541,14 +941,34 @@ MagmaLargeCollectionSegment subclass: #MagmaCollectionSegment
 MagmaCollectionSegment class
 	instanceVariableNames: ''!
 
-!classDefinition: #MagmaServerStatistics category: 'Magma-Client'!
-MaServerStat subclass: #MagmaServerStatistics
-	instanceVariableNames: 'flushTimeHistory'
+!classDefinition: #MagmaSolHashFrame category: 'Magma-Client-Backend'!
+SOLHashFrame subclass: #MagmaSolHashFrame
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Magma-Client-Backend'!
+!classDefinition: 'MagmaSolHashFrame class' category: 'Magma-Client-Backend'!
+MagmaSolHashFrame class
+	instanceVariableNames: ''!
+
+!classDefinition: #MagmaSolHashSegment category: 'Magma-Client-Backend'!
+SOLHashSegment subclass: #MagmaSolHashSegment
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Magma-Client-Backend'!
+!classDefinition: 'MagmaSolHashSegment class' category: 'Magma-Client-Backend'!
+MagmaSolHashSegment class
+	instanceVariableNames: ''!
+
+!classDefinition: #MagmaSolHashTable category: 'Magma-Client'!
+SOLHashTable subclass: #MagmaSolHashTable
+	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'Magma-Client'!
-!classDefinition: 'MagmaServerStatistics class' category: 'Magma-Client'!
-MagmaServerStatistics class
+!classDefinition: 'MagmaSolHashTable class' category: 'Magma-Client'!
+MagmaSolHashTable class
 	instanceVariableNames: ''!
 
 !classDefinition: #MagmaMutatingProxy category: 'Magma-Client-Backend'!
@@ -1571,8 +991,18 @@ MaMinimalObject subclass: #MagmaForwardingProxy
 MagmaForwardingProxy class
 	instanceVariableNames: ''!
 
+!classDefinition: #MagmaServerStatistics category: 'Magma-Client'!
+ProtoObject subclass: #MagmaServerStatistics
+	instanceVariableNames: 'flushTimeHistory'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Magma-Client'!
+!classDefinition: 'MagmaServerStatistics class' category: 'Magma-Client'!
+MagmaServerStatistics class
+	instanceVariableNames: ''!
+
 !classDefinition: #MagmaSessionStatistics category: 'Magma-Client'!
-MaClientStat subclass: #MagmaSessionStatistics
+ProtoObject subclass: #MagmaSessionStatistics
 	instanceVariableNames: 'clientSideConnectionTimeHistory refreshAllTimeHistory clientSideMcPageReadsTimeHistory clientSideProxyMaterializationTimeHistory clientSideCommitTimeHistory refreshViewHistory objectsReadPerSecond objectBytesReadPerSecond'
 	classVariableNames: ''
 	poolDictionaries: ''
@@ -1591,14 +1021,584 @@ ProtoObject subclass: #MagmaStat
 MagmaStat class
 	instanceVariableNames: ''!
 
+!classDefinition: #MagmaEnvironmentError category: 'Magma-Client-Exceptions'!
+ProtoObject subclass: #MagmaEnvironmentError
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Magma-Client-Exceptions'!
+!classDefinition: 'MagmaEnvironmentError class' category: 'Magma-Client-Exceptions'!
+MagmaEnvironmentError class
+	instanceVariableNames: ''!
+
+!classDefinition: #MagmaDifferentBranch category: 'Magma-Client-Exceptions'!
+MagmaEnvironmentError subclass: #MagmaDifferentBranch
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Magma-Client-Exceptions'!
+!classDefinition: 'MagmaDifferentBranch class' category: 'Magma-Client-Exceptions'!
+MagmaDifferentBranch class
+	instanceVariableNames: ''!
+
+!classDefinition: #MagmaGarbageCollectedObject category: 'Magma-Client-Exceptions'!
+MagmaEnvironmentError subclass: #MagmaGarbageCollectedObject
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Magma-Client-Exceptions'!
+!classDefinition: 'MagmaGarbageCollectedObject class' category: 'Magma-Client-Exceptions'!
+MagmaGarbageCollectedObject class
+	instanceVariableNames: ''!
+
+!classDefinition: #MagmaReadServerTooFarBehind category: 'Magma-Client-Exceptions'!
+MagmaEnvironmentError subclass: #MagmaReadServerTooFarBehind
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Magma-Client-Exceptions'!
+!classDefinition: 'MagmaReadServerTooFarBehind class' category: 'Magma-Client-Exceptions'!
+MagmaReadServerTooFarBehind class
+	instanceVariableNames: ''!
+
+!classDefinition: #MagmaTooFarBehindError category: 'Magma-Client-Exceptions'!
+MagmaEnvironmentError subclass: #MagmaTooFarBehindError
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Magma-Client-Exceptions'!
+!classDefinition: 'MagmaTooFarBehindError class' category: 'Magma-Client-Exceptions'!
+MagmaTooFarBehindError class
+	instanceVariableNames: ''!
+
+!classDefinition: #MagmaUnavailableCommitRecord category: 'Magma-Client-Exceptions'!
+MagmaEnvironmentError subclass: #MagmaUnavailableCommitRecord
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Magma-Client-Exceptions'!
+!classDefinition: 'MagmaUnavailableCommitRecord class' category: 'Magma-Client-Exceptions'!
+MagmaUnavailableCommitRecord class
+	instanceVariableNames: ''!
+
+!classDefinition: #MagmaUnconnectableSessionError category: 'Magma-Client-Exceptions'!
+MagmaEnvironmentError subclass: #MagmaUnconnectableSessionError
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Magma-Client-Exceptions'!
+!classDefinition: 'MagmaUnconnectableSessionError class' category: 'Magma-Client-Exceptions'!
+MagmaUnconnectableSessionError class
+	instanceVariableNames: ''!
+
+!classDefinition: #MagmaWrongCommitNumber category: 'Magma-Client-Exceptions'!
+MagmaUnconnectableSessionError subclass: #MagmaWrongCommitNumber
+	instanceVariableNames: 'expectedCommitNumber'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Magma-Client-Exceptions'!
+!classDefinition: 'MagmaWrongCommitNumber class' category: 'Magma-Client-Exceptions'!
+MagmaWrongCommitNumber class
+	instanceVariableNames: ''!
+
+!classDefinition: #MagmaWrongServerError category: 'Magma-Client-Exceptions'!
+MagmaEnvironmentError subclass: #MagmaWrongServerError
+	instanceVariableNames: 'correctServer'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Magma-Client-Exceptions'!
+!classDefinition: 'MagmaWrongServerError class' category: 'Magma-Client-Exceptions'!
+MagmaWrongServerError class
+	instanceVariableNames: ''!
+
+!classDefinition: #MagmaNotification category: 'Magma-Client-Exceptions'!
+ProtoObject subclass: #MagmaNotification
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Magma-Client-Exceptions'!
+!classDefinition: 'MagmaNotification class' category: 'Magma-Client-Exceptions'!
+MagmaNotification class
+	instanceVariableNames: ''!
+
+!classDefinition: #MagmaLinkChange category: 'Magma-Client-Exceptions'!
+MagmaNotification subclass: #MagmaLinkChange
+	instanceVariableNames: 'oldLink newLink'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Magma-Client-Exceptions'!
+!classDefinition: 'MagmaLinkChange class' category: 'Magma-Client-Exceptions'!
+MagmaLinkChange class
+	instanceVariableNames: ''!
+
+!classDefinition: #MagmaNodeUpdate category: 'Magma-Client-Exceptions'!
+MagmaNotification subclass: #MagmaNodeUpdate
+	instanceVariableNames: 'add remove setPrimary'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Magma-Client-Exceptions'!
+!classDefinition: 'MagmaNodeUpdate class' category: 'Magma-Client-Exceptions'!
+MagmaNodeUpdate class
+	instanceVariableNames: ''!
+
+!classDefinition: #MagmaProxyMaterialization category: 'Magma-Client-Exceptions'!
+MagmaNotification subclass: #MagmaProxyMaterialization
+	instanceVariableNames: 'materializedObject'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Magma-Client-Exceptions'!
+!classDefinition: 'MagmaProxyMaterialization class' category: 'Magma-Client-Exceptions'!
+MagmaProxyMaterialization class
+	instanceVariableNames: ''!
+
+!classDefinition: #MagmaRepairNotification category: 'Magma-Client-Exceptions'!
+MagmaNotification subclass: #MagmaRepairNotification
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Magma-Client-Exceptions'!
+!classDefinition: 'MagmaRepairNotification class' category: 'Magma-Client-Exceptions'!
+MagmaRepairNotification class
+	instanceVariableNames: ''!
+
+!classDefinition: #MagmaServerLowOnMemoryNotification category: 'Magma-Client-Exceptions'!
+MagmaNotification subclass: #MagmaServerLowOnMemoryNotification
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Magma-Client-Exceptions'!
+!classDefinition: 'MagmaServerLowOnMemoryNotification class' category: 'Magma-Client-Exceptions'!
+MagmaServerLowOnMemoryNotification class
+	instanceVariableNames: ''!
+
+!classDefinition: #MagmaUserRequirementNotification category: 'Magma-Client-Exceptions'!
+MagmaNotification subclass: #MagmaUserRequirementNotification
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Magma-Client-Exceptions'!
+!classDefinition: 'MagmaUserRequirementNotification class' category: 'Magma-Client-Exceptions'!
+MagmaUserRequirementNotification class
+	instanceVariableNames: ''!
+
+!classDefinition: #MagmaUserRequiredNotification category: 'Magma-Client-Exceptions'!
+MagmaUserRequirementNotification subclass: #MagmaUserRequiredNotification
+	instanceVariableNames: 'session'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Magma-Client-Exceptions'!
+!classDefinition: 'MagmaUserRequiredNotification class' category: 'Magma-Client-Exceptions'!
+MagmaUserRequiredNotification class
+	instanceVariableNames: ''!
+
 !classDefinition: #MaTransaction category: 'Magma-Client-Backend'!
-WriteBarrier subclass: #MaTransaction
+ProtoObject subclass: #MaTransaction
 	instanceVariableNames: 'readSet session largeCollectionChanges commitPackage potentialKeysChange ignoreModifiedSignals commitNumber dictionaryArrays'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'Magma-Client-Backend'!
 !classDefinition: 'MaTransaction class' category: 'Magma-Client-Backend'!
 MaTransaction class
+	instanceVariableNames: ''!
+
+!classDefinition: #MagmaRepositoryRequest category: 'Magma-Client-Backend'!
+ProtoObject subclass: #MagmaRepositoryRequest
+	instanceVariableNames: 'sessionId console repositoryController failedLocation'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Magma-Client-Backend'!
+!classDefinition: 'MagmaRepositoryRequest class' category: 'Magma-Client-Backend'!
+MagmaRepositoryRequest class
+	instanceVariableNames: ''!
+
+!classDefinition: #MaAbortTransactionRequest category: 'Magma-Client-Backend'!
+MagmaRepositoryRequest subclass: #MaAbortTransactionRequest
+	instanceVariableNames: 'additionalBuffers'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Magma-Client-Backend'!
+!classDefinition: 'MaAbortTransactionRequest class' category: 'Magma-Client-Backend'!
+MaAbortTransactionRequest class
+	instanceVariableNames: ''!
+
+!classDefinition: #MaAbstractReadRequest category: 'Magma-Client-Backend'!
+MagmaRepositoryRequest subclass: #MaAbstractReadRequest
+	instanceVariableNames: 'readStrategy requiredProgress'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Magma-Client-Backend'!
+!classDefinition: 'MaAbstractReadRequest class' category: 'Magma-Client-Backend'!
+MaAbstractReadRequest class
+	instanceVariableNames: ''!
+
+!classDefinition: #MaAnchorRequest category: 'Magma-Client-Backend'!
+MaAbstractReadRequest subclass: #MaAnchorRequest
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Magma-Client-Backend'!
+!classDefinition: 'MaAnchorRequest class' category: 'Magma-Client-Backend'!
+MaAnchorRequest class
+	instanceVariableNames: ''!
+
+!classDefinition: #MaLargeCollectionSegmentRequest category: 'Magma-Client-Backend'!
+MaAbstractReadRequest subclass: #MaLargeCollectionSegmentRequest
+	instanceVariableNames: 'quantity collectionOid'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Magma-Client-Backend'!
+!classDefinition: 'MaLargeCollectionSegmentRequest class' category: 'Magma-Client-Backend'!
+MaLargeCollectionSegmentRequest class
+	instanceVariableNames: ''!
+
+!classDefinition: #MaRefreshSegmentRequest category: 'Magma-Client-Backend'!
+MaLargeCollectionSegmentRequest subclass: #MaRefreshSegmentRequest
+	instanceVariableNames: 'segment expression loadObjects exceptions'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Magma-Client-Backend'!
+!classDefinition: 'MaRefreshSegmentRequest class' category: 'Magma-Client-Backend'!
+MaRefreshSegmentRequest class
+	instanceVariableNames: ''!
+
+!classDefinition: #MaSegmentByIndexRequest category: 'Magma-Client-Backend'!
+MaLargeCollectionSegmentRequest subclass: #MaSegmentByIndexRequest
+	instanceVariableNames: 'lowIndex'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Magma-Client-Backend'!
+!classDefinition: 'MaSegmentByIndexRequest class' category: 'Magma-Client-Backend'!
+MaSegmentByIndexRequest class
+	instanceVariableNames: ''!
+
+!classDefinition: #MaReadMultipleRequest category: 'Magma-Client-Backend'!
+MaAbstractReadRequest subclass: #MaReadMultipleRequest
+	instanceVariableNames: 'oids'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Magma-Client-Backend'!
+!classDefinition: 'MaReadMultipleRequest class' category: 'Magma-Client-Backend'!
+MaReadMultipleRequest class
+	instanceVariableNames: ''!
+
+!classDefinition: #MaReadRequest category: 'Magma-Client-Backend'!
+MaAbstractReadRequest subclass: #MaReadRequest
+	instanceVariableNames: 'oid'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Magma-Client-Backend'!
+!classDefinition: 'MaReadRequest class' category: 'Magma-Client-Backend'!
+MaReadRequest class
+	instanceVariableNames: ''!
+
+!classDefinition: #MaCommitLogRecordRequest category: 'Magma-Client-Backend'!
+MagmaRepositoryRequest subclass: #MaCommitLogRecordRequest
+	instanceVariableNames: 'startingCommitNumber endingCommitNumber'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Magma-Client-Backend'!
+!classDefinition: 'MaCommitLogRecordRequest class' category: 'Magma-Client-Backend'!
+MaCommitLogRecordRequest class
+	instanceVariableNames: ''!
+
+!classDefinition: #MaWarmBackupUpdateRequest category: 'Magma-Client-Backend'!
+MaCommitLogRecordRequest subclass: #MaWarmBackupUpdateRequest
+	instanceVariableNames: 'requestingLocation'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Magma-Client-Backend'!
+!classDefinition: 'MaWarmBackupUpdateRequest class' category: 'Magma-Client-Backend'!
+MaWarmBackupUpdateRequest class
+	instanceVariableNames: ''!
+
+!classDefinition: #MaCommitRequest category: 'Magma-Client-Backend'!
+MagmaRepositoryRequest subclass: #MaCommitRequest
+	instanceVariableNames: 'package beginAnother'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Magma-Client-Backend'!
+!classDefinition: 'MaCommitRequest class' category: 'Magma-Client-Backend'!
+MaCommitRequest class
+	instanceVariableNames: ''!
+
+!classDefinition: #MaDownloadCodeRequest category: 'Magma-Client-Backend'!
+MagmaRepositoryRequest subclass: #MaDownloadCodeRequest
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Magma-Client-Backend'!
+!classDefinition: 'MaDownloadCodeRequest class' category: 'Magma-Client-Backend'!
+MaDownloadCodeRequest class
+	instanceVariableNames: ''!
+
+!classDefinition: #MaGetMcLockerRequest category: 'Magma-Client-Backend'!
+MagmaRepositoryRequest subclass: #MaGetMcLockerRequest
+	instanceVariableNames: 'mcOid'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Magma-Client-Backend'!
+!classDefinition: 'MaGetMcLockerRequest class' category: 'Magma-Client-Backend'!
+MaGetMcLockerRequest class
+	instanceVariableNames: ''!
+
+!classDefinition: #MaLargeCollectionSizeRequest category: 'Magma-Client-Backend'!
+MagmaRepositoryRequest subclass: #MaLargeCollectionSizeRequest
+	instanceVariableNames: 'collectionOid'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Magma-Client-Backend'!
+!classDefinition: 'MaLargeCollectionSizeRequest class' category: 'Magma-Client-Backend'!
+MaLargeCollectionSizeRequest class
+	instanceVariableNames: ''!
+
+!classDefinition: #MaKeyIntervalInfoRequest category: 'Magma-Client-Backend'!
+MaLargeCollectionSizeRequest subclass: #MaKeyIntervalInfoRequest
+	instanceVariableNames: 'attribute lowKey highKey'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Magma-Client-Backend'!
+!classDefinition: 'MaKeyIntervalInfoRequest class' category: 'Magma-Client-Backend'!
+MaKeyIntervalInfoRequest class
+	instanceVariableNames: ''!
+
+!classDefinition: #MaLoadFromReaderRequest category: 'Magma-Client-Backend'!
+MagmaRepositoryRequest subclass: #MaLoadFromReaderRequest
+	instanceVariableNames: 'commitPackage expression sourceCollectionOid distinct'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Magma-Client-Backend'!
+!classDefinition: 'MaLoadFromReaderRequest class' category: 'Magma-Client-Backend'!
+MaLoadFromReaderRequest class
+	instanceVariableNames: ''!
+
+!classDefinition: #MaLoadProgressRequest category: 'Magma-Client-Backend'!
+MagmaRepositoryRequest subclass: #MaLoadProgressRequest
+	instanceVariableNames: 'collectionOid'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Magma-Client-Backend'!
+!classDefinition: 'MaLoadProgressRequest class' category: 'Magma-Client-Backend'!
+MaLoadProgressRequest class
+	instanceVariableNames: ''!
+
+!classDefinition: #MaPrimitiveAttributesRequest category: 'Magma-Client-Backend'!
+MagmaRepositoryRequest subclass: #MaPrimitiveAttributesRequest
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Magma-Client-Backend'!
+!classDefinition: 'MaPrimitiveAttributesRequest class' category: 'Magma-Client-Backend'!
+MaPrimitiveAttributesRequest class
+	instanceVariableNames: ''!
+
+!classDefinition: #MaRawBufferRequest category: 'Magma-Client-Backend'!
+MagmaRepositoryRequest subclass: #MaRawBufferRequest
+	instanceVariableNames: 'oid'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Magma-Client-Backend'!
+!classDefinition: 'MaRawBufferRequest class' category: 'Magma-Client-Backend'!
+MaRawBufferRequest class
+	instanceVariableNames: ''!
+
+!classDefinition: #MaReaderTrunkRequest category: 'Magma-Client-Backend'!
+MagmaRepositoryRequest subclass: #MaReaderTrunkRequest
+	instanceVariableNames: 'collectionOid expression'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Magma-Client-Backend'!
+!classDefinition: 'MaReaderTrunkRequest class' category: 'Magma-Client-Backend'!
+MaReaderTrunkRequest class
+	instanceVariableNames: ''!
+
+!classDefinition: #MaRefreshRequest category: 'Magma-Client-Backend'!
+MagmaRepositoryRequest subclass: #MaRefreshRequest
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Magma-Client-Backend'!
+!classDefinition: 'MaRefreshRequest class' category: 'Magma-Client-Backend'!
+MaRefreshRequest class
+	instanceVariableNames: ''!
+
+!classDefinition: #MaRemoveSecondaryLocationRequest category: 'Magma-Client-Backend'!
+MagmaRepositoryRequest subclass: #MaRemoveSecondaryLocationRequest
+	instanceVariableNames: 'locationToRemove'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Magma-Client-Backend'!
+!classDefinition: 'MaRemoveSecondaryLocationRequest class' category: 'Magma-Client-Backend'!
+MaRemoveSecondaryLocationRequest class
+	instanceVariableNames: ''!
+
+!classDefinition: #MaRepositoryConnectionRequest category: 'Magma-Client-Backend'!
+MagmaRepositoryRequest subclass: #MaRepositoryConnectionRequest
+	instanceVariableNames: 'userId magmaVersion commitNumber uuid'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Magma-Client-Backend'!
+!classDefinition: 'MaRepositoryConnectionRequest class' category: 'Magma-Client-Backend'!
+MaRepositoryConnectionRequest class
+	instanceVariableNames: ''!
+
+!classDefinition: #MaRepositoryDisconnectRequest category: 'Magma-Client-Backend'!
+MagmaRepositoryRequest subclass: #MaRepositoryDisconnectRequest
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Magma-Client-Backend'!
+!classDefinition: 'MaRepositoryDisconnectRequest class' category: 'Magma-Client-Backend'!
+MaRepositoryDisconnectRequest class
+	instanceVariableNames: ''!
+
+!classDefinition: #MaSaveAndExitImageRequest category: 'Magma-Client-Backend'!
+MagmaRepositoryRequest subclass: #MaSaveAndExitImageRequest
+	instanceVariableNames: 'save exit'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Magma-Client-Backend'!
+!classDefinition: 'MaSaveAndExitImageRequest class' category: 'Magma-Client-Backend'!
+MaSaveAndExitImageRequest class
+	instanceVariableNames: ''!
+
+!classDefinition: #MaServerPerformRequest category: 'Magma-Client-Backend'!
+MagmaRepositoryRequest subclass: #MaServerPerformRequest
+	instanceVariableNames: 'selector arguments'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Magma-Client-Backend'!
+!classDefinition: 'MaServerPerformRequest class' category: 'Magma-Client-Backend'!
+MaServerPerformRequest class
+	instanceVariableNames: ''!
+
+!classDefinition: #MaTransactionRequest category: 'Magma-Client-Backend'!
+MagmaRepositoryRequest subclass: #MaTransactionRequest
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Magma-Client-Backend'!
+!classDefinition: 'MaTransactionRequest class' category: 'Magma-Client-Backend'!
+MaTransactionRequest class
+	instanceVariableNames: ''!
+
+!classDefinition: #MaWriteRequest category: 'Magma-Client-Backend'!
+MagmaRepositoryRequest subclass: #MaWriteRequest
+	instanceVariableNames: 'commitLogRecord'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Magma-Client-Backend'!
+!classDefinition: 'MaWriteRequest class' category: 'Magma-Client-Backend'!
+MaWriteRequest class
+	instanceVariableNames: ''!
+
+!classDefinition: #MagmaBeWarmBackupRequest category: 'Magma-Client-Backend'!
+MagmaRepositoryRequest subclass: #MagmaBeWarmBackupRequest
+	instanceVariableNames: 'primaryLocation'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Magma-Client-Backend'!
+!classDefinition: 'MagmaBeWarmBackupRequest class' category: 'Magma-Client-Backend'!
+MagmaBeWarmBackupRequest class
+	instanceVariableNames: ''!
+
+!classDefinition: #MagmaConnectionsRequest category: 'Magma-Client-Backend'!
+MagmaRepositoryRequest subclass: #MagmaConnectionsRequest
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Magma-Client-Backend'!
+!classDefinition: 'MagmaConnectionsRequest class' category: 'Magma-Client-Backend'!
+MagmaConnectionsRequest class
+	instanceVariableNames: ''!
+
+!classDefinition: #MagmaEnsureCorrectNodeConfiguration category: 'Magma-Client-Backend'!
+MagmaRepositoryRequest subclass: #MagmaEnsureCorrectNodeConfiguration
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Magma-Client-Backend'!
+!classDefinition: 'MagmaEnsureCorrectNodeConfiguration class' category: 'Magma-Client-Backend'!
+MagmaEnsureCorrectNodeConfiguration class
+	instanceVariableNames: ''!
+
+!classDefinition: #MagmaFullBackupRequest category: 'Magma-Client-Backend'!
+MagmaRepositoryRequest subclass: #MagmaFullBackupRequest
+	instanceVariableNames: 'serverPath'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Magma-Client-Backend'!
+!classDefinition: 'MagmaFullBackupRequest class' category: 'Magma-Client-Backend'!
+MagmaFullBackupRequest class
+	instanceVariableNames: ''!
+
+!classDefinition: #MagmaIdRequest category: 'Magma-Client-Backend'!
+MagmaRepositoryRequest subclass: #MagmaIdRequest
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Magma-Client-Backend'!
+!classDefinition: 'MagmaIdRequest class' category: 'Magma-Client-Backend'!
+MagmaIdRequest class
+	instanceVariableNames: ''!
+
+!classDefinition: #MagmaNoteUnreachableServer category: 'Magma-Client-Backend'!
+MagmaRepositoryRequest subclass: #MagmaNoteUnreachableServer
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Magma-Client-Backend'!
+!classDefinition: 'MagmaNoteUnreachableServer class' category: 'Magma-Client-Backend'!
+MagmaNoteUnreachableServer class
+	instanceVariableNames: ''!
+
+!classDefinition: #MagmaPathNameRequest category: 'Magma-Client-Backend'!
+MagmaRepositoryRequest subclass: #MagmaPathNameRequest
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Magma-Client-Backend'!
+!classDefinition: 'MagmaPathNameRequest class' category: 'Magma-Client-Backend'!
+MagmaPathNameRequest class
+	instanceVariableNames: ''!
+
+!classDefinition: #MagmaReleaseReaderRequest category: 'Magma-Client-Backend'!
+MagmaRepositoryRequest subclass: #MagmaReleaseReaderRequest
+	instanceVariableNames: 'collectionOid'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Magma-Client-Backend'!
+!classDefinition: 'MagmaReleaseReaderRequest class' category: 'Magma-Client-Backend'!
+MagmaReleaseReaderRequest class
+	instanceVariableNames: ''!
+
+!classDefinition: #MagmaRequestSwapPrimaryDutyRequest category: 'Magma-Client-Backend'!
+MagmaRepositoryRequest subclass: #MagmaRequestSwapPrimaryDutyRequest
+	instanceVariableNames: 'newPrimary'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Magma-Client-Backend'!
+!classDefinition: 'MagmaRequestSwapPrimaryDutyRequest class' category: 'Magma-Client-Backend'!
+MagmaRequestSwapPrimaryDutyRequest class
+	instanceVariableNames: ''!
+
+!classDefinition: #MagmaServerStatisticsRequest category: 'Magma-Client-Backend'!
+MagmaRepositoryRequest subclass: #MagmaServerStatisticsRequest
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Magma-Client-Backend'!
+!classDefinition: 'MagmaServerStatisticsRequest class' category: 'Magma-Client-Backend'!
+MagmaServerStatisticsRequest class
+	instanceVariableNames: ''!
+
+!classDefinition: #MagmaSwapPrimaryDutyRequest category: 'Magma-Client-Backend'!
+MagmaRepositoryRequest subclass: #MagmaSwapPrimaryDutyRequest
+	instanceVariableNames: 'newPrimary commitNumber branchCode'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Magma-Client-Backend'!
+!classDefinition: 'MagmaSwapPrimaryDutyRequest class' category: 'Magma-Client-Backend'!
+MagmaSwapPrimaryDutyRequest class
 	instanceVariableNames: ''!
 
 !classDefinition: #MagmaWbClassBuilder category: 'Magma-Client-Backend'!
@@ -1612,24 +1612,6 @@ MagmaWbClassBuilder class
 	instanceVariableNames: ''!
 
 
-!MagmaDifferentBranch commentStamp: 'cmm 10/24/2008 17:38' prior: 0!
-A MagmaDifferentBranch is used to indicate when a commit-record from one repository is attempted to be applied to a version of the same repository that has branched in a different direction at some point.  
-
-Normally this should not happen, but if you attempt to restore to a repository that was made by backing up another repository, but other commits have been applied to that repository since, there is no way Magma can reconcile the object models, so it signals this error to inconsistencies to the model.!
-
-!MagmaReadServerTooFarBehind commentStamp: 'cmm 3/8/2009 15:06' prior: 0!
-A MagmaReadServerTooFarBehind is signaled only when a higly-available, multi-server Magma node is running.  In this configuration, it is possible for the read-only servers to fall slightly behind the primary server (the one accepting commits).
-
-Applications which cannot tolerate this may set the #requiredProgress of their MagmaSession to a known commitNumber.  All ReadRequests will include this commitNumber, and, if a secondary read-only server finds itself behind that commitNumber for a particular client read-request, the client will pause 1 second and retry once before passing the error to the application.
-
-This will hopefully be sufficient to eliminate 100% of these kinds of errors.!
-
-!MagmaUnavailableCommitRecord commentStamp: 'cmm 8/12/2008 21:23' prior: 0!
-A MagmaUnavailableCommitRecord indicates the specified commit record is not available on the server.!
-
-!MagmaWrongServerError commentStamp: 'cmm 11/17/2008 14:33' prior: 0!
-A MagmaWrongServerError is signaled when a client asks a request fails it nodeCheck.  It occurs when a warm-backup is asked to commit.  If the server determines the primary is still up and running, and that the client should have asked that server to perform the commit, it will signal this error back to the client.!
-
 !MagmaDuplicateObjectInCollection commentStamp: '<historical>' prior: 0!
 Signalled by MagmaSet if a duplicate object is added to the collection.!
 
@@ -1641,43 +1623,6 @@ I am signaled when another user has committed a change an object that you change
 
 !MagmaNoTransactionError commentStamp: 'cmm 11/15/2008 14:23' prior: 0!
 Signaled when a client tries to commit when they do not have a transaction.!
-
-!MagmaLinkChange commentStamp: 'cmm 12/9/2012 11:52' prior: 0!
-This is a private notification to assist with HA processing.  When an HA event occurs, temp vars up on the stack can still be pointing to the server that went down, this notification informs them to update a particular 'oldLink' to a 'newLink' to the new server.!
-
-!MagmaProxyMaterialization commentStamp: 'cmm 1/13/2005 23:05' prior: 0!
-I am signaled when a mutating proxy is materialized.  The materializedObject is available as an argument.
-
-To use:
-
-	[ ... do your stuff ... ]
-		on: MagmaProxyMaterialization 
-		do:
-			[ : theNotification |
-			doSomethingWith: theNotification.
-			theNotification resume "<-- very important!!" ]
-
-!
-
-!MagmaUserRequirementNotification commentStamp: 'cmm 3/11/2005 14:13' prior: 0!
-I am used when Magma discovers it is missing an object and must get it from the user.  For example, when the user invokes a forwarding-proxy to another repository, connection credentials for that repository must be supplied.  Magma does not keep these for you, but it requires them.!
-
-!MagmaSolHashTable commentStamp: 'cmm 4/11/2011 10:33' prior: 0!
-A MagmaSolHashTable extends Tom Rushworth's SOLHashTable to substitute the internal Array with a MagmaArray.  This allows very large segBits.
-
-Instance Variables
-!
-
-!MagmaBufferPositionMap commentStamp: 'cmm 8/27/2008 18:43' prior: 0!
-Magma adds additional attributes useful for an ODBMS.
-
-	#commitNumber!
-
-!MagmaClassIdManager commentStamp: 'cmm 6/28/2004 15:04' prior: 0!
-The purpose of this class is to keep track of which classes are persistent.!
-
-!MagmaOidManager commentStamp: 'cmm 6/21/2004 00:20' prior: 0!
-Because removeKey: is so slow in Squeak, I keep track of which ones are newObjects.  That way, when we return from a commit, replacement of temp to permanent oids is much faster.!
 
 !MagmaDataRepair commentStamp: 'cmm 4/23/2014 16:42' prior: 0!
 A MaDataRepair is used to perform data repairs on Magma models in a controlled and reliable fashion.  The requirements of a data-repair are:
@@ -1700,28 +1645,16 @@ Each MagmaSession initializes its own preferences.  Get an instance of my by sen
 
 Debug and DebugProxies are global preferences.!
 
-!MagmaRepositoryRequest commentStamp: 'cmm 1/25/2003 17:56' prior: 0!
-Superclass for all Magma request objects.!
+!MagmaBufferPositionMap commentStamp: 'cmm 8/27/2008 18:43' prior: 0!
+Magma adds additional attributes useful for an ODBMS.
 
-!MaAnchorRequest commentStamp: 'cmm 1/25/2003 17:59' prior: 0!
-I'm the request used when you ask for the root.  The "real" root is actually an instance of MaRootAnchor, which references your root (this provides service via the standard commit mechanism).!
+	#commitNumber!
 
-!MaReadRequest commentStamp: 'cmm 1/25/2003 17:58' prior: 0!
-I'm a request to a Magma server for a bunch of needed object buffers, due to proxy materialization or whatever.!
+!MagmaClassIdManager commentStamp: 'cmm 6/28/2004 15:04' prior: 0!
+The purpose of this class is to keep track of which classes are persistent.!
 
-!MaCommitRequest commentStamp: 'cmm 1/25/2003 17:55' prior: 0!
-I am the request object sent to a Magma server that commits changes to the database.!
-
-!MaKeyIntervalInfoRequest commentStamp: '<historical>' prior: 0!
-This request is used to get sizes of sub-magmacollections, either with or without
-index.
-!
-
-!MaSaveAndExitImageRequest commentStamp: 'cmm 7/15/2008 17:22' prior: 0!
-This request supports management of headless servers.!
-
-!MagmaServerStatisticsRequest commentStamp: 'cmm 5/6/2008 13:26' prior: 0!
-Requests the console statistics from the server.!
+!MagmaOidManager commentStamp: 'cmm 6/21/2004 00:20' prior: 0!
+Because removeKey: is so slow in Squeak, I keep track of which ones are newObjects.  That way, when we return from a commit, replacement of temp to permanent oids is much faster.!
 
 !MaRootAnchor commentStamp: 'cmm 12/22/2008 16:47' prior: 0!
 This class represents the real root of every repository.  The #root is the user-application domain root, the definition is a meta-object describing this repository itself.!
@@ -2048,17 +1981,84 @@ trunkEnd:  The ending Integer index position within the trunk this segment repre
 trunkStart:  The starting Integer index position within the trunk this segment represents.
 !
 
+!MagmaSolHashTable commentStamp: 'cmm 4/11/2011 10:33' prior: 0!
+A MagmaSolHashTable extends Tom Rushworth's SOLHashTable to substitute the internal Array with a MagmaArray.  This allows very large segBits.
+
+Instance Variables
+!
+
+!MagmaForwardingProxy commentStamp: 'cmm 7/6/2009 20:28' prior: 0!
+I refer to an object in the repository indicated by my 'magmaId'.  You send me a message and I'll signal my session to try to connect if necessary and forward the message on to the real object in that repository.!
+
 !MagmaServerStatistics commentStamp: 'cmm 5/5/2008 22:57' prior: 0!
 A MagmaServerStatistics knows considerable information about the performance of a listening MagmaServerConsole.
 
 See method comments for details about each staistic.!
 
-!MagmaForwardingProxy commentStamp: 'cmm 7/6/2009 20:28' prior: 0!
-I refer to an object in the repository indicated by my 'magmaId'.  You send me a message and I'll signal my session to try to connect if necessary and forward the message on to the real object in that repository.!
+!MagmaDifferentBranch commentStamp: 'cmm 10/24/2008 17:38' prior: 0!
+A MagmaDifferentBranch is used to indicate when a commit-record from one repository is attempted to be applied to a version of the same repository that has branched in a different direction at some point.  
+
+Normally this should not happen, but if you attempt to restore to a repository that was made by backing up another repository, but other commits have been applied to that repository since, there is no way Magma can reconcile the object models, so it signals this error to inconsistencies to the model.!
+
+!MagmaReadServerTooFarBehind commentStamp: 'cmm 3/8/2009 15:06' prior: 0!
+A MagmaReadServerTooFarBehind is signaled only when a higly-available, multi-server Magma node is running.  In this configuration, it is possible for the read-only servers to fall slightly behind the primary server (the one accepting commits).
+
+Applications which cannot tolerate this may set the #requiredProgress of their MagmaSession to a known commitNumber.  All ReadRequests will include this commitNumber, and, if a secondary read-only server finds itself behind that commitNumber for a particular client read-request, the client will pause 1 second and retry once before passing the error to the application.
+
+This will hopefully be sufficient to eliminate 100% of these kinds of errors.!
+
+!MagmaUnavailableCommitRecord commentStamp: 'cmm 8/12/2008 21:23' prior: 0!
+A MagmaUnavailableCommitRecord indicates the specified commit record is not available on the server.!
+
+!MagmaWrongServerError commentStamp: 'cmm 11/17/2008 14:33' prior: 0!
+A MagmaWrongServerError is signaled when a client asks a request fails it nodeCheck.  It occurs when a warm-backup is asked to commit.  If the server determines the primary is still up and running, and that the client should have asked that server to perform the commit, it will signal this error back to the client.!
+
+!MagmaLinkChange commentStamp: 'cmm 12/9/2012 11:52' prior: 0!
+This is a private notification to assist with HA processing.  When an HA event occurs, temp vars up on the stack can still be pointing to the server that went down, this notification informs them to update a particular 'oldLink' to a 'newLink' to the new server.!
+
+!MagmaProxyMaterialization commentStamp: 'cmm 1/13/2005 23:05' prior: 0!
+I am signaled when a mutating proxy is materialized.  The materializedObject is available as an argument.
+
+To use:
+
+	[ ... do your stuff ... ]
+		on: MagmaProxyMaterialization 
+		do:
+			[ : theNotification |
+			doSomethingWith: theNotification.
+			theNotification resume "<-- very important!!" ]
+
+!
+
+!MagmaUserRequirementNotification commentStamp: 'cmm 3/11/2005 14:13' prior: 0!
+I am used when Magma discovers it is missing an object and must get it from the user.  For example, when the user invokes a forwarding-proxy to another repository, connection credentials for that repository must be supplied.  Magma does not keep these for you, but it requires them.!
 
 !MaTransaction commentStamp: 'cmm 8/21/2008 13:26' prior: 0!
 This class is private.  Applications should use the transaction control provided on MagmaSession.
 !
+
+!MagmaRepositoryRequest commentStamp: 'cmm 1/25/2003 17:56' prior: 0!
+Superclass for all Magma request objects.!
+
+!MaAnchorRequest commentStamp: 'cmm 1/25/2003 17:59' prior: 0!
+I'm the request used when you ask for the root.  The "real" root is actually an instance of MaRootAnchor, which references your root (this provides service via the standard commit mechanism).!
+
+!MaReadRequest commentStamp: 'cmm 1/25/2003 17:58' prior: 0!
+I'm a request to a Magma server for a bunch of needed object buffers, due to proxy materialization or whatever.!
+
+!MaCommitRequest commentStamp: 'cmm 1/25/2003 17:55' prior: 0!
+I am the request object sent to a Magma server that commits changes to the database.!
+
+!MaKeyIntervalInfoRequest commentStamp: '<historical>' prior: 0!
+This request is used to get sizes of sub-magmacollections, either with or without
+index.
+!
+
+!MaSaveAndExitImageRequest commentStamp: 'cmm 7/15/2008 17:22' prior: 0!
+This request supports management of headless servers.!
+
+!MagmaServerStatisticsRequest commentStamp: 'cmm 5/6/2008 13:26' prior: 0!
+Requests the console statistics from the server.!
 
 !MaRootAnchor methodsFor: 'accessing' stamp: 'cmm 12/28/2004 23:55'!
 definition
@@ -2171,45 +2171,9 @@ name
 maWantsPreSerialization
 	^ true! !
 
-!MagmaWbClassBuilder methodsFor: 'as yet unclassified' stamp: 'cmm 5/30/2018 22:00'!
-fieldsWrittenToBySelector: selectorSymbol 
-	| allInstVarNames transientFieldNumbers |
-	"#maDirtyAdd: is a low-level method used for safe materialization of HashedCollections, do not signal modified at that time."
-	selectorSymbol = #maDirtyAdd: ifTrue: [ ^Array empty ].
-	allInstVarNames _ self targetClass allInstVarNames.
-	transientFieldNumbers _ self targetClass basicNew maTransientVariables collect:
-		[ : eachVarName | allInstVarNames indexOf: eachVarName ].
-	^ (super fieldsWrittenToBySelector: selectorSymbol) reject:
-		[ : eachFieldNumber | transientFieldNumbers includes: eachFieldNumber ]! !
-
 !MagmaDictionaryAssociation methodsFor: 'as yet unclassified' stamp: 'cmm 7/16/2010 16:07'!
 = aLookupKey 
 	^ self species = aLookupKey species and: [ key = aLookupKey key ]! !
-
-!MagmaTooFarBehindError methodsFor: 'as yet unclassified' stamp: 'cmm 8/7/2014 16:23'!
-defaultAction
-	super defaultAction.
-	^ self resume: true! !
-
-!MagmaTooFarBehindError methodsFor: 'as yet unclassified' stamp: 'cmm 7/17/2014 15:31'!
-isResumable
-	^ true! !
-
-!MagmaWrongCommitNumber methodsFor: 'accessing' stamp: 'cmm 10/14/2008 18:19'!
-expectedCommitNumber
-	^expectedCommitNumber! !
-
-!MagmaWrongCommitNumber methodsFor: 'accessing' stamp: 'cmm 10/14/2008 18:19'!
-expectedCommitNumber: anInteger
-	expectedCommitNumber _ anInteger! !
-
-!MagmaWrongServerError methodsFor: 'accessing' stamp: 'cmm 11/4/2008 17:00'!
-correctServer
-	^correctServer! !
-
-!MagmaWrongServerError methodsFor: 'accessing' stamp: 'cmm 11/4/2008 17:00'!
-correctServer: aMagmaRemoteLocation
-	correctServer _ aMagmaRemoteLocation! !
 
 !MagmaInvalidReference methodsFor: 'accessing' stamp: 'cmm 5/5/2013 19:05'!
 oidOfMissingBuffer
@@ -2300,445 +2264,6 @@ mergeConflicts
 !MagmaTooFarBehindConflict methodsFor: 'private' stamp: 'cmm 10/20/2014 12:41'!
 handleOrPassUsing: aMagmaSession
 	self pass! !
-
-!MagmaLinkChange methodsFor: 'accessing' stamp: 'cmm 12/8/2012 14:01'!
-linkToReplace: aMaNetworkServerLink 
-	^ oldLink = aMaNetworkServerLink
-		ifTrue: [ newLink ]
-		ifFalse: [ oldLink ]! !
-
-!MagmaLinkChange methodsFor: 'initializing' stamp: 'cmm 12/8/2012 14:00'!
-setOldLink: theOldLink newLink: theNewLink 
-	oldLink _ theOldLink.
-	newLink _ theNewLink! !
-
-!MagmaLinkChange class methodsFor: 'as yet unclassified' stamp: 'cmm 12/8/2012 14:03'!
-oldLink: oldLink newLink: newLink 
-	^ self new
-		
-		setOldLink: oldLink
-		newLink: newLink ;
-		 yourself! !
-
-!MagmaNodeUpdate methodsFor: 'initialize-release' stamp: 'cmm 10/31/2008 11:34'!
-add: aMagmaRemoteLocation 
-	add _ aMagmaRemoteLocation! !
-
-!MagmaNodeUpdate methodsFor: 'initialize-release' stamp: 'cmm 10/31/2008 11:34'!
-remove: aMagmaRemoteLocation 
-	remove _ aMagmaRemoteLocation! !
-
-!MagmaNodeUpdate methodsFor: 'initialize-release' stamp: 'cmm 11/15/2008 14:48'!
-setPrimary: aMagmaRemoteLocation 
-	setPrimary _ aMagmaRemoteLocation! !
-
-!MagmaNodeUpdate methodsFor: 'accessing' stamp: 'cmm 11/15/2008 14:50'!
-applyTo: aMagmaNode 
-	"Make updates to the aMagmaNode."
-	remove ifNotNil: 
-		[ aMagmaNode removeLocation: remove
-		"Check node is production-capable (i.e., at least two locations in the node)." ].
-	add ifNotNil: [ aMagmaNode addLocation: add ].
-	setPrimary ifNotNil: [ aMagmaNode primaryLocation: setPrimary ]! !
-
-!MagmaNodeUpdate methodsFor: 'accessing' stamp: 'cmm 11/24/2009 15:48'!
-processUsing: aMagmaServerConsole 
-	"Apply my updates to the node in a transaction.  Then ensure a correct node configuration."
-	| session node oldBranchCode canSkipReconfigure |
-	session _ aMagmaServerConsole serverSession.
-	node _ aMagmaServerConsole node.
-	canSkipReconfigure _ self isOnlyRemoving and: [ node includesSecondary: remove ].
-	
-	[ 
-	[ self wantsNewPrimary ifTrue: 
-		[ "Can't do a commit if you're not the primary, gotta bite the bullet."
-		oldBranchCode _ aMagmaServerConsole controller branchCode.
-		aMagmaServerConsole controller commitRestore ].
-	session commit: [ self applyTo: node ] ] 
-		on: MagmaCommitError
-		do: 
-			[ : err | 
-			session abort.
-			oldBranchCode ifNotNil: 
-				[ "Ahhhh, go back!!  We didn't actually commit anything so it should be safe."
-				aMagmaServerConsole controller
-					branchCode: oldBranchCode ;
-					beginRestore ] ] ] ensure: 
-		[ "This is needed whether commit-error occurs or not"
-		"But, if only removing a secondary, we don't need to "
-		canSkipReconfigure ifFalse: [ aMagmaServerConsole ensureCorrectNodeConfiguration ] ]! !
-
-!MagmaNodeUpdate methodsFor: 'testing' stamp: 'cmm 11/24/2009 15:44'!
-isOnlyRemoving
-	^ add isNil and: [ self wantsNewPrimary not and: [ remove notNil ] ]! !
-
-!MagmaNodeUpdate methodsFor: 'testing' stamp: 'cmm 11/15/2008 16:30'!
-wantsNewPrimary
-	^ setPrimary notNil! !
-
-!MagmaNodeUpdate class methodsFor: 'signaling' stamp: 'cmm 10/31/2008 11:33'!
-signalAdd: aMagmaRemoteLocation 
-	^ self new
-		add: aMagmaRemoteLocation ;
-		signal! !
-
-!MagmaNodeUpdate class methodsFor: 'signaling' stamp: 'cmm 10/31/2008 11:33'!
-signalRemove: aMagmaRemoteLocation 
-	^ self new
-		remove: aMagmaRemoteLocation ;
-		signal! !
-
-!MagmaProxyMaterialization methodsFor: 'as yet unclassified' stamp: 'cmm 4/27/2003 20:14'!
-materializedObject
-
-	^materializedObject! !
-
-!MagmaProxyMaterialization methodsFor: 'as yet unclassified' stamp: 'cmm 5/2/2003 17:23'!
-materializedObject: anObject
-
-	materializedObject _ anObject! !
-
-!MagmaProxyMaterialization class methodsFor: 'signaling' stamp: 'cmm 4/10/2005 18:00'!
-signalMaterializedObject: anObject 
-	(self new)
-		messageText: 'materializing a ' , anObject maOriginalClass printString;
-		materializedObject: anObject;
-		signal! !
-
-!MagmaUserRequiredNotification methodsFor: 'as yet unclassified' stamp: 'cmm 11/13/2013 20:40'!
-defaultAction
-	"The user did not listen for this notification.  For now, bail them out by offering them an opportunity to create one on the fly."
-	self resume: (session user ifNil: 
-			[ Smalltalk isHeadless 
-				ifTrue: [ 'unnamed' ]
-				ifFalse: 
-					[ MagmaUser id: (UIManager default request: 'Enter a name to connect under.') ] ])! !
-
-!MagmaUserRequiredNotification methodsFor: 'as yet unclassified' stamp: 'cmm 3/13/2005 18:07'!
-session: aMagmaSession
-
-	session _ aMagmaSession! !
-
-!MagmaUserRequiredNotification class methodsFor: 'private' stamp: 'cmm 3/13/2005 18:08'!
-requestUserFor: aMagmaSession
-
-	^ (self session: aMagmaSession)
-		messageText: 'Supply a userId for ', aMagmaSession linkInformation ;
-		signal! !
-
-!MagmaUserRequiredNotification class methodsFor: 'as yet unclassified' stamp: 'cmm 3/13/2005 18:07'!
-session: aMagmaSession
-
-	^ self new
-		session: aMagmaSession ;
-		yourself! !
-
-!MagmaSolHashFrame methodsFor: 'overriding' stamp: 'cmm 4/21/2011 20:50'!
-advance
-	"next will almost always be a proxy, so we avoid the DNU cost with this override."
-	prev _ curr.
-	curr _ next.
-	next _ next ifNotNil: [ next realObjectIfMutatingProxy next ]! !
-
-!MagmaSolHashFrame methodsFor: 'overriding' stamp: 'cmm 4/21/2011 20:49'!
-set: aSOLHashNode
-	"next will almost always be a proxy, so we avoid the DNU cost with this override."
-	prev _ aSOLHashNode.
-	curr _ prev next.
-	next _ curr ifNotNil: [ curr realObjectIfMutatingProxy next ]! !
-
-!MagmaSolHashSegment methodsFor: 'private' stamp: 'cmm 4/8/2014 22:29'!
-bucketAt: bucketNum put: anObject 
-	"Return whatever (SOLHashSegment, SOLHashNode, or nil) is in pointers at the index corresponding to bucketNum."
-	(pointers maIsLargeCollection not and: [ 1 + (bucketNum bitAnd: owner segMask) > self maxPointers ]) ifTrue: [ self convertToMagmaArray ].
-	^ super
-		bucketAt: bucketNum
-		put: anObject! !
-
-!MagmaSolHashSegment methodsFor: 'private' stamp: 'cmm 4/23/2011 15:02'!
-convertToMagmaArray
-	| oldPointers |
-	oldPointers _ pointers.
-	pointers _ MagmaArray new
-		 pageSize: 1 ;
-		 yourself.
-	oldPointers withIndexDo:
-		[ : each : x | pointers
-			at: x
-			put: each ]! !
-
-!MagmaSolHashSegment methodsFor: 'private' stamp: 'cmm 4/8/2014 22:34'!
-maxPointers
-	^ 1000! !
-
-!MagmaSolHashTable methodsFor: 'overriding' stamp: 'cmm 4/23/2011 12:08'!
-hashSegmentClass
-	^ MagmaSolHashSegment ! !
-
-!MagmaSolHashTable methodsFor: 'overriding' stamp: 'cmm 4/21/2011 20:47'!
-initializeFrame
-	frame _ MagmaSolHashFrame new! !
-
-!MagmaSolHashTable methodsFor: 'overriding' stamp: 'cmm 5/30/2018 20:15'!
-newPointersCollection
-	"This will be converted to a MagmaArray if/when an access takes it past this size."
-	^ OrderedCollection new: 0! !
-
-!MagmaSolHashTable class methodsFor: 'overriding' stamp: 'cmm 4/13/2011 21:57'!
-defaultLoadFactor
-	"MagmaArray's excel at being large, and we should optimize for fast access.  This is better than 3 because it means that dummy elements only take up 8.3% more of the total space, and better than 1 because that would be one dummy for every real node, which is just too much space overhead.  2 seems to be the best balance."
-	^ 2! !
-
-!MagmaSolHashTable class methodsFor: 'overriding' stamp: 'cmm 4/10/2011 19:49'!
-defaultSegBits
-	"A MagmaArray with up to  268435456 buckets would take up roughly 1.61G on disk.  That would be a good size before creating a new one."
-	^ 28! !
-
-!MagmaBufferPositionMap class methodsFor: 'as yet unclassified' stamp: 'cmm 8/1/2011 13:05'!
-bufferPositionOfByteCodesPlusTrailerSize
-	^ 26! !
-
-!MagmaBufferPositionMap class methodsFor: 'as yet unclassified' stamp: 'cmm 8/10/2010 15:51'!
-bufferPositionOfClassVersion
-	"Magma adds 12 additional bytes."
-	^ 28! !
-
-!MagmaBufferPositionMap class methodsFor: 'as yet unclassified' stamp: 'cmm 8/10/2010 15:51'!
-bufferPositionOfCommitNumber
-	"Bumping over the classVersion for FixedObjectBuffers."
-	^ 16! !
-
-!MagmaBufferPositionMap class methodsFor: 'as yet unclassified' stamp: 'cmm 8/1/2011 13:06'!
-bufferPositionOfMethodHeader
-	^ 22! !
-
-!MagmaBufferPositionMap class methodsFor: 'as yet unclassified' stamp: 'cmm 8/1/2011 14:56'!
-headerSize
-	"The standard record has 18 bytes of header.  Magma replaces portion of the header with the following:
-		commitNumber - 6 bytes
-		filler - 6 bytes
-		classVersion - 2 bytes"
-	^ 30! !
-
-!MagmaBufferPositionMap class methodsFor: 'as yet unclassified' stamp: 'cmm 8/4/2011 21:32'!
-headerSizeForCompiledMethodBuffer
-	^ 34! !
-
-!MagmaBufferPositionMap class methodsFor: 'as yet unclassified' stamp: 'cmm 8/27/2008 20:53'!
-indexPosition
-	"Reserve the 0-based particular slot for this attribute map."
-	^ 1! !
-
-!MagmaClassIdManager methodsFor: 'event handling' stamp: 'cmm 10/15/2004 12:40'!
-assimilateInImageDefinition: aClass
-	aClass isMeta ifTrue: [ MagmaSoftwareError signal: 'Metaclass instances are not stored here.' ].
-	self addClassDefinition: (self inImageDefinition: aClass)! !
-
-!MagmaClassIdManager methodsFor: 'event handling' stamp: 'cmm 10/1/2004 15:19'!
-handleClassModification: aClass using: aMaObjectSerializer
-
-	self refreshInImageDefinition: aClass! !
-
-!MagmaClassIdManager methodsFor: 'event handling' stamp: 'cmm 9/6/2012 11:03'!
-handleClassRename: aRenamedEvent 
-	"aRenamedEvent's item has just been renamed."
-	aRenamedEvent isRenamed ifFalse: [ ^ self ].
-	self
-		renameClass: aRenamedEvent item
-		to: aRenamedEvent newName! !
-
-!MagmaClassIdManager methodsFor: 'event handling' stamp: 'cmm 9/6/2012 17:55'!
-renameClass: aClass to: newName 
-	"Class name changed, so did hash, so rehash."
-	idsByClass rehash.
-	inImageDefinitions rehash.
-	(self includesIdForClass: aClass) ifFalse: [ ^ self ].
-	(self inImageDefinition: aClass) in:
-		[ : renamedClassDefinition | renamedClassDefinition beKnownAs: newName ].
-	(self classDefinitions at: (self idForClass: aClass)) do:
-		[ : each | each beKnownAs: newName ]! !
-
-!MagmaClassIdManager methodsFor: 'accessing' stamp: 'cmm 7/20/2007 11:52'!
-idForClass: aClass ifAbsent: aBlock 
-	^ aClass = MagmaCounter 
-		ifTrue: [ self class magmaCounterClassId ]
-		ifFalse: 
-			[ super 
-				idForClass: aClass
-				ifAbsent: aBlock ]! !
-
-!MagmaClassIdManager methodsFor: 'accessing' stamp: 'cmm 3/8/2007 00:28'!
-largeCollectionIdsDo: aBlock 
-	largeCollectionIds ifNil: 
-		[ largeCollectionIds _ OrderedCollection new.
-		self class largeCollectionClasses do: 
-			[ : each | | id |
-			(self includesIdForClass: each) 
-				ifTrue: [ largeCollectionIds add: (self idForClass: each) ] ] ].
-	largeCollectionIds do: aBlock! !
-
-!MagmaClassIdManager methodsFor: 'private' stamp: 'cmm 7/14/2010 14:29'!
-legacyClassMap
-	^ ({99 -> MagmaCounter} , super legacyClassMap) sort: [ : a : b | a key < b key ]! !
-
-!MagmaClassIdManager class methodsFor: 'as yet unclassified' stamp: 'cmm 7/23/2011 14:07'!
-largeCollectionClasses
-	^ MagmaCoreLargeCollection allSubclasses! !
-
-!MagmaClassIdManager class methodsFor: 'as yet unclassified' stamp: 'cmm 7/20/2007 11:53'!
-minimumClasses
-	^ super minimumClasses, { MagmaCounter }! !
-
-!MagmaClassIdManager class methodsFor: 'accessing' stamp: 'cmm 7/24/2007 23:00'!
-magmaCounterClassId
-	"MagmaCounters get special treatment because they cannot cause a commit-conflict.  To easily support this, we check for a special class-id."
-	^ 99! !
-
-!MagmaOidManager methodsFor: 'private' stamp: 'cmm 9/4/2012 16:42'!
-cleanObject: anObject 
-	super cleanObject: anObject.
-	newObjects
-		removeKey:
-			(newOids
-				removeKey: anObject
-				ifAbsent: [ ^ self ])
-		ifAbsent: [  ]! !
-
-!MagmaOidManager methodsFor: 'private' stamp: 'cmm 8/6/2013 14:07'!
-getNextOid
-	| ans |
-	^ (MaOidCalculator isOidForNewObject: (ans _ super getNextOid))
-		ifTrue: [ ans ]
-		ifFalse: [ MagmaUserError signal: 'Cannot support more than about 4M objects in a single commit.' ]! !
-
-!MagmaOidManager methodsFor: 'private' stamp: 'cmm 8/3/2009 20:44'!
-validateNextOid
-	(MaOidCalculator isOidForNewObject: nextOid) ifFalse: 
-		[ MagmaUserError signal: 'Magma cannot add more than 4-million new objects at once.' ]! !
-
-!MagmaOidManager methodsFor: 'initialize-release' stamp: 'cmm 6/22/2016 19:56'!
-finalizeOids
-	super finalizeOids.
-	newOids finalizeValues: true.
-	newObjects class isAutoCleaning 
-		ifTrue: [ newObjects finalizeValues ]
-		ifFalse: [ newObjects _ newObjects reject: [ : each | each isNil ] ]! !
-
-!MagmaOidManager methodsFor: 'initialize-release' stamp: 'sig 9/24/2007 09:41'!
-initializeNewObjects
-
-	newObjects _ MagmaPreferences weakValueDictionaryClass new! !
-
-!MagmaOidManager methodsFor: 'initialize-release' stamp: 'cmm 4/25/2010 21:45'!
-initializeNewOids
-	newOids _ MaObjectSerializerPreferences newWeakIdentityKeyDictionary! !
-
-!MagmaOidManager methodsFor: 'initialize-release' stamp: 'cmm 4/20/2005 22:23'!
-reset
-
-	super reset.
-	self resetNewObjects! !
-
-!MagmaOidManager methodsFor: 'initialize-release' stamp: 'cmm 4/20/2005 22:23'!
-resetNewObjects
-	"This is needed because we only have 2 million new-object oids.  If we didn't do this, the nextOid counter continues to increase to its ceiling."
-
-	self
-		initializeNewObjects ;
-		initializeNewOids ;
-		resetNextOid
-	! !
-
-!MagmaOidManager methodsFor: 'accessing' stamp: 'cmm 4/22/2013 13:33'!
-objectWithOid: anInteger ifFound: oneArgBlock ifAbsent: aBlock
-
-	^MaOidCalculator
-		objectWithOid: anInteger
-		ifNone:
-			[ (MaOidCalculator isOidForNewObject: anInteger)
-				ifTrue:
-					[ newObjects
-						at: anInteger
-						ifPresent:
-							[ :obj |
-							obj 
-								ifNil: [ aBlock value ] 
-								ifNotNil: [ oneArgBlock value: obj ] ]
-						ifAbsent: aBlock ]
-				ifFalse:
-					[ objects
-						at: anInteger
-						ifPresent:
-							[ :obj |
-							obj   "oid key marked to be cleaned"
-								ifNil: [ aBlock value ]
-								ifNotNil: [ oneArgBlock value: obj ] ]
-						ifAbsent: aBlock ] ]
-
-
-
-
-! !
-
-!MagmaOidManager methodsFor: 'accessing' stamp: 'cmm 5/7/2013 10:28'!
-oidFor: anObject ifAbsent: aBlock 
-	^ anObject maIsMutatingProxy
-		ifTrue: [ anObject maOid ]
-		ifFalse:
-			[ anObject maRequiresOwnBuffer
-				ifTrue:
-					[ newOids
-						at: anObject
-						ifPresent:
-							[ : oid | oid
-								ifNil: aBlock
-								ifNotNil: [ oid ] ]
-						ifAbsent:
-							[ super
-								oidFor: anObject
-								ifAbsent: aBlock ] ]
-				ifFalse:
-					[ super
-						oidFor: anObject
-						ifAbsent: aBlock ] ]! !
-
-!MagmaOidManager methodsFor: 'accessing' stamp: 'cmm 5/6/2013 17:25'!
-oidOf: anObject is: anInteger 
-	^ (MaOidCalculator isOidForNewObject: anInteger)
-		ifTrue:
-			[ newObjects
-				at: anInteger
-				put: anObject.
-			newOids
-				at: anObject
-				put: anInteger ]
-		ifFalse:
-			[ super
-				oidOf: anObject
-				is: anInteger.
-			(anObject maIsMutatingProxy and: [ anObject maRealObjectIsReified ]) ifTrue:
-				[ oids
-					at: anObject realObjectIfMutatingProxy
-					put: anInteger ] ]! !
-
-!MagmaOidManager methodsFor: 'copying' stamp: 'cmm 4/20/2005 22:16'!
-postIndependentCopy
-
-	super postIndependentCopy.
-	newObjects _ newObjects copy.
-	newOids _ newOids copy! !
-
-!MagmaOidManager methodsFor: 'stats' stamp: 'cmm 5/7/2008 16:28'!
-statistics
-	^ statistics! !
-
-!MagmaOidManager methodsFor: 'stats' stamp: 'cmm 5/7/2008 15:54'!
-statistics: MaSerializationStat 
-	statistics _ MaSerializationStat! !
-
-!MagmaOidManager methodsFor: 'stats' stamp: 'cmm 5/7/2008 16:28'!
-useStatisticsFrom: anotherOidManager 
-	statistics _ anotherOidManager statistics! !
 
 !MagmaDataRepair methodsFor: 'private' stamp: 'cmm 4/4/2014 20:45'!
 anyDataToRepair
@@ -3280,563 +2805,251 @@ runningTestCases
 runningTestCases: aBoolean
 	RunningTestCases _ aBoolean! !
 
-!MagmaRepositoryRequest methodsFor: 'accessing' stamp: 'cmm 2/27/2009 15:59'!
-failedLocation: aMagmaRemoteLocation 
-	failedLocation _ aMagmaRemoteLocation! !
+!MagmaBufferPositionMap class methodsFor: 'as yet unclassified' stamp: 'cmm 8/1/2011 13:05'!
+bufferPositionOfByteCodesPlusTrailerSize
+	^ 26! !
 
-!MagmaRepositoryRequest methodsFor: 'accessing' stamp: 'cmm 3/8/2009 15:21'!
-prepareToSubmitFor: aMagmaSession 
-	self sessionId: aMagmaSession id! !
+!MagmaBufferPositionMap class methodsFor: 'as yet unclassified' stamp: 'cmm 8/10/2010 15:51'!
+bufferPositionOfClassVersion
+	"Magma adds 12 additional bytes."
+	^ 28! !
 
-!MagmaRepositoryRequest methodsFor: 'accessing'!
-sessionId
+!MagmaBufferPositionMap class methodsFor: 'as yet unclassified' stamp: 'cmm 8/10/2010 15:51'!
+bufferPositionOfCommitNumber
+	"Bumping over the classVersion for FixedObjectBuffers."
+	^ 16! !
 
-	^sessionId! !
+!MagmaBufferPositionMap class methodsFor: 'as yet unclassified' stamp: 'cmm 8/1/2011 13:06'!
+bufferPositionOfMethodHeader
+	^ 22! !
 
-!MagmaRepositoryRequest methodsFor: 'accessing' stamp: 'cmm 11/5/2008 16:10'!
-sessionId: aUuid 
-	self requiresConnection ifTrue: [ aUuid ifNil: [ MagmaSoftwareError signal ] ].
-	sessionId _ aUuid! !
+!MagmaBufferPositionMap class methodsFor: 'as yet unclassified' stamp: 'cmm 8/1/2011 14:56'!
+headerSize
+	"The standard record has 18 bytes of header.  Magma replaces portion of the header with the following:
+		commitNumber - 6 bytes
+		filler - 6 bytes
+		classVersion - 2 bytes"
+	^ 30! !
 
-!MagmaRepositoryRequest methodsFor: 'accessing' stamp: 'cmm 6/17/2009 10:08'!
-waitCursor
-	^ MagmaPreferences waitCursor! !
+!MagmaBufferPositionMap class methodsFor: 'as yet unclassified' stamp: 'cmm 8/4/2011 21:32'!
+headerSizeForCompiledMethodBuffer
+	^ 34! !
 
-!MagmaRepositoryRequest methodsFor: 'testing' stamp: 'cmm 8/20/2014 14:47'!
-isBegin
-	^ false! !
+!MagmaBufferPositionMap class methodsFor: 'as yet unclassified' stamp: 'cmm 8/27/2008 20:53'!
+indexPosition
+	"Reserve the 0-based particular slot for this attribute map."
+	^ 1! !
 
-!MagmaRepositoryRequest methodsFor: 'testing' stamp: 'cmm 2/5/2009 20:16'!
-isConnect
-	^ false! !
+!MagmaClassIdManager methodsFor: 'event handling' stamp: 'cmm 10/15/2004 12:40'!
+assimilateInImageDefinition: aClass
+	aClass isMeta ifTrue: [ MagmaSoftwareError signal: 'Metaclass instances are not stored here.' ].
+	self addClassDefinition: (self inImageDefinition: aClass)! !
 
-!MagmaRepositoryRequest methodsFor: 'testing' stamp: 'cmm 9/21/2008 21:02'!
-isDisconnect
-	^ false! !
+!MagmaClassIdManager methodsFor: 'event handling' stamp: 'cmm 10/1/2004 15:19'!
+handleClassModification: aClass using: aMaObjectSerializer
 
-!MagmaRepositoryRequest methodsFor: 'testing' stamp: 'cmm 3/1/2009 12:02'!
-isWriteRequest
-	^ false! !
+	self refreshInImageDefinition: aClass! !
 
-!MagmaRepositoryRequest methodsFor: 'testing' stamp: 'cmm 12/31/2002 15:26'!
-requiresConnection
+!MagmaClassIdManager methodsFor: 'event handling' stamp: 'cmm 9/6/2012 11:03'!
+handleClassRename: aRenamedEvent 
+	"aRenamedEvent's item has just been renamed."
+	aRenamedEvent isRenamed ifFalse: [ ^ self ].
+	self
+		renameClass: aRenamedEvent item
+		to: aRenamedEvent newName! !
 
-	^true! !
+!MagmaClassIdManager methodsFor: 'event handling' stamp: 'cmm 9/6/2012 17:55'!
+renameClass: aClass to: newName 
+	"Class name changed, so did hash, so rehash."
+	idsByClass rehash.
+	inImageDefinitions rehash.
+	(self includesIdForClass: aClass) ifFalse: [ ^ self ].
+	(self inImageDefinition: aClass) in:
+		[ : renamedClassDefinition | renamedClassDefinition beKnownAs: newName ].
+	(self classDefinitions at: (self idForClass: aClass)) do:
+		[ : each | each beKnownAs: newName ]! !
 
-!MagmaRepositoryRequest methodsFor: 'testing' stamp: 'cmm 9/24/2012 16:54'!
-timesToRetry
-	^ 2! !
+!MagmaClassIdManager methodsFor: 'accessing' stamp: 'cmm 7/20/2007 11:52'!
+idForClass: aClass ifAbsent: aBlock 
+	^ aClass = MagmaCounter 
+		ifTrue: [ self class magmaCounterClassId ]
+		ifFalse: 
+			[ super 
+				idForClass: aClass
+				ifAbsent: aBlock ]! !
 
-!MaAbortTransactionRequest methodsFor: 'accessing' stamp: 'cmm 7/10/2009 13:49'!
-additionalBuffers: anArray
-	additionalBuffers _ anArray! !
+!MagmaClassIdManager methodsFor: 'accessing' stamp: 'cmm 3/8/2007 00:28'!
+largeCollectionIdsDo: aBlock 
+	largeCollectionIds ifNil: 
+		[ largeCollectionIds _ OrderedCollection new.
+		self class largeCollectionClasses do: 
+			[ : each | | id |
+			(self includesIdForClass: each) 
+				ifTrue: [ largeCollectionIds add: (self idForClass: each) ] ] ].
+	largeCollectionIds do: aBlock! !
 
-!MaAbortTransactionRequest methodsFor: 'accessing' stamp: 'cmm 12/5/2012 10:05'!
-timesToRetry
-	^ 0! !
+!MagmaClassIdManager methodsFor: 'private' stamp: 'cmm 7/14/2010 14:29'!
+legacyClassMap
+	^ ({99 -> MagmaCounter} , super legacyClassMap) sort: [ : a : b | a key < b key ]! !
 
-!MaAbstractReadRequest methodsFor: 'building' stamp: 'cmm 3/8/2009 15:21'!
-prepareToSubmitFor: aMagmaSession 
-	super prepareToSubmitFor: aMagmaSession.
-	requiredProgress _ aMagmaSession requiredProgress! !
+!MagmaClassIdManager class methodsFor: 'as yet unclassified' stamp: 'cmm 7/23/2011 14:07'!
+largeCollectionClasses
+	^ MagmaCoreLargeCollection allSubclasses! !
 
-!MaAbstractReadRequest methodsFor: 'building' stamp: 'cmm 6/4/2006 20:11'!
-readStrategy
-	^ readStrategy ! !
+!MagmaClassIdManager class methodsFor: 'as yet unclassified' stamp: 'cmm 7/20/2007 11:53'!
+minimumClasses
+	^ super minimumClasses, { MagmaCounter }! !
 
-!MaAbstractReadRequest methodsFor: 'building' stamp: 'cmm 9/1/2003 23:25'!
-readStrategy: aMaReadStrategy
+!MagmaClassIdManager class methodsFor: 'accessing' stamp: 'cmm 7/24/2007 23:00'!
+magmaCounterClassId
+	"MagmaCounters get special treatment because they cannot cause a commit-conflict.  To easily support this, we check for a special class-id."
+	^ 99! !
 
-	readStrategy _ aMaReadStrategy! !
+!MagmaOidManager methodsFor: 'private' stamp: 'cmm 9/4/2012 16:42'!
+cleanObject: anObject 
+	super cleanObject: anObject.
+	newObjects
+		removeKey:
+			(newOids
+				removeKey: anObject
+				ifAbsent: [ ^ self ])
+		ifAbsent: [  ]! !
 
-!MaAbstractReadRequest methodsFor: 'accessing' stamp: 'cmm 3/8/2009 14:25'!
-requiredProgress
-	^requiredProgress! !
+!MagmaOidManager methodsFor: 'private' stamp: 'cmm 8/6/2013 14:07'!
+getNextOid
+	| ans |
+	^ (MaOidCalculator isOidForNewObject: (ans _ super getNextOid))
+		ifTrue: [ ans ]
+		ifFalse: [ MagmaUserError signal: 'Cannot support more than about 4M objects in a single commit.' ]! !
 
-!MaAbstractReadRequest methodsFor: 'accessing' stamp: 'cmm 12/4/2012 22:15'!
-timesToRetry
-	^ 3! !
+!MagmaOidManager methodsFor: 'private' stamp: 'cmm 8/3/2009 20:44'!
+validateNextOid
+	(MaOidCalculator isOidForNewObject: nextOid) ifFalse: 
+		[ MagmaUserError signal: 'Magma cannot add more than 4-million new objects at once.' ]! !
 
-!MaAbstractReadRequest methodsFor: 'accessing' stamp: 'cmm 6/17/2009 09:50'!
-waitCursor
-	^ MagmaPreferences readCursor! !
+!MagmaOidManager methodsFor: 'initialize-release' stamp: 'cmm 6/22/2016 19:56'!
+finalizeOids
+	super finalizeOids.
+	newOids finalizeValues: true.
+	newObjects class isAutoCleaning 
+		ifTrue: [ newObjects finalizeValues ]
+		ifFalse: [ newObjects _ newObjects reject: [ : each | each isNil ] ]! !
 
-!MaAbstractReadRequest class methodsFor: 'as yet unclassified' stamp: 'cmm 10/12/2015 15:08'!
-initializeDefaultSound
-	defaultSound _ ((FMSound new
-		 addEnvelope:
-			(VolumeEnvelope
-				points: {0 @ 1.0. 1 @ 1.0}
-				loopStart: 1
-				loopEnd: 1) ;
-			 yourself)
-		setPitch: 840.0
-		dur: 0.1
-		loudness: 0.25)! !
+!MagmaOidManager methodsFor: 'initialize-release' stamp: 'sig 9/24/2007 09:41'!
+initializeNewObjects
 
-!MaLargeCollectionSegmentRequest methodsFor: 'accessing' stamp: 'cmm 6/4/2006 20:11'!
-collectionOid
-	^ collectionOid! !
+	newObjects _ MagmaPreferences weakValueDictionaryClass new! !
 
-!MaLargeCollectionSegmentRequest methodsFor: 'accessing' stamp: 'cmm 12/2/2004 13:50'!
-collectionOid: anInteger
+!MagmaOidManager methodsFor: 'initialize-release' stamp: 'cmm 4/25/2010 21:45'!
+initializeNewOids
+	newOids _ MaObjectSerializerPreferences newWeakIdentityKeyDictionary! !
 
-	collectionOid _ anInteger! !
+!MagmaOidManager methodsFor: 'initialize-release' stamp: 'cmm 4/20/2005 22:23'!
+reset
 
-!MaLargeCollectionSegmentRequest methodsFor: 'accessing' stamp: 'cmm 6/4/2006 20:11'!
-quantity
-	^ quantity! !
+	super reset.
+	self resetNewObjects! !
 
-!MaLargeCollectionSegmentRequest methodsFor: 'accessing'!
-quantity: anInteger
+!MagmaOidManager methodsFor: 'initialize-release' stamp: 'cmm 4/20/2005 22:23'!
+resetNewObjects
+	"This is needed because we only have 2 million new-object oids.  If we didn't do this, the nextOid counter continues to increase to its ceiling."
 
-	quantity _ anInteger
+	self
+		initializeNewObjects ;
+		initializeNewOids ;
+		resetNextOid
+	! !
+
+!MagmaOidManager methodsFor: 'accessing' stamp: 'cmm 4/22/2013 13:33'!
+objectWithOid: anInteger ifFound: oneArgBlock ifAbsent: aBlock
+
+	^MaOidCalculator
+		objectWithOid: anInteger
+		ifNone:
+			[ (MaOidCalculator isOidForNewObject: anInteger)
+				ifTrue:
+					[ newObjects
+						at: anInteger
+						ifPresent:
+							[ :obj |
+							obj 
+								ifNil: [ aBlock value ] 
+								ifNotNil: [ oneArgBlock value: obj ] ]
+						ifAbsent: aBlock ]
+				ifFalse:
+					[ objects
+						at: anInteger
+						ifPresent:
+							[ :obj |
+							obj   "oid key marked to be cleaned"
+								ifNil: [ aBlock value ]
+								ifNotNil: [ oneArgBlock value: obj ] ]
+						ifAbsent: aBlock ] ]
+
+
+
+
 ! !
 
-!MaRefreshSegmentRequest methodsFor: 'accessing' stamp: 'cmm 8/6/2006 21:24'!
-exceptions
-	^exceptions! !
-
-!MaRefreshSegmentRequest methodsFor: 'accessing' stamp: 'cmm 8/6/2006 22:32'!
-exceptions: aSet
-	exceptions _ aSet! !
-
-!MaRefreshSegmentRequest methodsFor: 'accessing' stamp: 'cmm 6/3/2006 15:50'!
-expression
-	^expression! !
-
-!MaRefreshSegmentRequest methodsFor: 'accessing' stamp: 'cmm 6/3/2006 15:50'!
-expression: aMaTerm
-	expression _ aMaTerm! !
-
-!MaRefreshSegmentRequest methodsFor: 'accessing' stamp: 'cmm 7/29/2006 18:23'!
-loadObjects
-	^loadObjects! !
-
-!MaRefreshSegmentRequest methodsFor: 'accessing' stamp: 'cmm 7/29/2006 18:23'!
-loadObjects: aBoolean
-	loadObjects _ aBoolean! !
-
-!MaRefreshSegmentRequest methodsFor: 'accessing' stamp: 'cmm 6/3/2006 15:50'!
-segment
-	^segment! !
-
-!MaRefreshSegmentRequest methodsFor: 'accessing' stamp: 'cmm 6/3/2006 15:50'!
-segment: aMagmaCollectionSegment
-	segment _ aMagmaCollectionSegment! !
-
-!MaSegmentByIndexRequest methodsFor: 'building'!
-lowIndex: anInteger
-
-	lowIndex _ anInteger
-! !
-
-!MaReadMultipleRequest methodsFor: 'accessing' stamp: 'cmm 2/11/2008 16:21'!
-oids: aCollection
-	oids _ aCollection! !
-
-!MaReadRequest methodsFor: 'building'!
-oid: anInteger
-
-	oid _ anInteger
-! !
-
-!MaCommitLogRecordRequest methodsFor: 'accessing' stamp: 'cmm 3/15/2009 19:35'!
-endingCommitNumber: anInteger
-	endingCommitNumber _ anInteger! !
-
-!MaCommitLogRecordRequest methodsFor: 'accessing' stamp: 'cmm 8/12/2008 21:43'!
-startingCommitNumber: anInteger
-	startingCommitNumber _ anInteger! !
-
-!MaCommitLogRecordRequest methodsFor: 'accessing' stamp: 'cmm 6/17/2009 10:07'!
-waitCursor
-	^ MagmaPreferences readCursor! !
-
-!MaCommitLogRecordRequest methodsFor: 'testing' stamp: 'cmm 10/14/2008 16:39'!
-requiresConnection
-	^ false! !
-
-!MaCommitLogRecordRequest class methodsFor: 'initialize-release' stamp: 'cmm 10/12/2015 16:05'!
-initializeDefaultSound
-	defaultSound _ ((FMSound new
-		 addEnvelope:
-			(VolumeEnvelope
-				points: {0 @ 1.0. 1 @ 1.0}
-				loopStart: 1
-				loopEnd: 1) ;
-			 yourself)
-		setPitch: 210.0
-		dur: 0.1
-		loudness: 1.0 ;
-		modulation: 2 ratio: 0.5)! !
-
-!MaWarmBackupUpdateRequest methodsFor: 'accessing' stamp: 'cmm 10/14/2008 17:26'!
-requestingLocation: aMagmaRemoteLocation
-	"Set with the location of the warm-backup requesting the records."
-	requestingLocation _ aMagmaRemoteLocation! !
-
-!MaCommitRequest methodsFor: 'building' stamp: 'cmm 4/21/2003 17:04'!
-beginAnother: aBoolean
-
-	beginAnother _ aBoolean! !
-
-!MaCommitRequest methodsFor: 'building'!
-package: aMaCommitPackage
-
-	package _ aMaCommitPackage
-! !
-
-!MaCommitRequest methodsFor: 'testing' stamp: 'cmm 9/24/2012 16:54'!
-timesToRetry
-	^ 0! !
-
-!MaCommitRequest methodsFor: 'accessing' stamp: 'cmm 6/17/2009 10:07'!
-waitCursor
-	^ MagmaPreferences writeCursor! !
-
-!MaCommitRequest class methodsFor: 'initialize-release' stamp: 'cmm 10/12/2015 15:15'!
-initializeDefaultSound
-	defaultSound _ ((FMSound new
-		 addEnvelope:
-			(VolumeEnvelope
-				points: {0 @ 1.0. 1 @ 1.0}
-				loopStart: 1
-				loopEnd: 1) ;
-			 yourself)
-		setPitch: 420.0
-		dur: 0.1
-		loudness: 0.25)! !
-
-!MaDownloadCodeRequest methodsFor: 'testing' stamp: 'cmm 12/31/2002 15:26'!
-requiresConnection
-
-	^false! !
-
-!MaGetMcLockerRequest methodsFor: 'accessing' stamp: 'cmm 9/28/2008 20:54'!
-mcOid: anInteger
-	"The oid of the MagmaCollection."
-	mcOid _ anInteger! !
-
-!MaLargeCollectionSizeRequest methodsFor: 'building'!
-collectionOid: anInteger
-
-	collectionOid _ anInteger
-! !
-
-!MaLargeCollectionSizeRequest class methodsFor: 'initialize-release' stamp: 'cmm 10/12/2015 15:24'!
-initializeDefaultSound
-	defaultSound _ ((FMSound new
-		 addEnvelope:
-			(VolumeEnvelope
-				points: {0 @ 1.0. 1 @ 1.0}
-				loopStart: 1
-				loopEnd: 1) ;
-			 yourself)
-		setPitch: 840.0
-		dur: 0.1
-		loudness: 0.25)! !
-
-!MaKeyIntervalInfoRequest methodsFor: 'building'!
-attribute: aSymbol
-
-	attribute _ aSymbol
-! !
-
-!MaKeyIntervalInfoRequest methodsFor: 'building'!
-highKey: anInteger
-
-	highKey _ anInteger
-! !
-
-!MaKeyIntervalInfoRequest methodsFor: 'building'!
-lowKey: anInteger
-
-	lowKey _ anInteger
-! !
-
-!MaLoadFromReaderRequest methodsFor: 'accessing' stamp: 'cmm 10/16/2006 12:15'!
-commitPackage: aMaCommitPackage
-	commitPackage _ aMaCommitPackage! !
-
-!MaLoadFromReaderRequest methodsFor: 'accessing' stamp: 'cmm 7/2/2006 23:43'!
-distinct: aBoolean
-	distinct _ aBoolean! !
-
-!MaLoadFromReaderRequest methodsFor: 'accessing' stamp: 'cmm 7/3/2006 12:55'!
-expression: aMagmaCollectionReader
-	expression _ aMagmaCollectionReader! !
-
-!MaLoadFromReaderRequest methodsFor: 'accessing' stamp: 'cmm 6/11/2006 21:51'!
-sourceCollectionOid: anInteger
-	sourceCollectionOid _ anInteger! !
-
-!MaLoadFromReaderRequest methodsFor: 'testing' stamp: 'cmm 9/24/2012 16:55'!
-timesToRetry
-	"Don't retry these; the chance of a duplicate load process is just not worth it."
-	^ 0! !
-
-!MaLoadProgressRequest methodsFor: 'accessing' stamp: 'cmm 7/26/2006 17:59'!
-collectionOid
-	^collectionOid! !
-
-!MaLoadProgressRequest methodsFor: 'accessing' stamp: 'cmm 7/26/2006 17:59'!
-collectionOid: anInteger
-	collectionOid _ anInteger! !
-
-!MaPrimitiveAttributesRequest methodsFor: 'testing' stamp: 'cmm 10/22/2008 16:34'!
-requiresConnection
-	^ false! !
-
-!MaRawBufferRequest methodsFor: 'as yet unclassified' stamp: 'cmm 3/14/2009 15:20'!
-oid: anInteger 
-	oid _ anInteger! !
-
-!MaRawBufferRequest methodsFor: 'as yet unclassified' stamp: 'cmm 3/14/2009 15:21'!
-requiresConnection
-	^ false! !
-
-!MaReaderTrunkRequest methodsFor: 'accessing' stamp: 'cmm 8/6/2006 18:34'!
-collectionOid: aMaTerm
-	collectionOid _ aMaTerm! !
-
-!MaReaderTrunkRequest methodsFor: 'accessing' stamp: 'cmm 8/6/2006 18:33'!
-expression: aMaTerm
-	expression _ aMaTerm! !
-
-!MaRefreshRequest methodsFor: 'overriding' stamp: 'cmm 1/8/2009 18:35'!
-nodeCheck
-	self shouldBePrimary! !
-
-!MaRefreshRequest methodsFor: 'accessing' stamp: 'cmm 12/5/2012 10:07'!
-timesToRetry
-	^ 0! !
-
-!MaRemoveSecondaryLocationRequest methodsFor: 'accessing' stamp: 'cmm 3/4/2009 15:47'!
-locationToRemove: anObject
-	locationToRemove _ anObject! !
-
-!MaRemoveSecondaryLocationRequest methodsFor: 'testing' stamp: 'cmm 3/4/2009 15:50'!
-requiresConnection
-	^ false! !
-
-!MaRemoveSecondaryLocationRequest methodsFor: 'testing' stamp: 'cmm 9/24/2012 16:55'!
-timesToRetry
-	^ 0! !
-
-!MaRepositoryConnectionRequest methodsFor: 'building' stamp: 'cmm 11/18/2008 13:49'!
-commitNumber: anInteger
-	commitNumber _ anInteger! !
-
-!MaRepositoryConnectionRequest methodsFor: 'building' stamp: 'cmm 12/30/2002 23:20'!
-magmaVersion: anInteger
-
-	magmaVersion _ anInteger! !
-
-!MaRepositoryConnectionRequest methodsFor: 'building'!
-userId: aString
-
-	userId _ aString
-! !
-
-!MaRepositoryConnectionRequest methodsFor: 'building' stamp: 'cmm 12/18/2008 17:16'!
-uuid: aUuid
-	uuid _ aUuid! !
-
-!MaRepositoryConnectionRequest methodsFor: 'testing' stamp: 'cmm 2/25/2009 11:04'!
-isConnect
-	^ true! !
-
-!MaRepositoryConnectionRequest methodsFor: 'testing' stamp: 'cmm 12/31/2002 15:27'!
-requiresConnection
-
-	^false! !
-
-!MaRepositoryConnectionRequest methodsFor: 'testing' stamp: 'cmm 12/5/2012 10:08'!
-timesToRetry
-	^ 0! !
-
-!MaRepositoryDisconnectRequest methodsFor: 'testing' stamp: 'cmm 9/21/2008 21:02'!
-isDisconnect
-	^ true! !
-
-!MaRepositoryDisconnectRequest methodsFor: 'testing' stamp: 'cmm 9/24/2012 16:55'!
-timesToRetry
-	"Can't connect to disconnect?  Don't retry that."
-	^ 0! !
-
-!MaRepositoryDisconnectRequest methodsFor: 'testing' stamp: 'cmm 11/24/2009 21:22'!
-wantsResponse
-	^ false! !
-
-!MaSaveAndExitImageRequest methodsFor: 'accessing' stamp: 'cmm 12/21/2008 15:38'!
-exit: aBoolean
-	exit _ aBoolean! !
-
-!MaSaveAndExitImageRequest methodsFor: 'accessing' stamp: 'cmm 12/21/2008 15:38'!
-save: aBoolean
-	save _ aBoolean! !
-
-!MaSaveAndExitImageRequest methodsFor: 'testing' stamp: 'cmm 7/15/2008 17:22'!
-requiresConnection
-	^ false! !
-
-!MaSaveAndExitImageRequest methodsFor: 'testing' stamp: 'cmm 9/24/2012 16:55'!
-timesToRetry
-	^ 0! !
-
-!MaServerPerformRequest methodsFor: 'access' stamp: 'cmm 9/6/2007 21:32'!
-arguments: anArray
-	arguments _ anArray! !
-
-!MaServerPerformRequest methodsFor: 'access' stamp: 'cmm 9/6/2007 21:32'!
-selector: selectorSymbol
-	selector _ selectorSymbol! !
-
-!MaServerPerformRequest methodsFor: 'testing' stamp: 'cmm 2/22/2011 15:12'!
-requiresConnection
-	^ false! !
-
-!MaServerPerformRequest methodsFor: 'testing' stamp: 'cmm 9/24/2012 16:56'!
-timesToRetry 
-	"Too risky to auto-retry, the operation may not be idempotent."
-	^ 0! !
-
-!MaTransactionRequest methodsFor: 'testing' stamp: 'cmm 8/20/2014 14:47'!
-isBegin
-	^ true! !
-
-!MaTransactionRequest methodsFor: 'testing' stamp: 'cmm 9/24/2012 16:56'!
-timesToRetry
-	"A retry here on a timeout would result in a guaranteed error once the original bytes made it, so don't retry."
-	^ 0! !
-
-!MaWriteRequest methodsFor: 'accessing' stamp: 'cmm 3/2/2009 15:11'!
-commitLogRecord
-	^ commitLogRecord! !
-
-!MaWriteRequest methodsFor: 'accessing' stamp: 'cmm 10/28/2008 11:15'!
-commitLogRecord: aMaCommitLogRecord
-	commitLogRecord _ aMaCommitLogRecord! !
-
-!MaWriteRequest methodsFor: 'accessing' stamp: 'cmm 6/17/2009 10:07'!
-waitCursor
-	^ MagmaPreferences writeCursor! !
-
-!MaWriteRequest methodsFor: 'testing' stamp: 'cmm 3/1/2009 12:02'!
-isWriteRequest
-	^ true! !
-
-!MaWriteRequest methodsFor: 'testing' stamp: 'cmm 12/29/2008 19:27'!
-requiresConnection
-	^ false! !
-
-!MaWriteRequest methodsFor: 'testing' stamp: 'cmm 9/24/2012 16:56'!
-timesToRetry
-	^ 0! !
-
-!MaWriteRequest methodsFor: 'testing' stamp: 'cmm 11/13/2008 10:30'!
-wantsResponse
-	^ false! !
-
-!MagmaBeWarmBackupRequest methodsFor: 'initializing' stamp: 'cmm 2/27/2009 15:13'!
-primaryLocation: aMagmaRemoteLocation 
-	primaryLocation _ aMagmaRemoteLocation! !
-
-!MagmaBeWarmBackupRequest methodsFor: 'testing' stamp: 'cmm 2/27/2009 15:14'!
-requiresConnection
-	^ false! !
-
-!MagmaBeWarmBackupRequest methodsFor: 'testing' stamp: 'cmm 9/24/2012 16:56'!
-timesToRetry
-	^ 0! !
-
-!MagmaBeWarmBackupRequest methodsFor: 'testing' stamp: 'cmm 2/27/2009 15:14'!
-wantsResponse
-	^ false! !
-
-!MagmaConnectionsRequest methodsFor: 'as yet unclassified' stamp: 'cmm 7/31/2013 09:58'!
-process
-	^ self repository connectionsList! !
-
-!MagmaConnectionsRequest methodsFor: 'as yet unclassified' stamp: 'cmm 3/24/2013 17:11'!
-requiresConnection
-	^ false! !
-
-!MagmaEnsureCorrectNodeConfiguration methodsFor: 'testing' stamp: 'cmm 9/24/2012 16:56'!
-timesToRetry
-	^ 0! !
-
-!MagmaEnsureCorrectNodeConfiguration methodsFor: 'testing' stamp: 'cmm 11/22/2009 22:26'!
-wantsResponse
-	^ false! !
-
-!MagmaFullBackupRequest methodsFor: 'testing' stamp: 'cmm 12/30/2008 14:02'!
-requiresConnection
-	^ false! !
-
-!MagmaFullBackupRequest methodsFor: 'testing' stamp: 'cmm 9/24/2012 16:56'!
-timesToRetry
-	^ 0! !
-
-!MagmaFullBackupRequest methodsFor: 'accessing' stamp: 'cmm 12/18/2008 15:26'!
-serverPath: aString 
-	"Set the server path to backup to."
-	serverPath _ aString! !
-
-!MagmaIdRequest methodsFor: 'testing' stamp: 'cmm 7/15/2008 17:00'!
-requiresConnection
-	"Although a connection is not required, the session must have been *previously* connected.  This is used for a session reconnection, we must ensure it is connecting to the same repository."
-	^ false! !
-
-!MagmaNoteUnreachableServer methodsFor: 'testing' stamp: 'cmm 3/6/2009 10:26'!
-requiresConnection
-	^ false! !
-
-!MagmaNoteUnreachableServer methodsFor: 'testing' stamp: 'cmm 9/24/2012 16:56'!
-timesToRetry
-	^ 0! !
-
-!MagmaPathNameRequest methodsFor: 'testing' stamp: 'cmm 9/19/2004 22:58'!
-requiresConnection
-
-	^ false! !
-
-!MagmaReleaseReaderRequest methodsFor: 'accessing' stamp: 'cmm 1/5/2010 13:43'!
-collectionOid: anInteger
-	collectionOid _ anInteger! !
-
-!MagmaReleaseReaderRequest methodsFor: 'testing' stamp: 'cmm 1/5/2010 14:25'!
-wantsResponse
-	^ false! !
-
-!MagmaRequestSwapPrimaryDutyRequest methodsFor: 'testing' stamp: 'cmm 3/3/2009 21:38'!
-requiresConnection
-	^ false! !
-
-!MagmaRequestSwapPrimaryDutyRequest methodsFor: 'testing' stamp: 'cmm 9/24/2012 16:56'!
-timesToRetry
-	^ 0! !
-
-!MagmaServerStatisticsRequest methodsFor: 'testing' stamp: 'cmm 5/6/2008 14:01'!
-requiresConnection
-	^ false! !
-
-!MagmaSwapPrimaryDutyRequest methodsFor: 'accessing' stamp: 'cmm 12/29/2008 16:41'!
-branchCode: anInteger 
-	branchCode _ anInteger! !
-
-!MagmaSwapPrimaryDutyRequest methodsFor: 'accessing' stamp: 'cmm 12/29/2008 15:01'!
-commitNumber: anInteger
-	commitNumber _ anInteger! !
-
-!MagmaSwapPrimaryDutyRequest methodsFor: 'accessing' stamp: 'cmm 3/3/2009 20:31'!
-newPrimary: aMagmaRemoteLocation
-	newPrimary _ aMagmaRemoteLocation! !
-
-!MagmaSwapPrimaryDutyRequest methodsFor: 'accessing' stamp: 'cmm 9/24/2012 16:56'!
-timesToRetry
-	^ 0! !
+!MagmaOidManager methodsFor: 'accessing' stamp: 'cmm 5/7/2013 10:28'!
+oidFor: anObject ifAbsent: aBlock 
+	^ anObject maIsMutatingProxy
+		ifTrue: [ anObject maOid ]
+		ifFalse:
+			[ anObject maRequiresOwnBuffer
+				ifTrue:
+					[ newOids
+						at: anObject
+						ifPresent:
+							[ : oid | oid
+								ifNil: aBlock
+								ifNotNil: [ oid ] ]
+						ifAbsent:
+							[ super
+								oidFor: anObject
+								ifAbsent: aBlock ] ]
+				ifFalse:
+					[ super
+						oidFor: anObject
+						ifAbsent: aBlock ] ]! !
+
+!MagmaOidManager methodsFor: 'accessing' stamp: 'cmm 5/6/2013 17:25'!
+oidOf: anObject is: anInteger 
+	^ (MaOidCalculator isOidForNewObject: anInteger)
+		ifTrue:
+			[ newObjects
+				at: anInteger
+				put: anObject.
+			newOids
+				at: anObject
+				put: anInteger ]
+		ifFalse:
+			[ super
+				oidOf: anObject
+				is: anInteger.
+			(anObject maIsMutatingProxy and: [ anObject maRealObjectIsReified ]) ifTrue:
+				[ oids
+					at: anObject realObjectIfMutatingProxy
+					put: anInteger ] ]! !
+
+!MagmaOidManager methodsFor: 'copying' stamp: 'cmm 4/20/2005 22:16'!
+postIndependentCopy
+
+	super postIndependentCopy.
+	newObjects _ newObjects copy.
+	newOids _ newOids copy! !
+
+!MagmaOidManager methodsFor: 'stats' stamp: 'cmm 5/7/2008 16:28'!
+statistics
+	^ statistics! !
+
+!MagmaOidManager methodsFor: 'stats' stamp: 'cmm 5/7/2008 15:54'!
+statistics: MaSerializationStat 
+	statistics _ MaSerializationStat! !
+
+!MagmaOidManager methodsFor: 'stats' stamp: 'cmm 5/7/2008 16:28'!
+useStatisticsFrom: anotherOidManager 
+	statistics _ anotherOidManager statistics! !
 
 !MaImmutabilityStrategy methodsFor: 'private' stamp: 'cmm 11/11/2011 21:28'!
 classes
@@ -4185,21 +3398,6 @@ restoreData: anObject
 
 	restoreData _ anObject! !
 
-!MagmaId methodsFor: 'testing' stamp: 'cmm 7/6/2009 21:20'!
-= aMagmaId 
-	self == aMagmaId ifTrue: [ ^ true ].
-	aMagmaId maOriginalClass = self maOriginalClass ifFalse: [ ^ false ].
-	^ uuid = aMagmaId uuid! !
-
-!MagmaId methodsFor: 'testing' stamp: 'cmm 1/16/2005 22:24'!
-hash
-
-	^ uuid hash! !
-
-!MagmaId methodsFor: 'testing' stamp: 'cmm 7/6/2009 21:21'!
-isMagmaId
-	^ true! !
-
 !MagmaId methodsFor: 'accessing' stamp: 'cmm 1/13/2005 22:34'!
 contact
 	"If having trouble connecting to this repository."
@@ -4250,6 +3448,21 @@ resetNode
 uuid
 
 	^ uuid! !
+
+!MagmaId methodsFor: 'testing' stamp: 'cmm 7/6/2009 21:20'!
+= aMagmaId 
+	self == aMagmaId ifTrue: [ ^ true ].
+	aMagmaId maOriginalClass = self maOriginalClass ifFalse: [ ^ false ].
+	^ uuid = aMagmaId uuid! !
+
+!MagmaId methodsFor: 'testing' stamp: 'cmm 1/16/2005 22:24'!
+hash
+
+	^ uuid hash! !
+
+!MagmaId methodsFor: 'testing' stamp: 'cmm 7/6/2009 21:21'!
+isMagmaId
+	^ true! !
 
 !MagmaId methodsFor: 'session' stamp: 'cmm 7/3/2012 21:26'!
 findSession
@@ -4414,6 +3627,11 @@ path: fullOrRelativePathString
 verifyIsVersion: versionNumber 
 	self repositoryVersion = versionNumber ifFalse: [ MagmaUserError signal: 'Repository is not already version ' , versionNumber asString ]! !
 
+!MagmaRemoteLocation methodsFor: 'printing' stamp: 'cmm 9/6/2012 20:47'!
+maPrintAbbreviatedOn: aStream 
+	aStream maPrint: 'magma://'.
+	location maPrintAbbreviatedOn: aStream! !
+
 !MagmaRemoteLocation methodsFor: 'testing' stamp: 'cmm 12/30/2008 13:06'!
 = aMagmaRemoteLocation 
 	aMagmaRemoteLocation maOriginalClass = self maOriginalClass ifFalse: [ ^ false ].
@@ -4450,11 +3668,6 @@ port
 !MagmaRemoteLocation methodsFor: 'accessing' stamp: 'cmm 11/6/2008 14:12'!
 serverLocation
 	^ location! !
-
-!MagmaRemoteLocation methodsFor: 'printing' stamp: 'cmm 9/6/2012 20:47'!
-maPrintAbbreviatedOn: aStream 
-	aStream maPrint: 'magma://'.
-	location maPrintAbbreviatedOn: aStream! !
 
 !MagmaRemoteLocation methodsFor: 'maui-support' stamp: 'cmm 9/11/2012 16:29'!
 mauiDefaultColumns
@@ -5020,7 +4233,90 @@ initialize
 	changeSets _ Dictionary new.
 	classes _ Dictionary new! !
 
-!MagmaSession methodsFor: 'transaction' stamp: 'cmm 1/16/2012 20:27'!
+!MagmaSession methodsFor: 'database' stamp: 'cmm 6/19/2013 14:15'!
+commitLogEntryAt: commitNumber
+	"The MaCommitLogEntry that contained this buffer."
+	^ (self commitLogRecordAt: commitNumber) ifNotNilDo: [ : cr | MagmaSession materializeCommitLogEntry: cr ]! !
+
+!MagmaSession methodsFor: 'database' stamp: 'cmm 2/26/2009 00:27'!
+commitNumber
+	"The commitNumber position this session is refreshed to."
+	^ guard critical: [ transaction commitNumber ]! !
+
+!MagmaSession methodsFor: 'database' stamp: 'cmm 6/19/2013 13:29'!
+commitPackageAt: commitNumber
+	"The MaCommitLogEntry that contained this buffer."
+	^ (self commitLogEntryAt: commitNumber) ifNotNilDo: [ : cle | cle commitPackage ]! !
+
+!MagmaSession methodsFor: 'database' stamp: 'cmm 7/15/2008 16:53'!
+magmaId
+	^ definition ifNotNil: [ definition magmaId ]! !
+
+!MagmaSession methodsFor: 'database' stamp: 'cmm 12/22/2008 13:23'!
+oidCount
+	"The number of oids allocated by this repository.  The total number of objects ever committed, even if some have since been garbage-collected."
+	^ oidCount! !
+
+!MagmaSession methodsFor: 'database' stamp: 'cmm 12/21/2008 23:02'!
+remoteBranchCode
+	"The branchCode is a private, internal Magma field used to identify whenever a backup copy of a repository is switched out of restoreMode.  Such a repository is now a 'branch' and can never again receive updates from its ancestral repository."
+	^ self remotePrimitiveAttributes at: #branchCode! !
+
+!MagmaSession methodsFor: 'database' stamp: 'cmm 12/21/2008 23:18'!
+remoteCommitNumber
+	"The commitNumber that the repository is at."
+	^ self remotePrimitiveAttributes at: #commitNumber! !
+
+!MagmaSession methodsFor: 'database' stamp: 'cmm 7/14/2008 23:22'!
+remoteMagmaId
+	"Calls #magmaId."
+	^ self submit: MagmaIdRequest new! !
+
+!MagmaSession methodsFor: 'serialization' stamp: 'cmm 5/1/2014 10:22'!
+firstPathToNewLinkOrType
+	self pathsToNewLinksAndTypesDo: [ : each | ^ each ].
+	^ nil! !
+
+!MagmaSession methodsFor: 'serialization' stamp: 'cmm 5/1/2014 10:19'!
+pathsToNewLinksAndTypes
+	| newClasses newLinks |
+	newClasses _ Set new.
+	newLinks _ Set new.
+	self pathsToNewLinksAndTypesDo:
+		[ : eachPath | eachPath isMagmaId
+			ifTrue: [ newLinks add: eachPath ]
+			ifFalse: [ newClasses add: eachPath ] ]! !
+
+!MagmaSession methodsFor: 'serialization' stamp: 'cmm 5/1/2014 10:18'!
+pathsToNewLinksAndTypesDo: aBlock
+	| classes links |
+	classes _ self definition classes asSet.
+	links _ self definition links asSet.
+	self dirtyGraphDo:
+		[ : path : parent : index |  "The same Symbol instances might exist in multiple Magma sessions, so disregard those."
+			path last isSymbol ifFalse:
+				[ | otherSess newClass |
+				otherSess _ path last quickMagmaSession.
+				otherSess ifNotNil:
+					[ otherSess ~= self ifTrue:
+						[ (links includes: otherSess magmaId) ifFalse: [ aBlock value: path asArray ] ] ].
+				(classes includes: (newClass _ path last maOriginalClass theNonMetaClass)) ifFalse: [ aBlock value: path asArray ] ]  ]! !
+
+!MagmaSession methodsFor: 'testing' stamp: 'cmm 4/28/2014 10:08'!
+isDirty: anObject 
+	"Answer whether anObject is persistent in this session and changed from its last-read buffer state."
+	^ (anObject maIsLargeCollection and: [ anObject changes hasChanges ]) or: [ transaction didChange: anObject ]! !
+
+!MagmaSession methodsFor: 'testing' stamp: 'cmm 5/28/2014 14:09'!
+isPersistent: anObject 
+	"Answer whether anObject has been read from the persistent graph."
+	^ anObject maIsLargeCollection
+		ifTrue: [ anObject changes isNotPersistent not ]
+		ifFalse:
+			[ (anObject maIsMutatingProxy and: [ anObject mutatingProxySession = self ]) or:
+				[ (self serializer hasOidFor: anObject) and: [ (MaOidCalculator isOidForNewObject: (self oidFor: anObject)) not ] ] ]! !
+
+!MagmaSession methodsFor: 'transaction' stamp: 'jpb 5/11/2021 17:00:00'!
 abort
 	"Abort the current transaction.  Objects are updated to their persistent state in the repository."
 	"This guard is needed for when we initially connect to the repository because we can't abort before the connection is made."
@@ -5039,6 +4335,7 @@ abort
 						ifAbsent: [  ].
 					oid ifNotNil: [ stream nextPut: oid ] ] ].
 			request _ MaAbortTransactionRequest new additionalBuffers: additional.
+			
 			"Calls #abortTransactionFor:."
 			self
 				refreshViewUsing: (self submit: request)
@@ -6937,75 +6234,6 @@ mapLegacyInstancesOf: oldClassName to: newClass
 		[ oldDefs do:
 			[ : each | each beKnownAs: newClass name ] ]! !
 
-!MagmaSession methodsFor: 'database' stamp: 'cmm 6/19/2013 14:15'!
-commitLogEntryAt: commitNumber
-	"The MaCommitLogEntry that contained this buffer."
-	^ (self commitLogRecordAt: commitNumber) ifNotNilDo: [ : cr | MagmaSession materializeCommitLogEntry: cr ]! !
-
-!MagmaSession methodsFor: 'database' stamp: 'cmm 2/26/2009 00:27'!
-commitNumber
-	"The commitNumber position this session is refreshed to."
-	^ guard critical: [ transaction commitNumber ]! !
-
-!MagmaSession methodsFor: 'database' stamp: 'cmm 6/19/2013 13:29'!
-commitPackageAt: commitNumber
-	"The MaCommitLogEntry that contained this buffer."
-	^ (self commitLogEntryAt: commitNumber) ifNotNilDo: [ : cle | cle commitPackage ]! !
-
-!MagmaSession methodsFor: 'database' stamp: 'cmm 7/15/2008 16:53'!
-magmaId
-	^ definition ifNotNil: [ definition magmaId ]! !
-
-!MagmaSession methodsFor: 'database' stamp: 'cmm 12/22/2008 13:23'!
-oidCount
-	"The number of oids allocated by this repository.  The total number of objects ever committed, even if some have since been garbage-collected."
-	^ oidCount! !
-
-!MagmaSession methodsFor: 'database' stamp: 'cmm 12/21/2008 23:02'!
-remoteBranchCode
-	"The branchCode is a private, internal Magma field used to identify whenever a backup copy of a repository is switched out of restoreMode.  Such a repository is now a 'branch' and can never again receive updates from its ancestral repository."
-	^ self remotePrimitiveAttributes at: #branchCode! !
-
-!MagmaSession methodsFor: 'database' stamp: 'cmm 12/21/2008 23:18'!
-remoteCommitNumber
-	"The commitNumber that the repository is at."
-	^ self remotePrimitiveAttributes at: #commitNumber! !
-
-!MagmaSession methodsFor: 'database' stamp: 'cmm 7/14/2008 23:22'!
-remoteMagmaId
-	"Calls #magmaId."
-	^ self submit: MagmaIdRequest new! !
-
-!MagmaSession methodsFor: 'serialization' stamp: 'cmm 5/1/2014 10:22'!
-firstPathToNewLinkOrType
-	self pathsToNewLinksAndTypesDo: [ : each | ^ each ].
-	^ nil! !
-
-!MagmaSession methodsFor: 'serialization' stamp: 'cmm 5/1/2014 10:19'!
-pathsToNewLinksAndTypes
-	| newClasses newLinks |
-	newClasses _ Set new.
-	newLinks _ Set new.
-	self pathsToNewLinksAndTypesDo:
-		[ : eachPath | eachPath isMagmaId
-			ifTrue: [ newLinks add: eachPath ]
-			ifFalse: [ newClasses add: eachPath ] ]! !
-
-!MagmaSession methodsFor: 'serialization' stamp: 'cmm 5/1/2014 10:18'!
-pathsToNewLinksAndTypesDo: aBlock
-	| classes links |
-	classes _ self definition classes asSet.
-	links _ self definition links asSet.
-	self dirtyGraphDo:
-		[ : path : parent : index |  "The same Symbol instances might exist in multiple Magma sessions, so disregard those."
-			path last isSymbol ifFalse:
-				[ | otherSess newClass |
-				otherSess _ path last quickMagmaSession.
-				otherSess ifNotNil:
-					[ otherSess ~= self ifTrue:
-						[ (links includes: otherSess magmaId) ifFalse: [ aBlock value: path asArray ] ] ].
-				(classes includes: (newClass _ path last maOriginalClass theNonMetaClass)) ifFalse: [ aBlock value: path asArray ] ]  ]! !
-
 !MagmaSession methodsFor: 'private-magma collections' stamp: 'cmm 1/4/2010 15:08'!
 fractionLoaded: aMagmaCollection 
 	"Calls loadProgress."
@@ -7114,20 +6342,6 @@ upTo: anInteger objectsIn: aMagmaCollection fromIndex: startIndex using: aMaRead
 		self materializeObjectsIn: segmentResult.
 		self inTransaction ifTrue: [ self stronglyReference: segmentResult ].
 		segmentResult ]! !
-
-!MagmaSession methodsFor: 'testing' stamp: 'cmm 4/28/2014 10:08'!
-isDirty: anObject 
-	"Answer whether anObject is persistent in this session and changed from its last-read buffer state."
-	^ (anObject maIsLargeCollection and: [ anObject changes hasChanges ]) or: [ transaction didChange: anObject ]! !
-
-!MagmaSession methodsFor: 'testing' stamp: 'cmm 5/28/2014 14:09'!
-isPersistent: anObject 
-	"Answer whether anObject has been read from the persistent graph."
-	^ anObject maIsLargeCollection
-		ifTrue: [ anObject changes isNotPersistent not ]
-		ifFalse:
-			[ (anObject maIsMutatingProxy and: [ anObject mutatingProxySession = self ]) or:
-				[ (self serializer hasOidFor: anObject) and: [ (MaOidCalculator isOidForNewObject: (self oidFor: anObject)) not ] ] ]! !
 
 !MagmaSession methodsFor: 'maui support' stamp: 'cmm 9/16/2008 22:23'!
 maChooseNotificationHandlerUsing: aMauiMorph 
@@ -7253,6 +6467,22 @@ serverSave: saveOption andExit: exitOption
 			"we may expect a network error, because we just told it to shutdown."
 			false ]! !
 
+!MagmaSession class methodsFor: 'initializing' stamp: 'cmm 1/17/2005 14:53'!
+disconnectAndCloseAllConnectedSessions
+
+	ConnectedSessions ifNotNil:
+		[ ConnectedSessions copy do: [ : each | each disconnectAndClose ] ]! !
+
+!MagmaSession class methodsFor: 'initializing' stamp: 'cmm 6/22/2012 13:13'!
+initialize
+	HasMagma_true.
+	self disconnectAndCloseAllConnectedSessions.
+	ConnectedSessions _ OrderedCollection new.
+	Smalltalk addToShutDownList: self.
+	MaObjectBuffer 
+		bpMapsAt: MagmaBufferPositionMap indexPosition + 1
+		put: MagmaBufferPositionMap! !
+
 !MagmaSession class methodsFor: 'accessing' stamp: 'cmm 8/30/2010 19:09'!
 allClientInstances
 	^ self allSubInstances reject: [ : each | each isServerSession ]! !
@@ -7302,22 +6532,6 @@ protocol
 		{ Association.  MaChangedKeySpecification },
 	"exceptions"
 		{ MaError. MaUnreadableRecoveryRecord . MagmaNoTransactionError . MaClientServerUserError . MaSoftwareError . MaObjectSerializationUserError . MagmaAlreadyInTransaction . MagmaWrongServerError . MaSpecialCollectionsSoftwareError . MagmaUnavailableCommitRecord . MagmaSoftwareError . MagmaDifferentBranch . MagmaSessionLost . MagmaEquivalentObjectNotInCollection . MaObjectSerializationSoftwareError . MaEnvironmentError . MagmaEnvironmentError . MagmaUserError . MaCorruptionError . MaUserError . MagmaCommitConflictError . MagmaCorruptionError . MagmaGarbageCollectedObject . MagmaDuplicateObjectInCollection . MagmaUnconnectableSessionError. MagmaWrongCommitNumber . MagmaInvalidIndexObject . MagmaInvalidOid . MagmaInvalidReference . MagmaCommitError . MaHashIndexUserError . MaMalformedRequestError . MagmaReadServerTooFarBehind }! !
-
-!MagmaSession class methodsFor: 'initializing' stamp: 'cmm 1/17/2005 14:53'!
-disconnectAndCloseAllConnectedSessions
-
-	ConnectedSessions ifNotNil:
-		[ ConnectedSessions copy do: [ : each | each disconnectAndClose ] ]! !
-
-!MagmaSession class methodsFor: 'initializing' stamp: 'cmm 6/22/2012 13:13'!
-initialize
-	HasMagma_true.
-	self disconnectAndCloseAllConnectedSessions.
-	ConnectedSessions _ OrderedCollection new.
-	Smalltalk addToShutDownList: self.
-	MaObjectBuffer 
-		bpMapsAt: MagmaBufferPositionMap indexPosition + 1
-		put: MagmaBufferPositionMap! !
 
 !MagmaSession class methodsFor: 'creation' stamp: 'cmm 1/1/2009 17:24'!
 host: hostName port: anInteger 
@@ -11272,6 +10486,22 @@ trunkSize
 trunkDo: aBlock
 	clauses do: aBlock! !
 
+!MaRecoveryRecord methodsFor: 'testing' stamp: 'cmm 5/27/2007 20:29'!
+hasValidCheckSum
+	^ self checkSumPosition > self headerSize and: [ self calculatedCheckSum = self checkSum ]! !
+
+!MaRecoveryRecord methodsFor: 'testing' stamp: 'cmm 5/27/2007 20:54'!
+isApplyToFile
+	^ false! !
+
+!MaRecoveryRecord methodsFor: 'testing' stamp: 'cmm 6/3/2005 16:57'!
+isBeginApply
+	^ false! !
+
+!MaRecoveryRecord methodsFor: 'testing' stamp: 'cmm 6/3/2005 16:58'!
+isEndApply
+	^ false! !
+
 !MaRecoveryRecord methodsFor: 'private' stamp: 'cmm 6/5/2005 16:47'!
 bodySize
 	"Subclasses override"
@@ -11424,22 +10654,6 @@ recordType: anInteger
 		maUint: 8
 		at: self bufferPositionOfRecordType
 		put: anInteger! !
-
-!MaRecoveryRecord methodsFor: 'testing' stamp: 'cmm 5/27/2007 20:29'!
-hasValidCheckSum
-	^ self checkSumPosition > self headerSize and: [ self calculatedCheckSum = self checkSum ]! !
-
-!MaRecoveryRecord methodsFor: 'testing' stamp: 'cmm 5/27/2007 20:54'!
-isApplyToFile
-	^ false! !
-
-!MaRecoveryRecord methodsFor: 'testing' stamp: 'cmm 6/3/2005 16:57'!
-isBeginApply
-	^ false! !
-
-!MaRecoveryRecord methodsFor: 'testing' stamp: 'cmm 6/3/2005 16:58'!
-isEndApply
-	^ false! !
 
 !MaRecoveryRecord methodsFor: 'copying' stamp: 'cmm 6/3/2005 14:33'!
 independentCopy
@@ -13513,129 +12727,66 @@ atEnd
 endIndex
 	^ startIndex + objects size - 1! !
 
-!MagmaServerStatistics methodsFor: 'chart' stamp: 'cmm 8/17/2014 17:48'!
-countProcessingTimesChart
-	^ StackedPlotMorph new
-		 addPlot: (self newIngressPlotOn: #count) ;
-		 addPlot: (self newProcessingPlotOn: #count) ;
-		 addPlot: (self newEgressPlotOn: #count)! !
+!MagmaSolHashFrame methodsFor: 'overriding' stamp: 'cmm 4/21/2011 20:50'!
+advance
+	"next will almost always be a proxy, so we avoid the DNU cost with this override."
+	prev _ curr.
+	curr _ next.
+	next _ next ifNotNil: [ next realObjectIfMutatingProxy next ]! !
 
-!MagmaServerStatistics methodsFor: 'chart' stamp: 'cmm 8/18/2014 13:58'!
-countSizesChart
-	^ StackedPlotMorph new
-		 addPlot: (self newQueueSizesPlotOn: #count) ;
-		 addPlot: (self newRequestResponseSizesPlotOn: #count) ;
-		"connections plot must use total."
-		 addPlot: (self newConnectionsPlotOn: #total)! !
+!MagmaSolHashFrame methodsFor: 'overriding' stamp: 'cmm 4/21/2011 20:49'!
+set: aSOLHashNode
+	"next will almost always be a proxy, so we avoid the DNU cost with this override."
+	prev _ aSOLHashNode.
+	curr _ prev next.
+	next _ curr ifNotNil: [ curr realObjectIfMutatingProxy next ]! !
 
-!MagmaServerStatistics methodsFor: 'chart' stamp: 'cmm 8/21/2014 15:21'!
-maxSizesChart
-	^ StackedPlotMorph new
-		 addPlot: (self newQueueSizesPlotOn: #max) ;
-		 addPlot: (self newRequestResponseSizesPlotOn: #max) ;
-		 addPlot: (self newConnectionsPlotOn: #max)! !
+!MagmaSolHashSegment methodsFor: 'private' stamp: 'cmm 4/8/2014 22:29'!
+bucketAt: bucketNum put: anObject 
+	"Return whatever (SOLHashSegment, SOLHashNode, or nil) is in pointers at the index corresponding to bucketNum."
+	(pointers maIsLargeCollection not and: [ 1 + (bucketNum bitAnd: owner segMask) > self maxPointers ]) ifTrue: [ self convertToMagmaArray ].
+	^ super
+		bucketAt: bucketNum
+		put: anObject! !
 
-!MagmaServerStatistics methodsFor: 'chart' stamp: 'cmm 8/17/2014 17:41'!
-meanProcessingTimesChart
-	^ StackedPlotMorph new
-		 addPlot: (self newIngressPlotOn: #mean) ;
-		 addPlot: (self newProcessingPlotOn: #mean) ;
-		 addPlot: (self newEgressPlotOn: #mean)! !
+!MagmaSolHashSegment methodsFor: 'private' stamp: 'cmm 4/23/2011 15:02'!
+convertToMagmaArray
+	| oldPointers |
+	oldPointers _ pointers.
+	pointers _ MagmaArray new
+		 pageSize: 1 ;
+		 yourself.
+	oldPointers withIndexDo:
+		[ : each : x | pointers
+			at: x
+			put: each ]! !
 
-!MagmaServerStatistics methodsFor: 'chart' stamp: 'cmm 8/17/2014 18:07'!
-meanSizesChart
-	^ StackedPlotMorph new
-		 addPlot: (self newQueueSizesPlotOn: #mean) ;
-		 addPlot: (self newRequestResponseSizesPlotOn: #mean) ;
-		 addPlot: (self newConnectionsPlotOn: #mean)! !
+!MagmaSolHashSegment methodsFor: 'private' stamp: 'cmm 4/8/2014 22:34'!
+maxPointers
+	^ 1000! !
 
-!MagmaServerStatistics methodsFor: 'chart' stamp: 'cmm 8/17/2014 17:45'!
-totalProcessingTimesChart
-	^ StackedPlotMorph new
-		 addPlot: (self newIngressPlotOn: #total) ;
-		 addPlot: (self newProcessingPlotOn: #total) ;
-		 addPlot: (self newEgressPlotOn: #total)! !
+!MagmaSolHashTable methodsFor: 'overriding' stamp: 'cmm 4/23/2011 12:08'!
+hashSegmentClass
+	^ MagmaSolHashSegment ! !
 
-!MagmaServerStatistics methodsFor: 'chart' stamp: 'cmm 8/17/2014 18:06'!
-totalSizesChart
-	^ StackedPlotMorph new
-		 addPlot: (self newQueueSizesPlotOn: #total) ;
-		 addPlot: (self newRequestResponseSizesPlotOn: #total) ;
-		 addPlot: (self newConnectionsPlotOn: #total)! !
+!MagmaSolHashTable methodsFor: 'overriding' stamp: 'cmm 4/21/2011 20:47'!
+initializeFrame
+	frame _ MagmaSolHashFrame new! !
 
-!MagmaServerStatistics methodsFor: 'historys' stamp: 'cmm 5/7/2008 17:37'!
-flushTimeHistory
-	"Several seconds after a commit the Magma server flushes it (and all other commits in that time) to disk in a secure, atomic way.  This history captures how much time is spent doing that."
-	^ flushTimeHistory! !
+!MagmaSolHashTable methodsFor: 'overriding' stamp: 'cmm 5/30/2018 20:15'!
+newPointersCollection
+	"This will be converted to a MagmaArray if/when an access takes it past this size."
+	^ OrderedCollection new: 0! !
 
-!MagmaServerStatistics methodsFor: 'private' stamp: 'cmm 5/7/2008 17:31'!
-historysDo: aBlock 
-	super historysDo: aBlock.
-	aBlock value: flushTimeHistory! !
+!MagmaSolHashTable class methodsFor: 'overriding' stamp: 'cmm 4/13/2011 21:57'!
+defaultLoadFactor
+	"MagmaArray's excel at being large, and we should optimize for fast access.  This is better than 3 because it means that dummy elements only take up 8.3% more of the total space, and better than 1 because that would be one dummy for every real node, which is just too much space overhead.  2 seems to be the best balance."
+	^ 2! !
 
-!MagmaServerStatistics methodsFor: 'initialize-release' stamp: 'cmm 5/7/2008 17:37'!
-initialize
-	super initialize.
-	flushTimeHistory _ MaStatHistory name: 'Flush-to-Disk Times'! !
-
-!MagmaServerStatistics methodsFor: 'chart-private' stamp: 'cmm 8/17/2014 18:05'!
-newConnectionsPlotOn: operatorSymbol
-	^ self newDateAndTimeBySizesPlot
-		 title: 'Connections / Disconnections' ;
-		 addSeries: ((numberOfClientConnectionsHistory seriesOn: operatorSymbol) color: Color green) ;
-		 addSeries: ((clientTimeoutsHistory seriesOn: operatorSymbol) color: Color red) ;
-		 yourself! !
-
-!MagmaServerStatistics methodsFor: 'chart-private' stamp: 'cmm 8/17/2014 17:53'!
-newEgressPlotOn: operatorSymbol
-	^ (operatorSymbol = #count
-		ifTrue: [ self newDateAndTimeBySizesPlot ]
-		ifFalse: [ self newDateAndTimeBySecondsPlot ])
-		title: 'Egress Times (', operatorSymbol asString, ')' ;
-		 addSeries: ((timeToSerializeHistory seriesOn: operatorSymbol) color: Color cyan twiceDarker) ;
-		 addSeries: ((timeToSendResponsesHistory seriesOn: operatorSymbol) color: (Color cyan muchLighter)) ;
-		 addSeries: ((timeToLoadBuffersHistory seriesOn: operatorSymbol) color: Color red muchDarker) ;
-		 yourself! !
-
-!MagmaServerStatistics methodsFor: 'chart-private' stamp: 'cmm 8/17/2014 17:49'!
-newIngressPlotOn: operator 
-	^ (operator = #count
-		ifTrue: [ self newDateAndTimeBySizesPlot ]
-		ifFalse: [ self newDateAndTimeBySecondsPlot ])
-		 title: 'Ingress Times (' , operator asString , ')' ;
-		 addSeries: ((timeWaitingInSocketQueueHistory seriesOn: operator) color: Color magenta twiceDarker) ;
-		 addSeries: ((extractTimeHistory seriesOn: operator) color: Color green twiceDarker) ;
-		 addSeries: ((timeWaitingInRequestQueueHistory seriesOn: operator) color: Color blue) ;
-		 addSeries: ((timeToMaterializeHistory seriesOn: operator) color: Color cyan) ;
-		 yourself! !
-
-!MagmaServerStatistics methodsFor: 'chart-private' stamp: 'cmm 8/17/2014 17:53'!
-newProcessingPlotOn: operatorSymbol
-	^ (operatorSymbol = #count
-		ifTrue: [ self newDateAndTimeBySizesPlot ]
-		ifFalse: [ self newDateAndTimeBySecondsPlot ])
-		title: 'Processing Times (', operatorSymbol asString, ')' ;
-		 addSeries: ((requestProcessingTimeHistory seriesOn: operatorSymbol) color: Color yellow twiceDarker) ;
-		 addSeries: ((idleTimeHistory seriesOn: operatorSymbol) color: Color green twiceDarker) ;
-		 addSeries: ((flushTimeHistory seriesOn: operatorSymbol) color: Color red twiceDarker) ;
-		 addSeries: ((houseCleaningTimeHistory seriesOn: operatorSymbol) color: Color red muchDarker) ;
-		 yourself! !
-
-!MagmaServerStatistics methodsFor: 'chart-private' stamp: 'cmm 8/17/2014 18:05'!
-newQueueSizesPlotOn: operatorSymbol
-	^ self newDateAndTimeBySizesPlot
-		 title: 'Queue Sizes' ;
-		 addSeries: ((socketsQueuedHistory seriesOn: operatorSymbol) color: Color blue) ;
-		 addSeries: ((requestsQueuedHistory seriesOn: operatorSymbol) color: Color blue muchLighter) ;
-		 yourself! !
-
-!MagmaServerStatistics methodsFor: 'chart-private' stamp: 'cmm 8/17/2014 18:09'!
-newRequestResponseSizesPlotOn: operatorSymbol
-	^ self newDateAndTimeBySizesPlot
-		 title: operatorSymbol, ' Bytes Received / Sent' ;
-		 addSeries: ((requestSizeHistory seriesOn: operatorSymbol) color: Color green) ;
-		 addSeries: ((responseSizeHistory seriesOn: operatorSymbol) color: Color red) ;
-		 yourself! !
+!MagmaSolHashTable class methodsFor: 'overriding' stamp: 'cmm 4/10/2011 19:49'!
+defaultSegBits
+	"A MagmaArray with up to  268435456 buckets would take up roughly 1.61G on disk.  That would be a good size before creating a new one."
+	^ 28! !
 
 !MagmaMutatingProxy methodsFor: 'testing' stamp: 'cmm 10/25/2010 13:27'!
 = object 
@@ -13841,56 +12992,6 @@ respondsTo: aSymbol
 	"Serialization wants to know whether I #respondsTo: aSymbol."
 	^ (self class canUnderstand: aSymbol) or: [ self realObject respondsTo: aSymbol ]! !
 
-!MagmaForwardingProxy methodsFor: 'converting' stamp: 'cmm 7/14/2008 17:58'!
-asMagmaForwardingProxy
-	^ self! !
-
-!MagmaForwardingProxy methodsFor: 'accessing'!
-basicSize
-	"Primitive. Answer the number of indexable variables in the receiver. 
-	This value is the same as the largest legal subscript. Essential. Do not 
-	override in any subclass. See Object documentation whatIsAPrimitive."
-
-	<primitive: 62>
-	"The number of indexable fields of fixed-length objects is 0"
-	^0 ! !
-
-!MagmaForwardingProxy methodsFor: 'accessing' stamp: 'cmm 12/25/2002 00:44'!
-instVarAt: index 
-	"Primitive. Answer a fixed variable in an object. The numbering of the 
-	variables corresponds to the named instance variables. Fail if the index 
-	is not an Integer or is not the index of a fixed variable. Essential. See 
-	Object documentation whatIsAPrimitive."
-
-	"Access beyond fixed variables."
-
-	<primitive: 73>
-	self primitiveFailed! !
-
-!MagmaForwardingProxy methodsFor: 'accessing' stamp: 'cmm 8/10/2011 16:28'!
-instVarAt: anInteger put: anObject 
-	"Primitive. Store a value into a fixed variable in the receiver. The 
-	numbering of the variables corresponds to the named instance variables. 
-	Fail if the index is not an Integer or is not the index of a fixed variable. 
-	Answer the value stored as the result. Using this message violates the 
-	principle that each object has sovereign control over the storing of 
-	values into its instance variables. Essential. See Object documentation 
-	whatIsAPrimitive."
-
-	<primitive: 74>
-	"Access beyond fixed fields"
-	^nil error: 'primitive failed updating object'! !
-
-!MagmaForwardingProxy methodsFor: 'initialize-release' stamp: 'cmm 11/18/2009 13:41'!
-cachedObject: anObject 
-	anObject maIsForwardingProxy ifTrue: 
-		[ MaError signal: 'ForwardingProxy should not reference a ForwardingProxy.' ].
-	cachedObject _ anObject.
-	anObject magmaSession ifNotNilDo: 
-		[ : sess | 
-		oid _ sess oidFor: anObject.
-		magmaId _ sess magmaId veryDeepCopy	"so we don't share the same object between two repositories." ]! !
-
 !MagmaForwardingProxy methodsFor: 'private' stamp: 'cmm 1/13/2005 16:21'!
 doesNotUnderstand: aMessage
 
@@ -14006,12 +13107,186 @@ ensureReferencePopulated
 maTransientVariables 
 	^ #( 'session' 'cachedObject' )! !
 
+!MagmaForwardingProxy methodsFor: 'converting' stamp: 'cmm 7/14/2008 17:58'!
+asMagmaForwardingProxy
+	^ self! !
+
+!MagmaForwardingProxy methodsFor: 'accessing'!
+basicSize
+	"Primitive. Answer the number of indexable variables in the receiver. 
+	This value is the same as the largest legal subscript. Essential. Do not 
+	override in any subclass. See Object documentation whatIsAPrimitive."
+
+	<primitive: 62>
+	"The number of indexable fields of fixed-length objects is 0"
+	^0 ! !
+
+!MagmaForwardingProxy methodsFor: 'accessing' stamp: 'cmm 12/25/2002 00:44'!
+instVarAt: index 
+	"Primitive. Answer a fixed variable in an object. The numbering of the 
+	variables corresponds to the named instance variables. Fail if the index 
+	is not an Integer or is not the index of a fixed variable. Essential. See 
+	Object documentation whatIsAPrimitive."
+
+	"Access beyond fixed variables."
+
+	<primitive: 73>
+	self primitiveFailed! !
+
+!MagmaForwardingProxy methodsFor: 'accessing' stamp: 'cmm 8/10/2011 16:28'!
+instVarAt: anInteger put: anObject 
+	"Primitive. Store a value into a fixed variable in the receiver. The 
+	numbering of the variables corresponds to the named instance variables. 
+	Fail if the index is not an Integer or is not the index of a fixed variable. 
+	Answer the value stored as the result. Using this message violates the 
+	principle that each object has sovereign control over the storing of 
+	values into its instance variables. Essential. See Object documentation 
+	whatIsAPrimitive."
+
+	<primitive: 74>
+	"Access beyond fixed fields"
+	^nil error: 'primitive failed updating object'! !
+
+!MagmaForwardingProxy methodsFor: 'initialize-release' stamp: 'cmm 11/18/2009 13:41'!
+cachedObject: anObject 
+	anObject maIsForwardingProxy ifTrue: 
+		[ MaError signal: 'ForwardingProxy should not reference a ForwardingProxy.' ].
+	cachedObject _ anObject.
+	anObject magmaSession ifNotNilDo: 
+		[ : sess | 
+		oid _ sess oidFor: anObject.
+		magmaId _ sess magmaId veryDeepCopy	"so we don't share the same object between two repositories." ]! !
+
 !MagmaForwardingProxy class methodsFor: 'create' stamp: 'cmm 11/18/2009 14:37'!
 for: anObject 
 	"Create a new forwarding-proxy for anObject.  Any messages sent to the proxy will be forwarded on to anObject and the answer returned.  This way, models may continue to run with or without a repository, but with the same Magma-aware code-base."
 	^ self new
 		cachedObject: anObject realObject ";
 		yourself"  "do not include yourself this time, it forwards it to anObject!!"! !
+
+!MagmaServerStatistics methodsFor: 'chart' stamp: 'cmm 8/17/2014 17:48'!
+countProcessingTimesChart
+	^ StackedPlotMorph new
+		 addPlot: (self newIngressPlotOn: #count) ;
+		 addPlot: (self newProcessingPlotOn: #count) ;
+		 addPlot: (self newEgressPlotOn: #count)! !
+
+!MagmaServerStatistics methodsFor: 'chart' stamp: 'cmm 8/18/2014 13:58'!
+countSizesChart
+	^ StackedPlotMorph new
+		 addPlot: (self newQueueSizesPlotOn: #count) ;
+		 addPlot: (self newRequestResponseSizesPlotOn: #count) ;
+		"connections plot must use total."
+		 addPlot: (self newConnectionsPlotOn: #total)! !
+
+!MagmaServerStatistics methodsFor: 'chart' stamp: 'cmm 8/21/2014 15:21'!
+maxSizesChart
+	^ StackedPlotMorph new
+		 addPlot: (self newQueueSizesPlotOn: #max) ;
+		 addPlot: (self newRequestResponseSizesPlotOn: #max) ;
+		 addPlot: (self newConnectionsPlotOn: #max)! !
+
+!MagmaServerStatistics methodsFor: 'chart' stamp: 'cmm 8/17/2014 17:41'!
+meanProcessingTimesChart
+	^ StackedPlotMorph new
+		 addPlot: (self newIngressPlotOn: #mean) ;
+		 addPlot: (self newProcessingPlotOn: #mean) ;
+		 addPlot: (self newEgressPlotOn: #mean)! !
+
+!MagmaServerStatistics methodsFor: 'chart' stamp: 'cmm 8/17/2014 18:07'!
+meanSizesChart
+	^ StackedPlotMorph new
+		 addPlot: (self newQueueSizesPlotOn: #mean) ;
+		 addPlot: (self newRequestResponseSizesPlotOn: #mean) ;
+		 addPlot: (self newConnectionsPlotOn: #mean)! !
+
+!MagmaServerStatistics methodsFor: 'chart' stamp: 'cmm 8/17/2014 17:45'!
+totalProcessingTimesChart
+	^ StackedPlotMorph new
+		 addPlot: (self newIngressPlotOn: #total) ;
+		 addPlot: (self newProcessingPlotOn: #total) ;
+		 addPlot: (self newEgressPlotOn: #total)! !
+
+!MagmaServerStatistics methodsFor: 'chart' stamp: 'cmm 8/17/2014 18:06'!
+totalSizesChart
+	^ StackedPlotMorph new
+		 addPlot: (self newQueueSizesPlotOn: #total) ;
+		 addPlot: (self newRequestResponseSizesPlotOn: #total) ;
+		 addPlot: (self newConnectionsPlotOn: #total)! !
+
+!MagmaServerStatistics methodsFor: 'historys' stamp: 'cmm 5/7/2008 17:37'!
+flushTimeHistory
+	"Several seconds after a commit the Magma server flushes it (and all other commits in that time) to disk in a secure, atomic way.  This history captures how much time is spent doing that."
+	^ flushTimeHistory! !
+
+!MagmaServerStatistics methodsFor: 'private' stamp: 'cmm 5/7/2008 17:31'!
+historysDo: aBlock 
+	super historysDo: aBlock.
+	aBlock value: flushTimeHistory! !
+
+!MagmaServerStatistics methodsFor: 'initialize-release' stamp: 'cmm 5/7/2008 17:37'!
+initialize
+	super initialize.
+	flushTimeHistory _ MaStatHistory name: 'Flush-to-Disk Times'! !
+
+!MagmaServerStatistics methodsFor: 'chart-private' stamp: 'cmm 8/17/2014 18:05'!
+newConnectionsPlotOn: operatorSymbol
+	^ self newDateAndTimeBySizesPlot
+		 title: 'Connections / Disconnections' ;
+		 addSeries: ((numberOfClientConnectionsHistory seriesOn: operatorSymbol) color: Color green) ;
+		 addSeries: ((clientTimeoutsHistory seriesOn: operatorSymbol) color: Color red) ;
+		 yourself! !
+
+!MagmaServerStatistics methodsFor: 'chart-private' stamp: 'cmm 8/17/2014 17:53'!
+newEgressPlotOn: operatorSymbol
+	^ (operatorSymbol = #count
+		ifTrue: [ self newDateAndTimeBySizesPlot ]
+		ifFalse: [ self newDateAndTimeBySecondsPlot ])
+		title: 'Egress Times (', operatorSymbol asString, ')' ;
+		 addSeries: ((timeToSerializeHistory seriesOn: operatorSymbol) color: Color cyan twiceDarker) ;
+		 addSeries: ((timeToSendResponsesHistory seriesOn: operatorSymbol) color: (Color cyan muchLighter)) ;
+		 addSeries: ((timeToLoadBuffersHistory seriesOn: operatorSymbol) color: Color red muchDarker) ;
+		 yourself! !
+
+!MagmaServerStatistics methodsFor: 'chart-private' stamp: 'cmm 8/17/2014 17:49'!
+newIngressPlotOn: operator 
+	^ (operator = #count
+		ifTrue: [ self newDateAndTimeBySizesPlot ]
+		ifFalse: [ self newDateAndTimeBySecondsPlot ])
+		 title: 'Ingress Times (' , operator asString , ')' ;
+		 addSeries: ((timeWaitingInSocketQueueHistory seriesOn: operator) color: Color magenta twiceDarker) ;
+		 addSeries: ((extractTimeHistory seriesOn: operator) color: Color green twiceDarker) ;
+		 addSeries: ((timeWaitingInRequestQueueHistory seriesOn: operator) color: Color blue) ;
+		 addSeries: ((timeToMaterializeHistory seriesOn: operator) color: Color cyan) ;
+		 yourself! !
+
+!MagmaServerStatistics methodsFor: 'chart-private' stamp: 'cmm 8/17/2014 17:53'!
+newProcessingPlotOn: operatorSymbol
+	^ (operatorSymbol = #count
+		ifTrue: [ self newDateAndTimeBySizesPlot ]
+		ifFalse: [ self newDateAndTimeBySecondsPlot ])
+		title: 'Processing Times (', operatorSymbol asString, ')' ;
+		 addSeries: ((requestProcessingTimeHistory seriesOn: operatorSymbol) color: Color yellow twiceDarker) ;
+		 addSeries: ((idleTimeHistory seriesOn: operatorSymbol) color: Color green twiceDarker) ;
+		 addSeries: ((flushTimeHistory seriesOn: operatorSymbol) color: Color red twiceDarker) ;
+		 addSeries: ((houseCleaningTimeHistory seriesOn: operatorSymbol) color: Color red muchDarker) ;
+		 yourself! !
+
+!MagmaServerStatistics methodsFor: 'chart-private' stamp: 'cmm 8/17/2014 18:05'!
+newQueueSizesPlotOn: operatorSymbol
+	^ self newDateAndTimeBySizesPlot
+		 title: 'Queue Sizes' ;
+		 addSeries: ((socketsQueuedHistory seriesOn: operatorSymbol) color: Color blue) ;
+		 addSeries: ((requestsQueuedHistory seriesOn: operatorSymbol) color: Color blue muchLighter) ;
+		 yourself! !
+
+!MagmaServerStatistics methodsFor: 'chart-private' stamp: 'cmm 8/17/2014 18:09'!
+newRequestResponseSizesPlotOn: operatorSymbol
+	^ self newDateAndTimeBySizesPlot
+		 title: operatorSymbol, ' Bytes Received / Sent' ;
+		 addSeries: ((requestSizeHistory seriesOn: operatorSymbol) color: Color green) ;
+		 addSeries: ((responseSizeHistory seriesOn: operatorSymbol) color: Color red) ;
+		 yourself! !
 
 !MagmaSessionStatistics methodsFor: 'historys' stamp: 'cmm 5/9/2008 17:07'!
 clientSideCommitTimeHistory
@@ -14194,6 +13469,163 @@ initialize
 	deltaCount _ Integer zero.
 	min _ Float infinity.
 	max _ Float infinity negated! !
+
+!MagmaTooFarBehindError methodsFor: 'as yet unclassified' stamp: 'cmm 8/7/2014 16:23'!
+defaultAction
+	super defaultAction.
+	^ self resume: true! !
+
+!MagmaTooFarBehindError methodsFor: 'as yet unclassified' stamp: 'cmm 7/17/2014 15:31'!
+isResumable
+	^ true! !
+
+!MagmaWrongCommitNumber methodsFor: 'accessing' stamp: 'cmm 10/14/2008 18:19'!
+expectedCommitNumber
+	^expectedCommitNumber! !
+
+!MagmaWrongCommitNumber methodsFor: 'accessing' stamp: 'cmm 10/14/2008 18:19'!
+expectedCommitNumber: anInteger
+	expectedCommitNumber _ anInteger! !
+
+!MagmaWrongServerError methodsFor: 'accessing' stamp: 'cmm 11/4/2008 17:00'!
+correctServer
+	^correctServer! !
+
+!MagmaWrongServerError methodsFor: 'accessing' stamp: 'cmm 11/4/2008 17:00'!
+correctServer: aMagmaRemoteLocation
+	correctServer _ aMagmaRemoteLocation! !
+
+!MagmaLinkChange methodsFor: 'accessing' stamp: 'cmm 12/8/2012 14:01'!
+linkToReplace: aMaNetworkServerLink 
+	^ oldLink = aMaNetworkServerLink
+		ifTrue: [ newLink ]
+		ifFalse: [ oldLink ]! !
+
+!MagmaLinkChange methodsFor: 'initializing' stamp: 'cmm 12/8/2012 14:00'!
+setOldLink: theOldLink newLink: theNewLink 
+	oldLink _ theOldLink.
+	newLink _ theNewLink! !
+
+!MagmaLinkChange class methodsFor: 'as yet unclassified' stamp: 'cmm 12/8/2012 14:03'!
+oldLink: oldLink newLink: newLink 
+	^ self new
+		
+		setOldLink: oldLink
+		newLink: newLink ;
+		 yourself! !
+
+!MagmaNodeUpdate methodsFor: 'initialize-release' stamp: 'cmm 10/31/2008 11:34'!
+add: aMagmaRemoteLocation 
+	add _ aMagmaRemoteLocation! !
+
+!MagmaNodeUpdate methodsFor: 'initialize-release' stamp: 'cmm 10/31/2008 11:34'!
+remove: aMagmaRemoteLocation 
+	remove _ aMagmaRemoteLocation! !
+
+!MagmaNodeUpdate methodsFor: 'initialize-release' stamp: 'cmm 11/15/2008 14:48'!
+setPrimary: aMagmaRemoteLocation 
+	setPrimary _ aMagmaRemoteLocation! !
+
+!MagmaNodeUpdate methodsFor: 'accessing' stamp: 'cmm 11/15/2008 14:50'!
+applyTo: aMagmaNode 
+	"Make updates to the aMagmaNode."
+	remove ifNotNil: 
+		[ aMagmaNode removeLocation: remove
+		"Check node is production-capable (i.e., at least two locations in the node)." ].
+	add ifNotNil: [ aMagmaNode addLocation: add ].
+	setPrimary ifNotNil: [ aMagmaNode primaryLocation: setPrimary ]! !
+
+!MagmaNodeUpdate methodsFor: 'accessing' stamp: 'cmm 11/24/2009 15:48'!
+processUsing: aMagmaServerConsole 
+	"Apply my updates to the node in a transaction.  Then ensure a correct node configuration."
+	| session node oldBranchCode canSkipReconfigure |
+	session _ aMagmaServerConsole serverSession.
+	node _ aMagmaServerConsole node.
+	canSkipReconfigure _ self isOnlyRemoving and: [ node includesSecondary: remove ].
+	
+	[ 
+	[ self wantsNewPrimary ifTrue: 
+		[ "Can't do a commit if you're not the primary, gotta bite the bullet."
+		oldBranchCode _ aMagmaServerConsole controller branchCode.
+		aMagmaServerConsole controller commitRestore ].
+	session commit: [ self applyTo: node ] ] 
+		on: MagmaCommitError
+		do: 
+			[ : err | 
+			session abort.
+			oldBranchCode ifNotNil: 
+				[ "Ahhhh, go back!!  We didn't actually commit anything so it should be safe."
+				aMagmaServerConsole controller
+					branchCode: oldBranchCode ;
+					beginRestore ] ] ] ensure: 
+		[ "This is needed whether commit-error occurs or not"
+		"But, if only removing a secondary, we don't need to "
+		canSkipReconfigure ifFalse: [ aMagmaServerConsole ensureCorrectNodeConfiguration ] ]! !
+
+!MagmaNodeUpdate methodsFor: 'testing' stamp: 'cmm 11/24/2009 15:44'!
+isOnlyRemoving
+	^ add isNil and: [ self wantsNewPrimary not and: [ remove notNil ] ]! !
+
+!MagmaNodeUpdate methodsFor: 'testing' stamp: 'cmm 11/15/2008 16:30'!
+wantsNewPrimary
+	^ setPrimary notNil! !
+
+!MagmaNodeUpdate class methodsFor: 'signaling' stamp: 'cmm 10/31/2008 11:33'!
+signalAdd: aMagmaRemoteLocation 
+	^ self new
+		add: aMagmaRemoteLocation ;
+		signal! !
+
+!MagmaNodeUpdate class methodsFor: 'signaling' stamp: 'cmm 10/31/2008 11:33'!
+signalRemove: aMagmaRemoteLocation 
+	^ self new
+		remove: aMagmaRemoteLocation ;
+		signal! !
+
+!MagmaProxyMaterialization methodsFor: 'as yet unclassified' stamp: 'cmm 4/27/2003 20:14'!
+materializedObject
+
+	^materializedObject! !
+
+!MagmaProxyMaterialization methodsFor: 'as yet unclassified' stamp: 'cmm 5/2/2003 17:23'!
+materializedObject: anObject
+
+	materializedObject _ anObject! !
+
+!MagmaProxyMaterialization class methodsFor: 'signaling' stamp: 'cmm 4/10/2005 18:00'!
+signalMaterializedObject: anObject 
+	(self new)
+		messageText: 'materializing a ' , anObject maOriginalClass printString;
+		materializedObject: anObject;
+		signal! !
+
+!MagmaUserRequiredNotification methodsFor: 'as yet unclassified' stamp: 'cmm 11/13/2013 20:40'!
+defaultAction
+	"The user did not listen for this notification.  For now, bail them out by offering them an opportunity to create one on the fly."
+	self resume: (session user ifNil: 
+			[ Smalltalk isHeadless 
+				ifTrue: [ 'unnamed' ]
+				ifFalse: 
+					[ MagmaUser id: (UIManager default request: 'Enter a name to connect under.') ] ])! !
+
+!MagmaUserRequiredNotification methodsFor: 'as yet unclassified' stamp: 'cmm 3/13/2005 18:07'!
+session: aMagmaSession
+
+	session _ aMagmaSession! !
+
+!MagmaUserRequiredNotification class methodsFor: 'private' stamp: 'cmm 3/13/2005 18:08'!
+requestUserFor: aMagmaSession
+
+	^ (self session: aMagmaSession)
+		messageText: 'Supply a userId for ', aMagmaSession linkInformation ;
+		signal! !
+
+!MagmaUserRequiredNotification class methodsFor: 'as yet unclassified' stamp: 'cmm 3/13/2005 18:07'!
+session: aMagmaSession
+
+	^ self new
+		session: aMagmaSession ;
+		yourself! !
 
 !MaTransaction methodsFor: 'writebarrier' stamp: 'cmm 12/1/2011 20:52'!
 add: anObject
@@ -14552,6 +13984,564 @@ session: aMagmaSession
 	^self new session: aMagmaSession
 ! !
 
+!MagmaRepositoryRequest methodsFor: 'accessing' stamp: 'cmm 2/27/2009 15:59'!
+failedLocation: aMagmaRemoteLocation 
+	failedLocation _ aMagmaRemoteLocation! !
+
+!MagmaRepositoryRequest methodsFor: 'accessing' stamp: 'cmm 3/8/2009 15:21'!
+prepareToSubmitFor: aMagmaSession 
+	self sessionId: aMagmaSession id! !
+
+!MagmaRepositoryRequest methodsFor: 'accessing'!
+sessionId
+
+	^sessionId! !
+
+!MagmaRepositoryRequest methodsFor: 'accessing' stamp: 'cmm 11/5/2008 16:10'!
+sessionId: aUuid 
+	self requiresConnection ifTrue: [ aUuid ifNil: [ MagmaSoftwareError signal ] ].
+	sessionId _ aUuid! !
+
+!MagmaRepositoryRequest methodsFor: 'accessing' stamp: 'cmm 6/17/2009 10:08'!
+waitCursor
+	^ MagmaPreferences waitCursor! !
+
+!MagmaRepositoryRequest methodsFor: 'testing' stamp: 'cmm 8/20/2014 14:47'!
+isBegin
+	^ false! !
+
+!MagmaRepositoryRequest methodsFor: 'testing' stamp: 'cmm 2/5/2009 20:16'!
+isConnect
+	^ false! !
+
+!MagmaRepositoryRequest methodsFor: 'testing' stamp: 'cmm 9/21/2008 21:02'!
+isDisconnect
+	^ false! !
+
+!MagmaRepositoryRequest methodsFor: 'testing' stamp: 'cmm 3/1/2009 12:02'!
+isWriteRequest
+	^ false! !
+
+!MagmaRepositoryRequest methodsFor: 'testing' stamp: 'cmm 12/31/2002 15:26'!
+requiresConnection
+
+	^true! !
+
+!MagmaRepositoryRequest methodsFor: 'testing' stamp: 'cmm 9/24/2012 16:54'!
+timesToRetry
+	^ 2! !
+
+!MaAbortTransactionRequest methodsFor: 'accessing' stamp: 'cmm 7/10/2009 13:49'!
+additionalBuffers: anArray
+	additionalBuffers _ anArray! !
+
+!MaAbortTransactionRequest methodsFor: 'accessing' stamp: 'cmm 12/5/2012 10:05'!
+timesToRetry
+	^ 0! !
+
+!MaAbstractReadRequest methodsFor: 'building' stamp: 'cmm 3/8/2009 15:21'!
+prepareToSubmitFor: aMagmaSession 
+	super prepareToSubmitFor: aMagmaSession.
+	requiredProgress _ aMagmaSession requiredProgress! !
+
+!MaAbstractReadRequest methodsFor: 'building' stamp: 'cmm 6/4/2006 20:11'!
+readStrategy
+	^ readStrategy ! !
+
+!MaAbstractReadRequest methodsFor: 'building' stamp: 'cmm 9/1/2003 23:25'!
+readStrategy: aMaReadStrategy
+
+	readStrategy _ aMaReadStrategy! !
+
+!MaAbstractReadRequest methodsFor: 'accessing' stamp: 'cmm 3/8/2009 14:25'!
+requiredProgress
+	^requiredProgress! !
+
+!MaAbstractReadRequest methodsFor: 'accessing' stamp: 'cmm 12/4/2012 22:15'!
+timesToRetry
+	^ 3! !
+
+!MaAbstractReadRequest methodsFor: 'accessing' stamp: 'cmm 6/17/2009 09:50'!
+waitCursor
+	^ MagmaPreferences readCursor! !
+
+!MaAbstractReadRequest class methodsFor: 'as yet unclassified' stamp: 'cmm 10/12/2015 15:08'!
+initializeDefaultSound
+	defaultSound _ ((FMSound new
+		 addEnvelope:
+			(VolumeEnvelope
+				points: {0 @ 1.0. 1 @ 1.0}
+				loopStart: 1
+				loopEnd: 1) ;
+			 yourself)
+		setPitch: 840.0
+		dur: 0.1
+		loudness: 0.25)! !
+
+!MaLargeCollectionSegmentRequest methodsFor: 'accessing' stamp: 'cmm 6/4/2006 20:11'!
+collectionOid
+	^ collectionOid! !
+
+!MaLargeCollectionSegmentRequest methodsFor: 'accessing' stamp: 'cmm 12/2/2004 13:50'!
+collectionOid: anInteger
+
+	collectionOid _ anInteger! !
+
+!MaLargeCollectionSegmentRequest methodsFor: 'accessing' stamp: 'cmm 6/4/2006 20:11'!
+quantity
+	^ quantity! !
+
+!MaLargeCollectionSegmentRequest methodsFor: 'accessing'!
+quantity: anInteger
+
+	quantity _ anInteger
+! !
+
+!MaRefreshSegmentRequest methodsFor: 'accessing' stamp: 'cmm 8/6/2006 21:24'!
+exceptions
+	^exceptions! !
+
+!MaRefreshSegmentRequest methodsFor: 'accessing' stamp: 'cmm 8/6/2006 22:32'!
+exceptions: aSet
+	exceptions _ aSet! !
+
+!MaRefreshSegmentRequest methodsFor: 'accessing' stamp: 'cmm 6/3/2006 15:50'!
+expression
+	^expression! !
+
+!MaRefreshSegmentRequest methodsFor: 'accessing' stamp: 'cmm 6/3/2006 15:50'!
+expression: aMaTerm
+	expression _ aMaTerm! !
+
+!MaRefreshSegmentRequest methodsFor: 'accessing' stamp: 'cmm 7/29/2006 18:23'!
+loadObjects
+	^loadObjects! !
+
+!MaRefreshSegmentRequest methodsFor: 'accessing' stamp: 'cmm 7/29/2006 18:23'!
+loadObjects: aBoolean
+	loadObjects _ aBoolean! !
+
+!MaRefreshSegmentRequest methodsFor: 'accessing' stamp: 'cmm 6/3/2006 15:50'!
+segment
+	^segment! !
+
+!MaRefreshSegmentRequest methodsFor: 'accessing' stamp: 'cmm 6/3/2006 15:50'!
+segment: aMagmaCollectionSegment
+	segment _ aMagmaCollectionSegment! !
+
+!MaSegmentByIndexRequest methodsFor: 'building'!
+lowIndex: anInteger
+
+	lowIndex _ anInteger
+! !
+
+!MaReadMultipleRequest methodsFor: 'accessing' stamp: 'cmm 2/11/2008 16:21'!
+oids: aCollection
+	oids _ aCollection! !
+
+!MaReadRequest methodsFor: 'building'!
+oid: anInteger
+
+	oid _ anInteger
+! !
+
+!MaCommitLogRecordRequest methodsFor: 'accessing' stamp: 'cmm 3/15/2009 19:35'!
+endingCommitNumber: anInteger
+	endingCommitNumber _ anInteger! !
+
+!MaCommitLogRecordRequest methodsFor: 'accessing' stamp: 'cmm 8/12/2008 21:43'!
+startingCommitNumber: anInteger
+	startingCommitNumber _ anInteger! !
+
+!MaCommitLogRecordRequest methodsFor: 'accessing' stamp: 'cmm 6/17/2009 10:07'!
+waitCursor
+	^ MagmaPreferences readCursor! !
+
+!MaCommitLogRecordRequest methodsFor: 'testing' stamp: 'cmm 10/14/2008 16:39'!
+requiresConnection
+	^ false! !
+
+!MaCommitLogRecordRequest class methodsFor: 'initialize-release' stamp: 'cmm 10/12/2015 16:05'!
+initializeDefaultSound
+	defaultSound _ ((FMSound new
+		 addEnvelope:
+			(VolumeEnvelope
+				points: {0 @ 1.0. 1 @ 1.0}
+				loopStart: 1
+				loopEnd: 1) ;
+			 yourself)
+		setPitch: 210.0
+		dur: 0.1
+		loudness: 1.0 ;
+		modulation: 2 ratio: 0.5)! !
+
+!MaWarmBackupUpdateRequest methodsFor: 'accessing' stamp: 'cmm 10/14/2008 17:26'!
+requestingLocation: aMagmaRemoteLocation
+	"Set with the location of the warm-backup requesting the records."
+	requestingLocation _ aMagmaRemoteLocation! !
+
+!MaCommitRequest methodsFor: 'building' stamp: 'cmm 4/21/2003 17:04'!
+beginAnother: aBoolean
+
+	beginAnother _ aBoolean! !
+
+!MaCommitRequest methodsFor: 'building'!
+package: aMaCommitPackage
+
+	package _ aMaCommitPackage
+! !
+
+!MaCommitRequest methodsFor: 'testing' stamp: 'cmm 9/24/2012 16:54'!
+timesToRetry
+	^ 0! !
+
+!MaCommitRequest methodsFor: 'accessing' stamp: 'cmm 6/17/2009 10:07'!
+waitCursor
+	^ MagmaPreferences writeCursor! !
+
+!MaCommitRequest class methodsFor: 'initialize-release' stamp: 'cmm 10/12/2015 15:15'!
+initializeDefaultSound
+	defaultSound _ ((FMSound new
+		 addEnvelope:
+			(VolumeEnvelope
+				points: {0 @ 1.0. 1 @ 1.0}
+				loopStart: 1
+				loopEnd: 1) ;
+			 yourself)
+		setPitch: 420.0
+		dur: 0.1
+		loudness: 0.25)! !
+
+!MaDownloadCodeRequest methodsFor: 'testing' stamp: 'cmm 12/31/2002 15:26'!
+requiresConnection
+
+	^false! !
+
+!MaGetMcLockerRequest methodsFor: 'accessing' stamp: 'cmm 9/28/2008 20:54'!
+mcOid: anInteger
+	"The oid of the MagmaCollection."
+	mcOid _ anInteger! !
+
+!MaLargeCollectionSizeRequest methodsFor: 'building'!
+collectionOid: anInteger
+
+	collectionOid _ anInteger
+! !
+
+!MaLargeCollectionSizeRequest class methodsFor: 'initialize-release' stamp: 'cmm 10/12/2015 15:24'!
+initializeDefaultSound
+	defaultSound _ ((FMSound new
+		 addEnvelope:
+			(VolumeEnvelope
+				points: {0 @ 1.0. 1 @ 1.0}
+				loopStart: 1
+				loopEnd: 1) ;
+			 yourself)
+		setPitch: 840.0
+		dur: 0.1
+		loudness: 0.25)! !
+
+!MaKeyIntervalInfoRequest methodsFor: 'building'!
+attribute: aSymbol
+
+	attribute _ aSymbol
+! !
+
+!MaKeyIntervalInfoRequest methodsFor: 'building'!
+highKey: anInteger
+
+	highKey _ anInteger
+! !
+
+!MaKeyIntervalInfoRequest methodsFor: 'building'!
+lowKey: anInteger
+
+	lowKey _ anInteger
+! !
+
+!MaLoadFromReaderRequest methodsFor: 'accessing' stamp: 'cmm 10/16/2006 12:15'!
+commitPackage: aMaCommitPackage
+	commitPackage _ aMaCommitPackage! !
+
+!MaLoadFromReaderRequest methodsFor: 'accessing' stamp: 'cmm 7/2/2006 23:43'!
+distinct: aBoolean
+	distinct _ aBoolean! !
+
+!MaLoadFromReaderRequest methodsFor: 'accessing' stamp: 'cmm 7/3/2006 12:55'!
+expression: aMagmaCollectionReader
+	expression _ aMagmaCollectionReader! !
+
+!MaLoadFromReaderRequest methodsFor: 'accessing' stamp: 'cmm 6/11/2006 21:51'!
+sourceCollectionOid: anInteger
+	sourceCollectionOid _ anInteger! !
+
+!MaLoadFromReaderRequest methodsFor: 'testing' stamp: 'cmm 9/24/2012 16:55'!
+timesToRetry
+	"Don't retry these; the chance of a duplicate load process is just not worth it."
+	^ 0! !
+
+!MaLoadProgressRequest methodsFor: 'accessing' stamp: 'cmm 7/26/2006 17:59'!
+collectionOid
+	^collectionOid! !
+
+!MaLoadProgressRequest methodsFor: 'accessing' stamp: 'cmm 7/26/2006 17:59'!
+collectionOid: anInteger
+	collectionOid _ anInteger! !
+
+!MaPrimitiveAttributesRequest methodsFor: 'testing' stamp: 'cmm 10/22/2008 16:34'!
+requiresConnection
+	^ false! !
+
+!MaRawBufferRequest methodsFor: 'as yet unclassified' stamp: 'cmm 3/14/2009 15:20'!
+oid: anInteger 
+	oid _ anInteger! !
+
+!MaRawBufferRequest methodsFor: 'as yet unclassified' stamp: 'cmm 3/14/2009 15:21'!
+requiresConnection
+	^ false! !
+
+!MaReaderTrunkRequest methodsFor: 'accessing' stamp: 'cmm 8/6/2006 18:34'!
+collectionOid: aMaTerm
+	collectionOid _ aMaTerm! !
+
+!MaReaderTrunkRequest methodsFor: 'accessing' stamp: 'cmm 8/6/2006 18:33'!
+expression: aMaTerm
+	expression _ aMaTerm! !
+
+!MaRefreshRequest methodsFor: 'overriding' stamp: 'cmm 1/8/2009 18:35'!
+nodeCheck
+	self shouldBePrimary! !
+
+!MaRefreshRequest methodsFor: 'accessing' stamp: 'cmm 12/5/2012 10:07'!
+timesToRetry
+	^ 0! !
+
+!MaRemoveSecondaryLocationRequest methodsFor: 'accessing' stamp: 'cmm 3/4/2009 15:47'!
+locationToRemove: anObject
+	locationToRemove _ anObject! !
+
+!MaRemoveSecondaryLocationRequest methodsFor: 'testing' stamp: 'cmm 3/4/2009 15:50'!
+requiresConnection
+	^ false! !
+
+!MaRemoveSecondaryLocationRequest methodsFor: 'testing' stamp: 'cmm 9/24/2012 16:55'!
+timesToRetry
+	^ 0! !
+
+!MaRepositoryConnectionRequest methodsFor: 'building' stamp: 'cmm 11/18/2008 13:49'!
+commitNumber: anInteger
+	commitNumber _ anInteger! !
+
+!MaRepositoryConnectionRequest methodsFor: 'building' stamp: 'cmm 12/30/2002 23:20'!
+magmaVersion: anInteger
+
+	magmaVersion _ anInteger! !
+
+!MaRepositoryConnectionRequest methodsFor: 'building'!
+userId: aString
+
+	userId _ aString
+! !
+
+!MaRepositoryConnectionRequest methodsFor: 'building' stamp: 'cmm 12/18/2008 17:16'!
+uuid: aUuid
+	uuid _ aUuid! !
+
+!MaRepositoryConnectionRequest methodsFor: 'testing' stamp: 'cmm 2/25/2009 11:04'!
+isConnect
+	^ true! !
+
+!MaRepositoryConnectionRequest methodsFor: 'testing' stamp: 'cmm 12/31/2002 15:27'!
+requiresConnection
+
+	^false! !
+
+!MaRepositoryConnectionRequest methodsFor: 'testing' stamp: 'cmm 12/5/2012 10:08'!
+timesToRetry
+	^ 0! !
+
+!MaRepositoryDisconnectRequest methodsFor: 'testing' stamp: 'cmm 9/21/2008 21:02'!
+isDisconnect
+	^ true! !
+
+!MaRepositoryDisconnectRequest methodsFor: 'testing' stamp: 'cmm 9/24/2012 16:55'!
+timesToRetry
+	"Can't connect to disconnect?  Don't retry that."
+	^ 0! !
+
+!MaRepositoryDisconnectRequest methodsFor: 'testing' stamp: 'cmm 11/24/2009 21:22'!
+wantsResponse
+	^ false! !
+
+!MaSaveAndExitImageRequest methodsFor: 'accessing' stamp: 'cmm 12/21/2008 15:38'!
+exit: aBoolean
+	exit _ aBoolean! !
+
+!MaSaveAndExitImageRequest methodsFor: 'accessing' stamp: 'cmm 12/21/2008 15:38'!
+save: aBoolean
+	save _ aBoolean! !
+
+!MaSaveAndExitImageRequest methodsFor: 'testing' stamp: 'cmm 7/15/2008 17:22'!
+requiresConnection
+	^ false! !
+
+!MaSaveAndExitImageRequest methodsFor: 'testing' stamp: 'cmm 9/24/2012 16:55'!
+timesToRetry
+	^ 0! !
+
+!MaServerPerformRequest methodsFor: 'access' stamp: 'cmm 9/6/2007 21:32'!
+arguments: anArray
+	arguments _ anArray! !
+
+!MaServerPerformRequest methodsFor: 'access' stamp: 'cmm 9/6/2007 21:32'!
+selector: selectorSymbol
+	selector _ selectorSymbol! !
+
+!MaServerPerformRequest methodsFor: 'testing' stamp: 'cmm 2/22/2011 15:12'!
+requiresConnection
+	^ false! !
+
+!MaServerPerformRequest methodsFor: 'testing' stamp: 'cmm 9/24/2012 16:56'!
+timesToRetry 
+	"Too risky to auto-retry, the operation may not be idempotent."
+	^ 0! !
+
+!MaTransactionRequest methodsFor: 'testing' stamp: 'cmm 8/20/2014 14:47'!
+isBegin
+	^ true! !
+
+!MaTransactionRequest methodsFor: 'testing' stamp: 'cmm 9/24/2012 16:56'!
+timesToRetry
+	"A retry here on a timeout would result in a guaranteed error once the original bytes made it, so don't retry."
+	^ 0! !
+
+!MaWriteRequest methodsFor: 'accessing' stamp: 'cmm 3/2/2009 15:11'!
+commitLogRecord
+	^ commitLogRecord! !
+
+!MaWriteRequest methodsFor: 'accessing' stamp: 'cmm 10/28/2008 11:15'!
+commitLogRecord: aMaCommitLogRecord
+	commitLogRecord _ aMaCommitLogRecord! !
+
+!MaWriteRequest methodsFor: 'accessing' stamp: 'cmm 6/17/2009 10:07'!
+waitCursor
+	^ MagmaPreferences writeCursor! !
+
+!MaWriteRequest methodsFor: 'testing' stamp: 'cmm 3/1/2009 12:02'!
+isWriteRequest
+	^ true! !
+
+!MaWriteRequest methodsFor: 'testing' stamp: 'cmm 12/29/2008 19:27'!
+requiresConnection
+	^ false! !
+
+!MaWriteRequest methodsFor: 'testing' stamp: 'cmm 9/24/2012 16:56'!
+timesToRetry
+	^ 0! !
+
+!MaWriteRequest methodsFor: 'testing' stamp: 'cmm 11/13/2008 10:30'!
+wantsResponse
+	^ false! !
+
+!MagmaBeWarmBackupRequest methodsFor: 'initializing' stamp: 'cmm 2/27/2009 15:13'!
+primaryLocation: aMagmaRemoteLocation 
+	primaryLocation _ aMagmaRemoteLocation! !
+
+!MagmaBeWarmBackupRequest methodsFor: 'testing' stamp: 'cmm 2/27/2009 15:14'!
+requiresConnection
+	^ false! !
+
+!MagmaBeWarmBackupRequest methodsFor: 'testing' stamp: 'cmm 9/24/2012 16:56'!
+timesToRetry
+	^ 0! !
+
+!MagmaBeWarmBackupRequest methodsFor: 'testing' stamp: 'cmm 2/27/2009 15:14'!
+wantsResponse
+	^ false! !
+
+!MagmaConnectionsRequest methodsFor: 'as yet unclassified' stamp: 'cmm 7/31/2013 09:58'!
+process
+	^ self repository connectionsList! !
+
+!MagmaConnectionsRequest methodsFor: 'as yet unclassified' stamp: 'cmm 3/24/2013 17:11'!
+requiresConnection
+	^ false! !
+
+!MagmaEnsureCorrectNodeConfiguration methodsFor: 'testing' stamp: 'cmm 9/24/2012 16:56'!
+timesToRetry
+	^ 0! !
+
+!MagmaEnsureCorrectNodeConfiguration methodsFor: 'testing' stamp: 'cmm 11/22/2009 22:26'!
+wantsResponse
+	^ false! !
+
+!MagmaFullBackupRequest methodsFor: 'testing' stamp: 'cmm 12/30/2008 14:02'!
+requiresConnection
+	^ false! !
+
+!MagmaFullBackupRequest methodsFor: 'testing' stamp: 'cmm 9/24/2012 16:56'!
+timesToRetry
+	^ 0! !
+
+!MagmaFullBackupRequest methodsFor: 'accessing' stamp: 'cmm 12/18/2008 15:26'!
+serverPath: aString 
+	"Set the server path to backup to."
+	serverPath _ aString! !
+
+!MagmaIdRequest methodsFor: 'testing' stamp: 'cmm 7/15/2008 17:00'!
+requiresConnection
+	"Although a connection is not required, the session must have been *previously* connected.  This is used for a session reconnection, we must ensure it is connecting to the same repository."
+	^ false! !
+
+!MagmaNoteUnreachableServer methodsFor: 'testing' stamp: 'cmm 3/6/2009 10:26'!
+requiresConnection
+	^ false! !
+
+!MagmaNoteUnreachableServer methodsFor: 'testing' stamp: 'cmm 9/24/2012 16:56'!
+timesToRetry
+	^ 0! !
+
+!MagmaPathNameRequest methodsFor: 'testing' stamp: 'cmm 9/19/2004 22:58'!
+requiresConnection
+
+	^ false! !
+
+!MagmaReleaseReaderRequest methodsFor: 'accessing' stamp: 'cmm 1/5/2010 13:43'!
+collectionOid: anInteger
+	collectionOid _ anInteger! !
+
+!MagmaReleaseReaderRequest methodsFor: 'testing' stamp: 'cmm 1/5/2010 14:25'!
+wantsResponse
+	^ false! !
+
+!MagmaRequestSwapPrimaryDutyRequest methodsFor: 'testing' stamp: 'cmm 3/3/2009 21:38'!
+requiresConnection
+	^ false! !
+
+!MagmaRequestSwapPrimaryDutyRequest methodsFor: 'testing' stamp: 'cmm 9/24/2012 16:56'!
+timesToRetry
+	^ 0! !
+
+!MagmaServerStatisticsRequest methodsFor: 'testing' stamp: 'cmm 5/6/2008 14:01'!
+requiresConnection
+	^ false! !
+
+!MagmaSwapPrimaryDutyRequest methodsFor: 'accessing' stamp: 'cmm 12/29/2008 16:41'!
+branchCode: anInteger 
+	branchCode _ anInteger! !
+
+!MagmaSwapPrimaryDutyRequest methodsFor: 'accessing' stamp: 'cmm 12/29/2008 15:01'!
+commitNumber: anInteger
+	commitNumber _ anInteger! !
+
+!MagmaSwapPrimaryDutyRequest methodsFor: 'accessing' stamp: 'cmm 3/3/2009 20:31'!
+newPrimary: aMagmaRemoteLocation
+	newPrimary _ aMagmaRemoteLocation! !
+
+!MagmaSwapPrimaryDutyRequest methodsFor: 'accessing' stamp: 'cmm 9/24/2012 16:56'!
+timesToRetry
+	^ 0! !
+
 !MagmaWbClassBuilder methodsFor: 'as yet unclassified' stamp: 'cmm 12/3/2011 16:55'!
 addPrimitiveOverride: methodSelector 
 	| mb |
@@ -14567,6 +14557,17 @@ addPrimitiveOverride: methodSelector
 	class
 		compileSilently: mb streamContents
 		classified: 'overriding'! !
+
+!MagmaWbClassBuilder methodsFor: 'as yet unclassified' stamp: 'cmm 5/30/2018 22:00'!
+fieldsWrittenToBySelector: selectorSymbol 
+	| allInstVarNames transientFieldNumbers |
+	"#maDirtyAdd: is a low-level method used for safe materialization of HashedCollections, do not signal modified at that time."
+	selectorSymbol = #maDirtyAdd: ifTrue: [ ^Array empty ].
+	allInstVarNames _ self targetClass allInstVarNames.
+	transientFieldNumbers _ self targetClass basicNew maTransientVariables collect:
+		[ : eachVarName | allInstVarNames indexOf: eachVarName ].
+	^ (super fieldsWrittenToBySelector: selectorSymbol) reject:
+		[ : eachFieldNumber | transientFieldNumbers includes: eachFieldNumber ]! !
 
 !MagmaWbClassBuilder methodsFor: 'as yet unclassified' stamp: 'cmm 11/11/2016 14:39'!
 installMagmaOverrides
@@ -15322,352 +15323,6 @@ isImmutableInMagma
 
 	^ true! !
 
-!SOLHashFrame methodsFor: '*magma-client' stamp: 'cmm 4/11/2011 13:33'!
-at: srchKey ifAbsentPut: aBlock from: aNode 
-	"Return an old value that compares: equal to srchVal if one is present, otherwise return nil to indicate a successful insertion."
-	(self
-		locate: srchKey
-		in: aNode) ifTrue: [ ^ curr value ].
-	self insert:
-		(SOLHashNode
-			key: srchKey
-			value: aBlock value).
-	^ nil! !
-
-!SOLHashTable methodsFor: '*magma-client' stamp: 'cmm 4/11/2011 17:00'!
-at: hashKey ifAbsentAdd: aBlock 
-	"Add anObject at hashKey, if hashKey does not already exist."
-	| hn |
-	hn _ self headNodeFor: hashKey.
-	^ (frame
-		at: (self regularKey: hashKey)
-		ifAbsentPut: aBlock
-		from: hn) ifNil:
-		[ numElements _ numElements + 1.
-		self checkSize.
-		self firstAt: hashKey ]! !
-
-!SOLHashTable methodsFor: '*magma-client' stamp: 'cmm 4/10/2011 19:27'!
-maPostMaterialize
-	self initializeFrame! !
-
-!SOLHashTable methodsFor: '*magma-client' stamp: 'cmm 4/9/2011 17:31'!
-maTransientVariables
-	^ #('frame')! !
-
-!SOLHashTable methodsFor: '*magma-client' stamp: 'cmm 4/10/2011 19:26'!
-maWantsPostMaterialization 
-	^ true! !
-
-!ClassBinding methodsFor: '*magma-client' stamp: 'cmm 4/19/2013 11:24'!
-isImmutableInMagma
-	"ClassBinding will not allow instVarAt: put: so make it immutable in magma."
-	^ true! !
-
-!Environment methodsFor: '*magma-client' stamp: 'cmm 2/26/2016 15:23'!
-isImmutableInMagma
-	"Environments are maintained by code, simply referenced by name in Magma."
-	^ true! !
-
-!FileDirectory methodsFor: '*magma-client' stamp: 'cmm 4/6/2010 22:57'!
-asMagmaLocalLocation
-	^ MagmaLocalLocation path: self pathName! !
-
-!HashedCollection methodsFor: '*magma-client' stamp: 'cmm 12/1/2011 20:52'!
-addSelfToWriteBarrier: aMaxTransaction
-	aMaxTransaction addHashedCollection: self! !
-
-!HashedCollection methodsFor: '*magma-client' stamp: 'cmm 9/16/2014 16:40'!
-postRefreshUsing: aMaObjectBuffer for: aMagmaSession 
-	self rehash.
-	^ super
-		postRefreshUsing: aMaObjectBuffer
-		for: aMagmaSession! !
-
-!MCAddition methodsFor: '*magma-client-private' stamp: 'cmm 11/20/2013 15:27'!
-canonicalizeFor: aMCVersion using: aMcModel 
-	definition _ aMcModel
-		canonicalizedDefinition: definition
-		of: self! !
-
-!MCAncestry methodsFor: '*magma-client' stamp: 'cmm 11/20/2013 14:15'!
-canonicalizedUsing: aMcModel 
-	"Replace my ancestors with the ones in aMcModel, if they exist, or add them if they don't.  Descend the ancestry-tree until we are connected to canonicalized instances."
-	^ aMcModel
-		infoAssociationFor: self
-		ifPresent:
-			[ : existingAssoc | existingAssoc value ]
-		ifAbsent:
-			[ aMcModel addInfo: self.
-			self ancestors withIndexDo:
-				[ : each : index | ancestors
-					at: index
-					put: (each canonicalizedUsing: aMcModel) ].
-			self ]! !
-
-!MCClassDefinition methodsFor: '*magma-client' stamp: 'cmm 5/2/2011 14:39'!
-dateAndTime
-	| subStrings |
-	subStrings _ self commentStamp subStrings.
-	^ subStrings size >= 3
-		ifTrue:
-			[ DateAndTime
-				date: subStrings second asDate
-				time: subStrings third asTime ]
-		ifFalse: [ DateAndTime epoch ]! !
-
-!MCClassDefinition methodsFor: '*magma-client' stamp: 'cmm 11/20/2013 15:24'!
-ensureHistoricalEntryIn: aMcModel
-	^ aMcModel ensureHistoricalEntry: self! !
-
-!MCConfiguration methodsFor: '*magma-client-private' stamp: 'cmm 4/23/2011 14:41'!
-postStoreCleanUpFor: aMCMagmaRepository
-	"Don't do anything for MCConfigurations."! !
-
-!MCConfiguration methodsFor: '*magma-client-private' stamp: 'cmm 4/25/2011 08:15'!
-removeFrom: aMcModel
-	^ aMcModel primRemoveConfiguration: self! !
-
-!MCConfiguration methodsFor: '*magma-client' stamp: 'cmm 4/23/2011 11:26'!
-storeInto: aMcModel 
-	aMcModel addConfiguration: self! !
-
-!MCConfiguration methodsFor: '*magma-client-private' stamp: 'cmm 4/23/2011 14:25'!
-versionName
-	^ self name asMCVersionName! !
-
-!MCDefinition methodsFor: '*magma-client' stamp: 'cmm 11/20/2013 15:24'!
-ensureHistoricalEntryIn: aMcModel
-	"Only Class and Method definitions do this."! !
-
-!MCDefinition methodsFor: '*magma-client' stamp: 'cmm 3/10/2011 18:31'!
-isImmutableInMagma 
-	"A MCDefinition, once saved in a version, never changes.  Magma will not bother to track changes to these types of objects, improving performance."
-	^ true! !
-
-!MCDiffyVersion methodsFor: '*magma-client-private' stamp: 'cmm 11/20/2013 15:13'!
-canonicalizeReferencesUsing: aMcModel 
-	"Make sure that, for all definitions in aMCVersion, we refer to an already-persistent equivalent, if present, and add it, if not."
-	super canonicalizeReferencesUsing: aMcModel.
-	base _ base canonicalizedUsing: aMcModel.
-	patch
-		canonicalizeFor: self
-		using: aMcModel! !
-
-!MCMethodDefinition methodsFor: '*magma-client' stamp: 'cmm 3/14/2011 15:39'!
-dateAndTime
-	| subStrings |
-	subStrings _ self timeStamp subStrings.
-	^ subStrings size >= 3
-		ifTrue:
-			[ DateAndTime
-				date: subStrings second asDate
-				time: subStrings third asTime ]
-		ifFalse: [ DateAndTime epoch ]! !
-
-!MCMethodDefinition methodsFor: '*magma-client' stamp: 'cmm 11/20/2013 15:24'!
-ensureHistoricalEntryIn: aMcModel
-	^ aMcModel ensureHistoricalEntry: self! !
-
-!MCModification methodsFor: '*magma-client-private' stamp: 'cmm 11/20/2013 15:28'!
-canonicalizeFor: aMCVersion using: aMcModel 
-	obsoletion _ aMcModel
-		canonicalizedDefinition: obsoletion
-		of: self.
-	modification _ aMcModel
-		canonicalizedDefinition: modification
-		of: self! !
-
-!MCOperationsList methodsFor: '*magma-client-private' stamp: 'cmm 11/20/2013 15:12'!
-canonicalizeFor: aMCVersion using: aMcModel 
-	operations do:
-		[ : each | each
-			canonicalizeFor: aMCVersion
-			using: aMcModel ]! !
-
-!MCPackage methodsFor: '*magma-client' stamp: 'cmm 3/10/2011 18:28'!
-isImmutableInMagma 
-	"A MCPackage, once created, never changes.  Magma will not bother to track changes to these types of objects, improving performance."
-	^ true! !
-
-!MCPatchOperation methodsFor: '*magma-client-private' stamp: 'cmm 11/20/2013 15:13'!
-canonicalizeFor: aMCVersion using: aMcModel
-	self subclassResponsibility! !
-
-!MCRemoval methodsFor: '*magma-client-private' stamp: 'cmm 11/20/2013 15:27'!
-canonicalizeFor: aMCVersion using: aMcModel 
-	definition _ aMcModel
-		canonicalizedDefinition: definition
-		of: self! !
-
-!MCSnapshot methodsFor: '*magma-client' stamp: 'cmm 3/10/2011 18:29'!
-isImmutableInMagma 
-	"A MCSnapshot, once created, never changes.  Magma will not bother to track changes to these types of objects, improving performance."
-	^ true! !
-
-!MCSnapshot methodsFor: '*magma-client' stamp: 'cmm 3/6/2011 22:17'!
-setDefinitions: anOrderedCollection
-	"Magma-hosted MC repositories canonicalize all of their objects.  This is used to replace my 'definitions' instances with the canonicalized instances."
-	definitions _ anOrderedCollection! !
-
-!MCVersion methodsFor: '*magma-client' stamp: 'cmm 2/25/2011 16:36'!
-author
-	^ info author! !
-
-!MCVersion methodsFor: '*magma-client-private' stamp: 'cmm 11/20/2013 14:39'!
-canonicalizeReferencesUsing: aMcModel 
-	"Make sure that, for all definitions in aMCVersion, we refer to an already-persistent equivalent, if present, and add it, if not."
-	package _ aMcModel canonicalizedPackageFor: self.
-	info _ info canonicalizedUsing: aMcModel.
-	snapshot setDefinitions: (aMcModel canonicalizedDefinitionsFor: self)! !
-
-!MCVersion methodsFor: '*magma-client' stamp: 'cmm 3/15/2011 14:45'!
-dateAndTime
-	^ info dateAndTime! !
-
-!MCVersion methodsFor: '*magma-client' stamp: 'cmm 3/10/2011 09:37'!
-definitions
-	^ self snapshot definitions! !
-
-!MCVersion methodsFor: '*magma-client' stamp: 'cmm 3/15/2011 14:44'!
-hasAncestor: aMCVersion
-	^ info hasAncestor: aMCVersion info! !
-
-!MCVersion methodsFor: '*magma-client' stamp: 'cmm 2/25/2011 15:51'!
-id
-	^ info id! !
-
-!MCVersion methodsFor: '*magma-client-private' stamp: 'cmm 3/10/2011 18:29'!
-isImmutableInMagma 
-	"A MCVersion, once created, never changes.  Magma will not bother to track changes to these types of objects, improving performance."
-	^ true! !
-
-!MCVersion methodsFor: '*magma-client' stamp: 'cmm 3/6/2011 14:21'!
-message
-	^ info message! !
-
-!MCVersion methodsFor: '*magma-client' stamp: 'cmm 3/6/2011 12:34'!
-packageName
-	^ self versionName packageName! !
-
-!MCVersion methodsFor: '*magma-client-private' stamp: 'cmm 4/23/2011 14:40'!
-postStoreCleanUpFor: aMCMagmaRepository
-	"Occasionally stubOut the missingVersions so we don't end up referencing too many versions."
-	self info versionNumber \\ 10 = 0 ifTrue: [ aMCMagmaRepository trim ]! !
-
-!MCVersion methodsFor: '*magma-client-private' stamp: 'cmm 4/25/2011 08:15'!
-removeFrom: aMcModel
-	^ aMcModel primRemoveVersion: self! !
-
-!MCVersion methodsFor: '*magma-client-private' stamp: 'cmm 3/10/2011 20:03'!
-setPackage: aMCPackage definitions: anOrderedCollection info: aMCVersionInfo
-	"Magma-hosted MC repositories canonicalize all of their objects.  This is used to replace my 'definitions' instances with the canonicalized instances."
-	package _ aMCPackage.
-	snapshot setDefinitions: anOrderedCollection.
-	info _ aMCVersionInfo! !
-
-!MCVersion methodsFor: '*magma-client-private' stamp: 'cmm 3/24/2015 16:59'!
-storeInto: aMcModel 
-"	self versionName isValid ifFalse: [ MagmaUserError signal: 'Cannot support mal-named versions.' ]."  "<---- Why not?"
-	(aMcModel includesVersion: self) ifTrue: [ ^ aMcModel ].
-	MagmaPreferences suspendStatusViaCursorWhile:
-		[ self canonicalizeReferencesUsing: aMcModel.
-		aMcModel
-			 addVersion: self ;
-			 adjustMissingVersions: self info ]! !
-
-!MCVersion methodsFor: '*magma-client' stamp: 'cmm 3/6/2011 12:33'!
-versionName
-	^ info versionName! !
-
-!MCVersion methodsFor: '*magma-client' stamp: 'cmm 4/21/2011 20:44'!
-versionNumber
-	^ info versionNumber! !
-
-!MCVersionDependency methodsFor: '*magma-client' stamp: 'cmm 3/10/2011 18:34'!
-isImmutableInMagma 
-	"A once saved in a repository, this object never changes.  Magma will not bother to track changes to these types of objects, improving performance."
-	^ true! !
-
-!MCVersionInfo methodsFor: '*magma-client' stamp: 'cmm 3/10/2011 18:28'!
-isImmutableInMagma 
-	"A MCVersionInfo, once created, never changes.  Magma will not bother to track changes to these types of objects, improving performance."
-	^ true! !
-
-!MorphicTransform methodsFor: '*magma-client' stamp: 'cmm 5/24/2010 16:43'!
-maAllowsWriteBarrier 
-	"Had a problem where this guy was losing his writeBarrier (nil) and so was blowing when it was modified.  Thought it had something to do with the fact that I was copied, but my testing shows the copy maintains access to the same WriteBarrier."
-
-	^ false
-	
-"Seems like it should be ok..  What gives??
-| mt1 mt2 mt3 mt4 wb |
-wb _ WriteBarrier new.
-mt1 _ self offset: 2@3.
-wb add: mt1.
-mt2 _ mt1 withOffset: 3@4.
-mt3 _ mt2 withOffset: 4@5.
-mt4 _ mt1 withOffset: 5@6.
-{ mt1. mt2. mt3. mt4 } do: [ : e | e setAngle: Float pi ].
-{ mt1. mt2. mt3. mt4 } do: [ : e | e writeBarrier == wb ifFalse: [ self halt ] ].
-{ mt1. mt2. mt3. mt4 } do: [ : e | wb remove: e ]
-"! !
-
-!ScrollPane methodsFor: '*magma-client' stamp: 'cmm 4/13/2005 14:11'!
-isImmutableInMagma 
-	"disallow one clients scrolling to affect other clients."
-
-	^ true! !
-
-!ScrollPane methodsFor: '*magma-client' stamp: 'cmm 4/13/2005 14:11'!
-wantsMagmaEvents
-	"We don't refresh scrollbars.  Although this technically isn't necessary as long I answer true to isImmutableInMagma, this will prevent my updatableActionMap from getting the event-listeners put in there unnecessarily."
-
-	^ false! !
-
-!SmalltalkImage methodsFor: '*magma-client' stamp: 'cmm 7/29/2018 21:36'!
-initializeGarbageCollectorSettingsForMagma
-        "Initialize the memory and GC settings to be more liberal with memory in order to reduce garbage-collector impact on the processor."
-	
-     "The following settings affect the rate incremental GCs and tenuring"
-     
-     "Limit incremental GC activity to run every 100k allocations"
- "    self vmParameterAt: 5 put: 100000." "allocations between GCs (default: 4000)"
-     "Limit tenuring threshold to only tenure w/ > 35k survivors"
-     self vmParameterAt: 6 put: 35000. "tenuring threshold (default: 2000)"
-     
-     "These settings affect overall memory usage"
-     
-     "Only give memory back to the OS when we have more than 16MB free"
-     self vmParameterAt: 24 put: 16*1024*1024. "default 8MB"
-     "Try to keep 8MB headroom at all times"
-     self vmParameterAt: 25 put: 8*1024*1024. "default 4MB"
-     
-     "These settings describe what to do when we're close to running out of free space"
-     self isRunningSpur ifFalse:
-          [ "Tell the VM that we'd rather grow than spinning in tight GC loops"
-"          self setGCBiasToGrow: 1." "default: false"
-          "Tell the VM to do a fullGC for good measure if the above growth exceeded 16MB"
-"          self setGCBiasToGrowGCLimit: 16*1024*1024." "default: 0"]! !
-
-!SmalltalkImage methodsFor: '*magma-client' stamp: 'cmm 3/12/2010 17:51'!
-isImmutableInMagma
-	^ true! !
-
-!DirectoryEntryDirectory methodsFor: '*magma-client' stamp: 'cmm 7/21/2016 15:59'!
-asMagmaLocalLocation
-	^ MagmaLocalLocation path: self directoryName! !
-
-!TTFontDescription methodsFor: '*magma-client' stamp: 'cmm 4/8/2005 12:37'!
-isImmutableInMagma
-
-	^ true! !
-
-!TranscriptStream methodsFor: '*magma-client' stamp: 'cmm 4/8/2005 12:37'!
-isImmutableInMagma
-
-	^ true! !
-
 !MaClassDefinition methodsFor: '*magma-client' stamp: 'cmm 9/6/2012 17:55'!
 beKnownAs: newClassName
 	self className ifNotNil: [ aliases add: self className ].
@@ -15882,6 +15537,43 @@ newObjectBuffersMissingFromWhole
 				[ : oid | MaOidCalculator isOidForNewObject: oid ]
 			do:
 				[ : referencedOid : referencingBuffer | stream nextPut: referencedOid -> referencingBuffer copyWithSameBuffer ] ]! !
+
+!SOLHashFrame methodsFor: '*magma-client' stamp: 'cmm 4/11/2011 13:33'!
+at: srchKey ifAbsentPut: aBlock from: aNode 
+	"Return an old value that compares: equal to srchVal if one is present, otherwise return nil to indicate a successful insertion."
+	(self
+		locate: srchKey
+		in: aNode) ifTrue: [ ^ curr value ].
+	self insert:
+		(SOLHashNode
+			key: srchKey
+			value: aBlock value).
+	^ nil! !
+
+!SOLHashTable methodsFor: '*magma-client' stamp: 'cmm 4/11/2011 17:00'!
+at: hashKey ifAbsentAdd: aBlock 
+	"Add anObject at hashKey, if hashKey does not already exist."
+	| hn |
+	hn _ self headNodeFor: hashKey.
+	^ (frame
+		at: (self regularKey: hashKey)
+		ifAbsentPut: aBlock
+		from: hn) ifNil:
+		[ numElements _ numElements + 1.
+		self checkSize.
+		self firstAt: hashKey ]! !
+
+!SOLHashTable methodsFor: '*magma-client' stamp: 'cmm 4/10/2011 19:27'!
+maPostMaterialize
+	self initializeFrame! !
+
+!SOLHashTable methodsFor: '*magma-client' stamp: 'cmm 4/9/2011 17:31'!
+maTransientVariables
+	^ #('frame')! !
+
+!SOLHashTable methodsFor: '*magma-client' stamp: 'cmm 4/10/2011 19:26'!
+maWantsPostMaterialization 
+	^ true! !
 
 !MaMinimalObject methodsFor: '*magma-client' stamp: 'cmm 3/28/2005 17:02'!
 maAllowsWriteBarrier
