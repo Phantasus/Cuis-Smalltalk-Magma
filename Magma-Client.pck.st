@@ -1,10 +1,10 @@
-'From Cuis 5.0 [latest update: #4579] on 11 May 2021 at 5:11:58 pm'!
+'From Cuis 5.0 [latest update: #4579] on 11 May 2021 at 5:59:19 pm'!
 'Description Package containing the magma client implementation
 
 License: MIT
 Original Author: Chris Muller (cmm)
 Author: Josef Philip Bernhart (jpb)'!
-!provides: 'Magma-Client' 1 4!
+!provides: 'Magma-Client' 1 6!
 SystemOrganization addCategory: 'Magma-Client'!
 SystemOrganization addCategory: 'Magma-Client-Exceptions'!
 SystemOrganization addCategory: 'Magma-Client-MagmaCollections'!
@@ -1012,7 +1012,7 @@ MagmaServerStatistics class
 	instanceVariableNames: ''!
 
 !classDefinition: #MagmaSessionStatistics category: 'Magma-Client'!
-ProtoObject subclass: #MagmaSessionStatistics
+MaClientStat subclass: #MagmaSessionStatistics
 	instanceVariableNames: 'clientSideConnectionTimeHistory refreshAllTimeHistory clientSideMcPageReadsTimeHistory clientSideProxyMaterializationTimeHistory clientSideCommitTimeHistory refreshViewHistory objectsReadPerSecond objectBytesReadPerSecond'
 	classVariableNames: ''
 	poolDictionaries: ''
@@ -3582,13 +3582,13 @@ base
 
 	^FileDirectory default  ! !
 
-!MagmaLocalLocation methodsFor: 'accessing' stamp: 'cmm 1/18/2007 21:05'!
+!MagmaLocalLocation methodsFor: 'accessing' stamp: 'jpb 5/11/2021 17:21:59'!
 directory
 	"It's not obvious, but this actually supports fully-qualified paths or relative paths.
 		(FileDirectory default on: 'c:\temp') inspect.
 		(FileDirectory default on: 'magma') inspect
 	"
-	^  FileDirectory on: (self base fullNameFor: path) ! !
+	^ path asDirectoryEntry ! !
 
 !MagmaLocalLocation methodsFor: 'accessing' stamp: 'kph 4/27/2007 02:52'!
 fileNames
@@ -9969,7 +9969,7 @@ initialize
 		resetDepths ;
 		initializeDefaultSpecifications! !
 
-!MaReadStrategy methodsFor: 'private' stamp: 'cmm 5/15/2018 16:42'!
+!MaReadStrategy methodsFor: 'private' stamp: 'jpb 5/11/2021 17:39:14'!
 initializeDefaultSpecifications
 	depthSpecifications _ Dictionary new.
 	self
@@ -9978,9 +9978,6 @@ initializeDefaultSpecifications
 		readToDepth: 1 ;
 
 		onAny: BlockClosure
-		readToDepth: 1 ;
-
-		onAny: Context
 		readToDepth: 1 ;
 
 		onAny: Collection
@@ -9999,16 +9996,6 @@ initializeDefaultSpecifications
 		onAny: MaAssociation
 		readToDepth: 1 ;
 
-		forVariablesNamed: #('package' 'info' 'dependencies' )
-		onAny: MCVersion
-		readToDepth: 1 ;
-
-		forVariablesNamed: #('name' 'author' )
-		onAny: MCVersionInfo
-		readToDepth: 1 ;
-
-		onAny: MCDefinition
-		readToDepth: 1 ;
 
 		onAny: SOLHashTable
 		readToDepth: 1 ;
@@ -10035,10 +10022,10 @@ initializeDefaultSpecifications
 		forVariablesNamed: (MagmaRepositoryDefinition allInstVarNames copyWithoutAll: #('codeBase' 'attributes' ))
 		onAny: MagmaRepositoryDefinition
 		readToDepth: 99.
-	#(#MagmaLocation #MagmaId #MagmaNode #MagmaCollection #MagmaCollectionReader #MagmaPreallocatedDictionary #MaClassDefinition #Project #Color #Duration #Point #Time #TimeZone #Form #BitMap #FileDirectory #DiskProxy #CompiledMethod #MaClassReference #ScaledDecimal #Fraction #LargePositiveInteger #FillStyle ) do:
-		[ : each | (self maOriginalClass environment hasClassNamed: each) ifTrue:
+	#(#MagmaLocation #MagmaId #MagmaNode #MagmaCollection #MagmaCollectionReader #MagmaPreallocatedDictionary #MaClassDefinition #Project #Color #Duration #Point #Time #TimeZone #Form #BitMap #DiskProxy #CompiledMethod #MaClassReference #Fraction #LargePositiveInteger) do:
+		[ : each | (self hasClassNamed: each) ifTrue:
 			[ self
-				onAny: (self maOriginalClass environment classNamed: each)
+				onAny: (self findClassNamed: each)
 				readToDepth: 99 ] ]! !
 
 !MaReadStrategy methodsFor: 'private' stamp: 'cmm 10/28/2011 15:39'!
@@ -10180,6 +10167,14 @@ onAny: aClass readToDepth: anInteger
 !MaReadStrategy methodsFor: 'accessing' stamp: 'cmm 4/7/2005 15:14'!
 isBasic
 	^ false! !
+
+!MaReadStrategy methodsFor: 'as yet unclassified' stamp: 'jpb 5/11/2021 17:39:26'!
+findClassNamed: className
+	^Smalltalk at: className! !
+
+!MaReadStrategy methodsFor: 'as yet unclassified' stamp: 'jpb 5/11/2021 17:39:39'!
+hasClassNamed: className
+	^Smalltalk hasClassNamed: className! !
 
 !MaChangedKeySpecification methodsFor: 'accessing'!
 attribute

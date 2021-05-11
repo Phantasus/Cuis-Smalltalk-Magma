@@ -1,10 +1,10 @@
-'From Cuis 5.0 [latest update: #4588] on 11 May 2021 at 4:34:24 pm'!
+'From Cuis 5.0 [latest update: #4579] on 11 May 2021 at 5:59:14 pm'!
 'Description Magma core for server and client
 
 License: MIT
 Original author: Chris Muller (cmm)
 Author: Josef Philip Bernhart (jpb)'!
-!provides: 'Ma-Client-Server-Core' 1 5!
+!provides: 'Ma-Client-Server-Core' 1 8!
 !requires: 'Ma-Collections' 1 0 nil!
 !requires: 'Ma-Core' 1 1 nil!
 SystemOrganization addCategory: 'Ma-Client-Server-Core'!
@@ -294,7 +294,7 @@ MaClientStat class
 !MaMalformedRequestError commentStamp: 'cmm 2/1/2005 15:26' prior: 0!
 I am signaled when a request is received from a client that could not be materialized.!
 
-!MaClientConnection commentStamp: 'cmm 11/13/2008 15:34' prior: 0!
+!MaClientConnection commentStamp: '<historical>' prior: 0!
 A MaClientConnection is created in the server image when a MaClientSocket connects to a MaServerSocket.  At that point, the client can send request ByteArrays which will be extracted by my extractProcess.  The server allows up to 50 simultaneous connections, after which the oldest is disconnected (but not while they're in a request-lifecycle, of course, since they have to be able to send the response).
 
 Instance Variables
@@ -1004,6 +1004,49 @@ location: aMaServerLocation
 mtuSize
 	^ 1500! !
 
+!MaNetworkOrchestra methodsFor: 'accessing' stamp: 'cmm 10/28/2013 10:56'!
+firstPort 
+	"The starting port number my players will use to listen for requests from the conductor."
+	^ firstPort! !
+
+!MaNetworkOrchestra methodsFor: 'accessing' stamp: 'cmm 10/28/2013 10:57'!
+firstPort: anInteger 
+	"Set the starting port number my players will use to listen for requests from the conductor."
+	firstPort _ anInteger! !
+
+!MaNetworkOrchestra methodsFor: 'accessing' stamp: 'cmm 1/1/2013 11:20'!
+name: aString 
+	"The name of this orchestra which is used to prefix the image names of the individual players."
+	name _ aString! !
+
+!MaNetworkOrchestra methodsFor: 'accessing' stamp: 'cmm 9/23/2013 21:31'!
+protocol
+	"An array of the classes of objects that will be passed between conductor and players."
+	^ protocol ifNil: [ { MaRemotePerformRequest } ]! !
+
+!MaNetworkOrchestra methodsFor: 'accessing' stamp: 'cmm 9/17/2013 15:10'!
+protocol: anArray 
+	"An array of the classes of objects that will be passed between conductor and players."
+	protocol _ anArray! !
+
+!MaNetworkOrchestra methodsFor: 'accessing' stamp: 'cmm 1/9/2013 15:16'!
+startBlock
+	"The block of code to run immediately upon launch, after becoming the conductor but before launching any players."
+	^ startBlock! !
+
+!MaNetworkOrchestra methodsFor: 'accessing' stamp: 'cmm 1/9/2013 15:16'!
+startBlock: aBlock 
+	"The block of code to run immediately upon launch, after becoming the conductor but before launching any players."
+	startBlock _ aBlock! !
+
+!MaNetworkOrchestra methodsFor: 'accessing' stamp: 'cmm 3/15/2015 13:16'!
+timeoutSeconds
+	^ timeoutSeconds ifNil: [ 600 ]! !
+
+!MaNetworkOrchestra methodsFor: 'accessing' stamp: 'cmm 9/17/2013 16:29'!
+timeoutSeconds: anInteger 
+	timeoutSeconds _ anInteger! !
+
 !MaNetworkOrchestra methodsFor: 'core-management' stamp: 'cmm 2/25/2013 17:33'!
 addCores: anInteger
 	"Increase the number of cores used to process by anInteger.  Will result in the immediate launching of new players."
@@ -1143,49 +1186,6 @@ prepareImageSelector
 !MaNetworkOrchestra methodsFor: 'images' stamp: 'cmm 4/14/2014 22:15'!
 prepareImageSelector: selectorSymbol
 	prepareImageSelector _ selectorSymbol! !
-
-!MaNetworkOrchestra methodsFor: 'accessing' stamp: 'cmm 10/28/2013 10:56'!
-firstPort 
-	"The starting port number my players will use to listen for requests from the conductor."
-	^ firstPort! !
-
-!MaNetworkOrchestra methodsFor: 'accessing' stamp: 'cmm 10/28/2013 10:57'!
-firstPort: anInteger 
-	"Set the starting port number my players will use to listen for requests from the conductor."
-	firstPort _ anInteger! !
-
-!MaNetworkOrchestra methodsFor: 'accessing' stamp: 'cmm 1/1/2013 11:20'!
-name: aString 
-	"The name of this orchestra which is used to prefix the image names of the individual players."
-	name _ aString! !
-
-!MaNetworkOrchestra methodsFor: 'accessing' stamp: 'cmm 9/23/2013 21:31'!
-protocol
-	"An array of the classes of objects that will be passed between conductor and players."
-	^ protocol ifNil: [ { MaRemotePerformRequest } ]! !
-
-!MaNetworkOrchestra methodsFor: 'accessing' stamp: 'cmm 9/17/2013 15:10'!
-protocol: anArray 
-	"An array of the classes of objects that will be passed between conductor and players."
-	protocol _ anArray! !
-
-!MaNetworkOrchestra methodsFor: 'accessing' stamp: 'cmm 1/9/2013 15:16'!
-startBlock
-	"The block of code to run immediately upon launch, after becoming the conductor but before launching any players."
-	^ startBlock! !
-
-!MaNetworkOrchestra methodsFor: 'accessing' stamp: 'cmm 1/9/2013 15:16'!
-startBlock: aBlock 
-	"The block of code to run immediately upon launch, after becoming the conductor but before launching any players."
-	startBlock _ aBlock! !
-
-!MaNetworkOrchestra methodsFor: 'accessing' stamp: 'cmm 3/15/2015 13:16'!
-timeoutSeconds
-	^ timeoutSeconds ifNil: [ 600 ]! !
-
-!MaNetworkOrchestra methodsFor: 'accessing' stamp: 'cmm 9/17/2013 16:29'!
-timeoutSeconds: anInteger 
-	timeoutSeconds _ anInteger! !
 
 !MaNetworkOrchestra methodsFor: 'player access' stamp: 'cmm 12/31/2012 21:35'!
 homePlayer
@@ -1328,6 +1328,21 @@ orchestraTest: numberOfTasks cores: numberOfCores
 				do: [ Smalltalk runAndQuit: [ (Delay forSeconds: (1 to: 10) atRandom) wait ] ] ].
 	orch launch.
 	orch isConductorImage ifTrue: [ orch waitForTaskComplete ]! !
+
+!MaNetworkPlayer methodsFor: 'access' stamp: 'cmm 1/1/2013 11:19'!
+orchestra
+	^ orchestra! !
+
+!MaNetworkPlayer methodsFor: 'access' stamp: 'cmm 10/12/2013 18:24'!
+port
+	"The TCP/IP port through which my conductor communicates with me."
+	^ link
+		ifNil: [ (Smalltalk argumentAt: 1) asInteger ]
+		ifNotNil: [ link port ]! !
+
+!MaNetworkPlayer methodsFor: 'access' stamp: 'cmm 1/3/2013 12:31'!
+timeoutSeconds
+	^ link timeoutSeconds! !
 
 !MaNetworkPlayer methodsFor: 'private' stamp: 'cmm 10/29/2013 14:54'!
 baseName
@@ -1514,21 +1529,6 @@ maPrintAbbreviatedOn: aStream
 	self
 		maPrintAttributes: #(#name )
 		on: aStream! !
-
-!MaNetworkPlayer methodsFor: 'access' stamp: 'cmm 1/1/2013 11:19'!
-orchestra
-	^ orchestra! !
-
-!MaNetworkPlayer methodsFor: 'access' stamp: 'cmm 10/12/2013 18:24'!
-port
-	"The TCP/IP port through which my conductor communicates with me."
-	^ link
-		ifNil: [ (Smalltalk argumentAt: 1) asInteger ]
-		ifNotNil: [ link port ]! !
-
-!MaNetworkPlayer methodsFor: 'access' stamp: 'cmm 1/3/2013 12:31'!
-timeoutSeconds
-	^ link timeoutSeconds! !
 
 !MaNetworkPlayer class methodsFor: 'instance creation' stamp: 'cmm 7/14/2013 18:57'!
 name: aString 
@@ -2916,6 +2916,10 @@ newUuid
 newUuidString36
 	^self newString36With: self newUuid.! !
 
+!MaRegistry class methodsFor: 'as yet unclassified' stamp: 'jpb 5/11/2021 17:30:41'!
+registerForNotifications: anObject
+	"SystemChangeNotifier uniqueInstance notify: anObject ofAllSystemChangesUsing: #systemChanged:"! !
+
 !MaRegistry class methodsFor: 'as yet unclassified' stamp: 'jpb 5/11/2021 03:56:48'!
 registerMemoryHog: newMemoryHog
 	(memoryHogs includes: newMemoryHog)
@@ -3218,23 +3222,11 @@ wantsResponse
 	"Until protocol is established, we must only use types of objects that are part of the original serializer.  The initial request for protocol establishment is a simple hard-coded String."
 	^ true! !
 
-!SmalltalkImage methodsFor: '*ma-client-server-core' stamp: 'cmm 6/21/2016 10:56'!
-restartSigTermHandler
-	SigTermHandler ifNotNil: [ SigTermHandler terminate ].
-	SigTermHandler _ [ (Smalltalk classNamed: #OSProcess) accessor restoreSigTerm.
-	(Smalltalk classNamed: #OSProcess) accessor forwardSigTerm wait.
-	FileStream stdout nextPutAll: 'SIGTERM received, shutting down gracefully.'; flush.
-	Smalltalk
-		snapshot: false
-		andQuit: true ] newProcess
-		 name: 'Waiting for SIGTERM for graceful shutdown' ;
-		 resume! !
-
-!NetNameResolver class methodsFor: '*ma-client-server-core' stamp: 'cmm 11/7/2018 20:57'!
+!UndefinedObject methodsFor: '*ma-client-server-core' stamp: 'cmm 11/7/2018 20:57'!
 linuxHostName
 	^ OSProcess commandOutput: 'hostname'! !
 
-!NetNameResolver class methodsFor: '*ma-client-server-core' stamp: 'cmm 7/24/2018 15:39'!
+!UndefinedObject methodsFor: '*ma-client-server-core' stamp: 'cmm 7/24/2018 15:39'!
 maLocalHostName
 	| fromSqueakVm |
 	^ (fromSqueakVm _ self localHostName) = '0.0.0.0'

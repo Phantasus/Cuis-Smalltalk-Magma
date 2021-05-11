@@ -1,4 +1,4 @@
-'From Cuis 5.0 [latest update: #4588] on 11 May 2021 at 3:58:34 am'!
+'From Cuis 5.0 [latest update: #4579] on 11 May 2021 at 6:10:36 pm'!
 'Description I am a general object serialization and materialization framework.  Currently, I convert objects to ByteArrays and back.  I am used by both the "Ma client server" and "Magma" packages.  I offer a lot of flexibility in the way objects are serialized and materialized, even to the way the object graphs are traversed during serialization.
 
 The major class is MaObjectSerializer, see it for more information.  It utilizes a MaOidManager, a MaClassIdManager, and a MaObjectGraphTraversalStrategy to create a MaSerializedGraphBuffer, the final object that wraps the ByteArray.
@@ -7,9 +7,10 @@ The major class is MaObjectSerializer, see it for more information.  It utilizes
 License: MIT
 Original Author: Chris Muller (cmm)
 Author: Josef Philip Bernhart (jpb)'!
-!provides: 'Ma-Serializer-Core' 1 7!
+!provides: 'Ma-Serializer-Core' 1 9!
 !requires: 'Ma-Core' 1 1 nil!
 !requires: 'SOLHashTables' 1 4 nil!
+!requires: 'Ma-Statistics' 1 0 nil!
 SystemOrganization addCategory: 'Ma-Serializer-Core'!
 
 
@@ -71,16 +72,6 @@ MaNotification subclass: #MaTraverseProxyNotification
 	category: 'Ma-Serializer-Core'!
 !classDefinition: 'MaTraverseProxyNotification class' category: 'Ma-Serializer-Core'!
 MaTraverseProxyNotification class
-	instanceVariableNames: ''!
-
-!classDefinition: #MaObjectGraphTraversalStrategy category: 'Ma-Serializer-Core'!
-Object subclass: #MaObjectGraphTraversalStrategy
-	instanceVariableNames: 'valueWhenBlock traverseWhenBlock'
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Ma-Serializer-Core'!
-!classDefinition: 'MaObjectGraphTraversalStrategy class' category: 'Ma-Serializer-Core'!
-MaObjectGraphTraversalStrategy class
 	instanceVariableNames: ''!
 
 !classDefinition: #MaBufferPositionMap category: 'Ma-Serializer-Core'!
@@ -271,6 +262,26 @@ MaObject subclass: #MaSerializedGraphBuffer
 	category: 'Ma-Serializer-Core'!
 !classDefinition: 'MaSerializedGraphBuffer class' category: 'Ma-Serializer-Core'!
 MaSerializedGraphBuffer class
+	instanceVariableNames: ''!
+
+!classDefinition: #MaSerializationStat category: 'Ma-Serializer-Core'!
+MaStatCollection subclass: #MaSerializationStat
+	instanceVariableNames: 'timeToSerializeHistory timeToMaterializeHistory houseCleaningTimeHistory'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Ma-Serializer-Core'!
+!classDefinition: 'MaSerializationStat class' category: 'Ma-Serializer-Core'!
+MaSerializationStat class
+	instanceVariableNames: ''!
+
+!classDefinition: #MaObjectGraphTraversalStrategy category: 'Ma-Serializer-Core'!
+Object subclass: #MaObjectGraphTraversalStrategy
+	instanceVariableNames: 'valueWhenBlock traverseWhenBlock'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Ma-Serializer-Core'!
+!classDefinition: 'MaObjectGraphTraversalStrategy class' category: 'Ma-Serializer-Core'!
+MaObjectGraphTraversalStrategy class
 	instanceVariableNames: ''!
 
 !classDefinition: #MaMinimalObject category: 'Ma-Serializer-Core'!
@@ -568,104 +579,6 @@ path: anOrderedCollection proxy: aMaMutatingProxy
 		setPath: anOrderedCollection
 		proxy: aMaMutatingProxy ;
 		yourself! !
-
-!MaObjectGraphTraversalStrategy methodsFor: 'private' stamp: 'cmm 5/2/2005 22:13'!
-initialize
-	super initialize.
-	valueWhenBlock _ [:path :parent :instVarIndex | true].
-	traverseWhenBlock _ [:path :parent :instVarIndex | true]! !
-
-!MaObjectGraphTraversalStrategy methodsFor: 'testing'!
-shouldTraverseIntoLastOf: path from: parent index: anInteger
-
-	^traverseWhenBlock
-		value: path
-		value: parent
-		value: anInteger
-! !
-
-!MaObjectGraphTraversalStrategy methodsFor: 'testing'!
-shouldValueLastOf: anOrderedCollection from: parentObject index: anInteger
-
-	^valueWhenBlock
-		value: anOrderedCollection
-		value: parentObject
-		value: anInteger
-! !
-
-!MaObjectGraphTraversalStrategy methodsFor: 'building'!
-traverseWhen: threeArgBlock
-	"The default traversal behavior is to traverse everything.  threeArgBlock
-	may be specified to restrict the default traversal (stepping into an objects
-	instance variables).  The first argument is an OrderedCollection of the
-	path of objects that lead to the current node, the second is the parent
-	of the current node (and second to last in the path), the last is the integer
-	index of the instVar of the current node."
-
-	traverseWhenBlock _ threeArgBlock
-! !
-
-!MaObjectGraphTraversalStrategy methodsFor: 'building'!
-valueWhen: threeArgBlock
-	"The default behavior is to value every node once (the framework automatically
-	keeps track of where it has already been).   threeArgBlock takes the same arguments
-	as the other parameters of this class."
-
-	valueWhenBlock _ threeArgBlock
-! !
-
-!MaObjectGraphTraversalStrategy class methodsFor: 'create' stamp: 'cmm 2/16/2014 18:01'!
-newTraverseForSerialization
-	^ self new traverseWhen:
-		[ : path : parent : indexInteger | path last
-			maShouldTraverseWithPath: path
-			parent: parent
-			index: indexInteger ]! !
-
-!MaObjectGraphTraversalStrategy class methodsFor: 'create' stamp: 'cmm 2/16/2014 17:48'!
-newTraverseNoBytes
-	"Make a new traversal strategy that does not traverse into individual bytes or words of those class-types, only named and index pointers."
-	^ self new traverseWhen:
-		[ : path : parent : index | | obj cl |
-		obj _ path last.
-		cl _ self class.
-		cl = CompiledMethod ifTrue: [ ^ true ].
-		cl isBytes ifTrue: [ ^ false ].
-		cl isPointers ifFalse: [ ^ false ].
-		^ true ]! !
-
-!MaObjectGraphTraversalStrategy class methodsFor: 'create' stamp: 'cmm 2/16/2014 17:53'!
-newTraverseNoBytesNoGlobals
-	"Make a new traversal strategy that does not traverse into individual bytes or words of those class-types, only named and index pointers."
-	^ self new traverseWhen:
-		[ : path : parent : index | | obj |
-		obj _ path last.
-		(self shouldTraverseNoBytes: obj) and: [ self shouldTraverseNoGlobals: obj ] ]! !
-
-!MaObjectGraphTraversalStrategy class methodsFor: 'private' stamp: 'cmm 2/16/2014 17:51'!
-shouldTraverseNoBytes: anObject 
-	| cl |
-	cl _ anObject class.
-	cl = CompiledMethod ifTrue: [ ^ true ].
-	cl isBytes ifTrue: [ ^ false ].
-	cl isPointers ifFalse: [ ^ false ].
-	^ true! !
-
-!MaObjectGraphTraversalStrategy class methodsFor: 'private' stamp: 'cmm 5/28/2014 14:14'!
-shouldTraverseNoGlobals: anObject 
-	anObject == Smalltalk ifTrue: [ ^ false ].
-	anObject == Processor ifTrue: [ ^ false ].
-	anObject == Display ifTrue: [ ^ false ].
-	anObject == ActiveHand ifTrue: [ ^ false ].
-	anObject == ActiveWorld ifTrue: [ ^ false ].
-	anObject == Sensor ifTrue: [ ^ false ].
-	anObject == SourceFiles ifTrue: [ ^ false ].
-	anObject == SystemOrganization ifTrue: [ ^ false ].
-	anObject == TextConstants ifTrue: [ ^ false ].
-	anObject == World ifTrue: [ ^ false ].
-	anObject isBehavior ifTrue: [ ^ false ].
-	anObject maIsEnvironment ifTrue: [ ^ false ].
-	^ true! !
 
 !MaBufferPositionMap class methodsFor: 'as yet unclassified' stamp: 'cmm 8/1/2011 13:51'!
 bufferPositionOfByteCodesPlusTrailerSize
@@ -1014,7 +927,7 @@ initializeMinimumClasses
 isMutable
 	^ mutable! !
 
-!MaClassIdManager methodsFor: 'private' stamp: 'jpb 5/10/2021 16:26:32'!
+!MaClassIdManager methodsFor: 'private' stamp: 'jpb 5/11/2021 17:33:22'!
 legacyClassMap
 	^ { 
 		(1 -> Metaclass).
@@ -1028,7 +941,7 @@ legacyClassMap
 		(9 -> UndefinedObject).
 		(10 -> Array).
 		(11 -> MaLegacyClass).
-		(12 -> ByteString).
+		(12 -> MaLegacyClass).
 		(13 -> ByteArray).
 		(14 -> Set).
 		(15 -> OrderedCollection).
@@ -1246,6 +1159,39 @@ version
 
 	^version! !
 
+!MaClassDefinition methodsFor: 'private' stamp: 'cmm 5/18/2004 00:38'!
+classInstanceVariablesString
+	^ self stringForVariables: classInstVarNames! !
+
+!MaClassDefinition methodsFor: 'private' stamp: 'cmm 10/13/2004 23:50'!
+initialize
+
+	super initialize.
+	self version: 0.
+	aliases _ OrderedCollection new! !
+
+!MaClassDefinition methodsFor: 'private' stamp: 'jpb 5/10/2021 16:08:42'!
+initializeFrom: aClass
+
+	self globalName: aClass name.
+	instVarNames _ aClass allInstVarNames.
+	classVarNames _ aClass classVarNames.
+	poolDictionaryNames _ aClass sharedPools collect: [:pool | pool name ].
+	classInstVarNames _ aClass class instVarNames.
+	category _ aClass category.
+	type _ aClass typeOfClass.
+	comment _ aClass organization classComment asString.
+	commentStamp _ aClass organization commentStamp! !
+
+!MaClassDefinition methodsFor: 'private' stamp: 'cmm 5/18/2004 00:34'!
+stringForVariables: aCollection
+
+	^ String streamContents:
+		[ :stream |
+		aCollection
+			do: [ :ea | stream nextPutAll: ea ]
+			separatedBy: [ stream space ] ]! !
+
 !MaClassDefinition methodsFor: 'actions' stamp: 'cmm 1/26/2005 13:06'!
 allSuperclassDefinitionsDo: oneArgBlock
 	"Value oneArgBlock with each of my superclass-definitions, in turn."
@@ -1287,39 +1233,6 @@ withAllSuperclassDefinitionsDo: oneArgBlock
 
 	oneArgBlock value: self.
 	superclassDefinition ifNotNil: [ superclassDefinition withAllSuperclassDefinitionsDo: oneArgBlock ]! !
-
-!MaClassDefinition methodsFor: 'private' stamp: 'cmm 5/18/2004 00:38'!
-classInstanceVariablesString
-	^ self stringForVariables: classInstVarNames! !
-
-!MaClassDefinition methodsFor: 'private' stamp: 'cmm 10/13/2004 23:50'!
-initialize
-
-	super initialize.
-	self version: 0.
-	aliases _ OrderedCollection new! !
-
-!MaClassDefinition methodsFor: 'private' stamp: 'jpb 5/10/2021 16:08:42'!
-initializeFrom: aClass
-
-	self globalName: aClass name.
-	instVarNames _ aClass allInstVarNames.
-	classVarNames _ aClass classVarNames.
-	poolDictionaryNames _ aClass sharedPools collect: [:pool | pool name ].
-	classInstVarNames _ aClass class instVarNames.
-	category _ aClass category.
-	type _ aClass typeOfClass.
-	comment _ aClass organization classComment asString.
-	commentStamp _ aClass organization commentStamp! !
-
-!MaClassDefinition methodsFor: 'private' stamp: 'cmm 5/18/2004 00:34'!
-stringForVariables: aCollection
-
-	^ String streamContents:
-		[ :stream |
-		aCollection
-			do: [ :ea | stream nextPutAll: ea ]
-			separatedBy: [ stream space ] ]! !
 
 !MaClassDefinition methodsFor: 'testing' stamp: 'cmm 5/20/2010 15:19'!
 hasSameDefinitionAs: aClassOrMaClassDefinition 
@@ -1523,6 +1436,21 @@ type: anInteger
 	"Now OR these bits with anInteger."
 	self controlFields: (withZeroedBits bitOr: anInteger)! !
 
+!MaObjectBuffer methodsFor: 'testing' stamp: 'cmm 10/8/2012 16:54'!
+equivalentTo: aMaObjectBuffer 
+	self type = aMaObjectBuffer type ifFalse: [ ^ false ].
+	self oid = aMaObjectBuffer oid ifFalse: [ ^ false ].
+	self classId = aMaObjectBuffer classId ifFalse: [ ^ false ].
+	self objectInstSize = aMaObjectBuffer objectInstSize ifFalse: [ ^ false ].
+	self instVarsDoWithIndex:
+		[ : eachRef : n | eachRef = (aMaObjectBuffer maInstVarAt: n) ifFalse: [ ^ false ] ].
+	^ true! !
+
+!MaObjectBuffer methodsFor: 'testing' stamp: 'cmm 4/19/2009 17:45'!
+references: oid 
+	^ self isPointers and: 
+		[ (1 to: self objectInstSize) anySatisfy: [ : n | (self maInstVarAt: n) = oid ] ]! !
+
 !MaObjectBuffer methodsFor: 'private' stamp: 'cmm 8/10/2010 15:20'!
 bufferPositionOfClassId
 	"Zero-based position of the class id."
@@ -1723,21 +1651,6 @@ createObjectUsing: aMaObjectSerializer
 establishReferencesFrom: anObject using: aMaObjectSerializer
 	"This is the second-stage of materializing anObject.  The first stage populated its instVars with oids, this stage now replaces those oids with the actual objects.  Typically, only Fixed and VariableObject buffers will need to do anything on this."! !
 
-!MaObjectBuffer methodsFor: 'testing' stamp: 'cmm 10/8/2012 16:54'!
-equivalentTo: aMaObjectBuffer 
-	self type = aMaObjectBuffer type ifFalse: [ ^ false ].
-	self oid = aMaObjectBuffer oid ifFalse: [ ^ false ].
-	self classId = aMaObjectBuffer classId ifFalse: [ ^ false ].
-	self objectInstSize = aMaObjectBuffer objectInstSize ifFalse: [ ^ false ].
-	self instVarsDoWithIndex:
-		[ : eachRef : n | eachRef = (aMaObjectBuffer maInstVarAt: n) ifFalse: [ ^ false ] ].
-	^ true! !
-
-!MaObjectBuffer methodsFor: 'testing' stamp: 'cmm 4/19/2009 17:45'!
-references: oid 
-	^ self isPointers and: 
-		[ (1 to: self objectInstSize) anySatisfy: [ : n | (self maInstVarAt: n) = oid ] ]! !
-
 !MaObjectBuffer methodsFor: 'initializing'!
 initialize
 
@@ -1890,10 +1803,6 @@ initializeBufferPositionMaps
 		bpMapsAt: 1
 		put: self defaultBpMap! !
 
-!MaFixedObjectBuffer methodsFor: 'private' stamp: 'cmm 8/25/2008 22:14'!
-bufferPositionOfClassVersion
-	^ self bpMap bufferPositionOfClassVersion! !
-
 !MaFixedObjectBuffer methodsFor: 'accessing' stamp: 'cmm 11/19/2004 15:32'!
 bufferType
 	^ 3! !
@@ -1906,6 +1815,10 @@ classVersion: anInteger
 		at: self bufferPositionOfClassVersion
 		put: anInteger
 ! !
+
+!MaFixedObjectBuffer methodsFor: 'private' stamp: 'cmm 8/25/2008 22:14'!
+bufferPositionOfClassVersion
+	^ self bpMap bufferPositionOfClassVersion! !
 
 !MaFixedObjectBuffer methodsFor: 'creation' stamp: 'cmm 8/1/2011 20:46'!
 createObjectUsing: aMaObjectSerializer 
@@ -3630,6 +3543,12 @@ oidOf: anObject is: anInteger
 		at: anObject
 		put: anInteger! !
 
+!MaSerializedGraphBuffer methodsFor: 'private creation' stamp: 'cmm 10/21/2004 12:52'!
+newPremadeBuffers
+
+	^MaObjectBuffer bufferClasses collect: [ :each | each new ]
+! !
+
 !MaSerializedGraphBuffer methodsFor: 'private' stamp: 'cmm 8/10/2010 14:03'!
 bufferPositionsDo: oneArgBlock 
 	"Value oneArgBlock with the value of the starting position of each
@@ -3825,12 +3744,6 @@ maPrintAbbreviatedOn: aStream
 				maPrint: self bufferSize asBytesDescription;
 				nextPutAll: ' bytes)' ]! !
 
-!MaSerializedGraphBuffer methodsFor: 'private creation' stamp: 'cmm 10/21/2004 12:52'!
-newPremadeBuffers
-
-	^MaObjectBuffer bufferClasses collect: [ :each | each new ]
-! !
-
 !MaSerializedGraphBuffer class methodsFor: 'creation' stamp: 'cmm 5/1/2005 22:27'!
 byteArray: aByteArray
 
@@ -3872,6 +3785,154 @@ unreasonablePhysicalSize
 	"An arbitrary limit at this time, we need *something* to check to prevent unreasonable allocation attempts."
 	^ 150000000! !
 
+!MaSerializationStat methodsFor: 'historys' stamp: 'cmm 5/9/2008 17:04'!
+houseCleaningTimeHistory
+	"MaObjectSerializers must do house-cleaning to maintain good performance but this, itself, consumes a bit of time, which is tracked by this stat."
+	^houseCleaningTimeHistory! !
+
+!MaSerializationStat methodsFor: 'historys' stamp: 'cmm 5/9/2008 17:03'!
+timeToMaterializeHistory
+	"The time spent materializing objects.  In a client-server application, this means materializing requests on the server or responses on the client."
+	^timeToMaterializeHistory! !
+
+!MaSerializationStat methodsFor: 'historys' stamp: 'cmm 5/9/2008 17:03'!
+timeToSerializeHistory
+	"The time spent serializing objects.  In a client-server application, this means serializing requests on the client or responses on the server."
+	^timeToSerializeHistory! !
+
+!MaSerializationStat methodsFor: 'initialize-release' stamp: 'cmm 5/7/2008 17:38'!
+initialize
+	super initialize.
+	houseCleaningTimeHistory _ MaStatHistory name: 'House Cleaning Times'.
+	timeToMaterializeHistory _ MaStatHistory name: 'Time Spent Materializing'.
+	timeToSerializeHistory _ MaStatHistory name: 'Time Spent Serializing'! !
+
+!MaSerializationStat methodsFor: 'enumerate' stamp: 'cmm 5/7/2008 15:20'!
+historysDo: aBlock 
+	{ 
+		houseCleaningTimeHistory.
+		timeToMaterializeHistory.
+		timeToSerializeHistory
+	 } do: aBlock! !
+
+!MaSerializationStat methodsFor: 'ui-support' stamp: 'cmm 4/27/2009 20:50'!
+serializationStats
+	"Statistics related to local serialization and materialization of objects."
+	^ { 
+		timeToSerializeHistory.
+		timeToMaterializeHistory.
+		houseCleaningTimeHistory
+	 }! !
+
+!MaObjectGraphTraversalStrategy methodsFor: 'private' stamp: 'cmm 5/2/2005 22:13'!
+initialize
+	super initialize.
+	valueWhenBlock _ [:path :parent :instVarIndex | true].
+	traverseWhenBlock _ [:path :parent :instVarIndex | true]! !
+
+!MaObjectGraphTraversalStrategy methodsFor: 'testing'!
+shouldTraverseIntoLastOf: path from: parent index: anInteger
+
+	^traverseWhenBlock
+		value: path
+		value: parent
+		value: anInteger
+! !
+
+!MaObjectGraphTraversalStrategy methodsFor: 'testing'!
+shouldValueLastOf: anOrderedCollection from: parentObject index: anInteger
+
+	^valueWhenBlock
+		value: anOrderedCollection
+		value: parentObject
+		value: anInteger
+! !
+
+!MaObjectGraphTraversalStrategy methodsFor: 'building'!
+traverseWhen: threeArgBlock
+	"The default traversal behavior is to traverse everything.  threeArgBlock
+	may be specified to restrict the default traversal (stepping into an objects
+	instance variables).  The first argument is an OrderedCollection of the
+	path of objects that lead to the current node, the second is the parent
+	of the current node (and second to last in the path), the last is the integer
+	index of the instVar of the current node."
+
+	traverseWhenBlock _ threeArgBlock
+! !
+
+!MaObjectGraphTraversalStrategy methodsFor: 'building'!
+valueWhen: threeArgBlock
+	"The default behavior is to value every node once (the framework automatically
+	keeps track of where it has already been).   threeArgBlock takes the same arguments
+	as the other parameters of this class."
+
+	valueWhenBlock _ threeArgBlock
+! !
+
+!MaObjectGraphTraversalStrategy class methodsFor: 'create' stamp: 'cmm 2/16/2014 18:01'!
+newTraverseForSerialization
+	^ self new traverseWhen:
+		[ : path : parent : indexInteger | path last
+			maShouldTraverseWithPath: path
+			parent: parent
+			index: indexInteger ]! !
+
+!MaObjectGraphTraversalStrategy class methodsFor: 'create' stamp: 'cmm 2/16/2014 17:48'!
+newTraverseNoBytes
+	"Make a new traversal strategy that does not traverse into individual bytes or words of those class-types, only named and index pointers."
+	^ self new traverseWhen:
+		[ : path : parent : index | | obj cl |
+		obj _ path last.
+		cl _ self class.
+		cl = CompiledMethod ifTrue: [ ^ true ].
+		cl isBytes ifTrue: [ ^ false ].
+		cl isPointers ifFalse: [ ^ false ].
+		^ true ]! !
+
+!MaObjectGraphTraversalStrategy class methodsFor: 'create' stamp: 'cmm 2/16/2014 17:53'!
+newTraverseNoBytesNoGlobals
+	"Make a new traversal strategy that does not traverse into individual bytes or words of those class-types, only named and index pointers."
+	^ self new traverseWhen:
+		[ : path : parent : index | | obj |
+		obj _ path last.
+		(self shouldTraverseNoBytes: obj) and: [ self shouldTraverseNoGlobals: obj ] ]! !
+
+!MaObjectGraphTraversalStrategy class methodsFor: 'private' stamp: 'cmm 2/16/2014 17:51'!
+shouldTraverseNoBytes: anObject 
+	| cl |
+	cl _ anObject class.
+	cl = CompiledMethod ifTrue: [ ^ true ].
+	cl isBytes ifTrue: [ ^ false ].
+	cl isPointers ifFalse: [ ^ false ].
+	^ true! !
+
+!MaObjectGraphTraversalStrategy class methodsFor: 'private' stamp: 'cmm 5/28/2014 14:14'!
+shouldTraverseNoGlobals: anObject 
+	anObject == Smalltalk ifTrue: [ ^ false ].
+	anObject == Processor ifTrue: [ ^ false ].
+	anObject == Display ifTrue: [ ^ false ].
+	anObject == ActiveHand ifTrue: [ ^ false ].
+	anObject == ActiveWorld ifTrue: [ ^ false ].
+	anObject == Sensor ifTrue: [ ^ false ].
+	anObject == SourceFiles ifTrue: [ ^ false ].
+	anObject == SystemOrganization ifTrue: [ ^ false ].
+	anObject == TextConstants ifTrue: [ ^ false ].
+	anObject == World ifTrue: [ ^ false ].
+	anObject isBehavior ifTrue: [ ^ false ].
+	anObject maIsEnvironment ifTrue: [ ^ false ].
+	^ true! !
+
+!MaMinimalObject methodsFor: 'printing' stamp: 'kph 7/14/2007 05:48'!
+asExplorerString
+	^ self printString! !
+
+!MaMinimalObject methodsFor: 'printing' stamp: 'cmm 12/25/2002 00:41'!
+printString
+	"Answer a String whose characters are a description of the receiver. 
+	If you want to print without a character limit, use fullPrintString."
+
+	^String streamContents: [ :s | self printOn: s ]! !
+
 !MaMinimalObject methodsFor: 'Public methods'!
 = anObject 
 	"Answer whether the receiver and the argument represent the same 
@@ -3893,17 +3954,6 @@ subclassResponsibility
 	"This message sets up a framework for the behavior of the class' subclasses.
 	Announce that the subclass should have implemented this message."
 	self error: 'My subclass should have overridden ' , thisContext sender selector printString! !
-
-!MaMinimalObject methodsFor: 'printing' stamp: 'kph 7/14/2007 05:48'!
-asExplorerString
-	^ self printString! !
-
-!MaMinimalObject methodsFor: 'printing' stamp: 'cmm 12/25/2002 00:41'!
-printString
-	"Answer a String whose characters are a description of the receiver. 
-	If you want to print without a character limit, use fullPrintString."
-
-	^String streamContents: [ :s | self printOn: s ]! !
 
 !MaMinimalObject methodsFor: 'actions' stamp: 'cmm 1/13/2005 13:46'!
 becomeForward: otherObject copyHash: copyHash

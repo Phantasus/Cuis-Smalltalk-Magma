@@ -1,10 +1,10 @@
-'From Cuis 5.0 [latest update: #4579] on 11 May 2021 at 4:59:26 pm'!
+'From Cuis 5.0 [latest update: #4579] on 11 May 2021 at 5:59:16 pm'!
 'Description Core of magma object oriented database
 
 License: MIT
 Original Author: Chris Muller (cmm)
 Author: Josef Philip Bernhart (jpb)'!
-!provides: 'Ma-Core' 1 6!
+!provides: 'Ma-Core' 1 7!
 SystemOrganization addCategory: 'Ma-Core'!
 
 
@@ -146,6 +146,16 @@ TestCase subclass: #MaTestCase
 	category: 'Ma-Core'!
 !classDefinition: 'MaTestCase class' category: 'Ma-Core'!
 MaTestCase class
+	instanceVariableNames: ''!
+
+!classDefinition: #MaLegacyClass category: 'Ma-Core'!
+Object subclass: #MaLegacyClass
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Ma-Core'!
+!classDefinition: 'MaLegacyClass class' category: 'Ma-Core'!
+MaLegacyClass class
 	instanceVariableNames: ''!
 
 !classDefinition: #MaObject category: 'Ma-Core'!

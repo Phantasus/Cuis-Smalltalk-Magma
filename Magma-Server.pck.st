@@ -1,10 +1,10 @@
-'From Cuis 5.0 [latest update: #4579] on 11 May 2021 at 5:04:45 pm'!
+'From Cuis 5.0 [latest update: #4579] on 11 May 2021 at 6:05:30 pm'!
 'Description Package containing the magma server implementation
 
 License: MIT
 Original Author: Chris Muller (cmm)
 Author: Josef Philip Bernhart (jpb)'!
-!provides: 'Magma-Server' 1 4!
+!provides: 'Magma-Server' 1 7!
 !requires: 'Ma-Client-Server-Core' 1 3 nil!
 !requires: 'Ma-Statistics' 1 0 nil!
 SystemOrganization addCategory: 'Magma-Server'!
@@ -775,7 +775,7 @@ deleteFrom: fileIndex
 maxPhysicalFileSize
 	^ MaxPhysicalFileSize! !
 
-!MaAtomicFileStream methodsFor: 'private' stamp: 'jpb 5/10/2021 16:43:04'!
+!MaAtomicFileStream methodsFor: 'private' stamp: 'jpb 5/11/2021 18:00:13'!
 nameFor: fileIndex 
 	"The name of the file numbered fileIndex."
 	| initBlock |
@@ -792,7 +792,7 @@ nameFor: fileIndex
 					nextPut: $. ;
 					maPrint: nameNumberAndExtension last ] ] ].
 		
-		^initBlock value: (FileDirectory default splitNameVersionExtensionFor: filename).! !
+		^initBlock value: (FileIOAccessor default splitNameVersionExtensionFor: filename).! !
 
 !MaAtomicFileStream methodsFor: 'private' stamp: 'cmm 4/11/2007 23:03'!
 nextName
@@ -909,9 +909,9 @@ writerAt: filePosition
 		do: [ : each | ^ (each coversFilePosition: filePosition) ifTrue: [ each ] ].
 	^ nil! !
 
-!MaAtomicFileStream methodsFor: 'accessing' stamp: 'cmm 4/23/2007 00:39'!
+!MaAtomicFileStream methodsFor: 'accessing' stamp: 'jpb 5/11/2021 17:54:26'!
 baseName
-	^ FileDirectory baseNameFor: self localName! !
+	^self localName asFileEntry baseName! !
 
 !MaAtomicFileStream methodsFor: 'accessing' stamp: 'cmm 4/11/2007 23:05'!
 committedSize
@@ -923,17 +923,17 @@ committedSize
 deletePhysicalFiles
 	self directory in: [ : dir | self physicalFilenamesDo: [ : each | dir deleteFileNamed: each ] ]! !
 
-!MaAtomicFileStream methodsFor: 'accessing' stamp: 'cmm 4/23/2007 00:39'!
+!MaAtomicFileStream methodsFor: 'accessing' stamp: 'jpb 5/11/2021 17:54:46'!
 extension
-	^ FileDirectory extensionFor: self localName! !
+	^ self localName asFileEntry extension! !
 
 !MaAtomicFileStream methodsFor: 'accessing' stamp: 'cmm 12/24/2012 10:47'!
 guard: aBlock
 	^ guard critical: aBlock! !
 
-!MaAtomicFileStream methodsFor: 'accessing' stamp: 'cmm 4/23/2007 00:30'!
+!MaAtomicFileStream methodsFor: 'accessing' stamp: 'jpb 5/11/2021 17:54:16'!
 localName
-	^ (FileDirectory on: (FileDirectory dirPathFor: filename)) localNameFor: filename! !
+	^filename asFileEntry name! !
 
 !MaAtomicFileStream methodsFor: 'accessing' stamp: 'cmm 4/28/2007 18:23'!
 numberOfPhysicalFiles
@@ -1132,34 +1132,41 @@ initialize
 	fileStreams _ OrderedCollection new.
 	sizes _ OrderedCollection new! !
 
-!MaAtomicFileStream methodsFor: 'initialize-release' stamp: 'cmm 10/22/2014 14:01'!
+!MaAtomicFileStream methodsFor: 'initialize-release' stamp: 'jpb 5/11/2021 18:03:47'!
 initializeStreamsAndSizes
 	"Determine which streams are available in the current directory and their sizes."
 	| fd baseName extension matchingEntries |
-	fd _ FileDirectory on: (FileDirectory dirPathFor: filename).
+	fd _ filename asDirectoryEntry parent. 
 	baseName _ self baseName.
 	extension _ self extension.
+	
 	"Gather up the entries for my filename and extension."
-	matchingEntries _ fd entries select:
+	matchingEntries _ fd files select:
 		[ : eachEntry | | eachNameVersionAndExtension |
-		eachNameVersionAndExtension _ fd splitNameVersionExtensionFor: eachEntry name.
+		eachNameVersionAndExtension _ eachEntry nameVersionExtension.
 		eachNameVersionAndExtension first = baseName and: [ eachNameVersionAndExtension last = extension ] ].
+	
 	"Then sort them by the file-number (second dot-delimited field)"
 	matchingEntries _ matchingEntries asSortedCollection:
 		[ : a : b | | nameVersionAndExtensionA nameVersionAndExtensionB |
-		nameVersionAndExtensionA _ fd splitNameVersionExtensionFor: a name.
-		nameVersionAndExtensionB _ fd splitNameVersionExtensionFor: b name.
+		nameVersionAndExtensionA _ a nameVersionExtension.
+		nameVersionAndExtensionB _ b nameVersionExtension.
 		(nameVersionAndExtensionA at: 2) < (nameVersionAndExtensionB at: 2) ].
+	
 	"Now load my fileStreams and sizes with these correctly-ordered entries."
-	matchingEntries do:
-		[ : eachEntry | | physicalStream |
-		physicalStream _ StandardFileStream readOnlyFileNamed: (fd fullNameFor: eachEntry name).
-		(physicalStream isNil or: [ physicalStream closed ]) ifTrue: [ MagmaEnvironmentError signal: 'file did not open for read-only' ].
+	matchingEntries do: 	[ : eachEntry |
+		| physicalStream |
+		physicalStream _ (fd // eachEntry) readStream.
+		
+		(physicalStream isNil or: [ physicalStream closed ]) 
+			ifTrue: [ MagmaEnvironmentError signal: 'file did not open for read-only' ].
+			
 		fileStreams add: physicalStream.
 		physicalStream
 			close ;
 			readWrite ;
 			binary.
+			
 		sizes add: eachEntry fileSize ]! !
 
 !MaAtomicFileStream methodsFor: 'initialize-release' stamp: 'cmm 7/13/2005 15:04'!
@@ -2065,10 +2072,10 @@ filePointerForOid: oidInteger
 		[ MagmaInvalidOid signal: oidInteger printString , ' has been reclaimed.' ].
 	^ answer! !
 
-!MaObjectFiler methodsFor: 'accessing' stamp: 'cmm 9/24/2004 13:07'!
+!MaObjectFiler methodsFor: 'accessing' stamp: 'jpb 5/11/2021 18:00:34'!
 filePositionIndexFileName
 
-	^ directory fullNameFor: self class objectPointersFilename! !
+	^ (directory // self class objectPointersFilename) asString! !
 
 !MaObjectFiler methodsFor: 'accessing' stamp: 'cmm 5/27/2007 15:08'!
 getNextOid
@@ -2219,9 +2226,9 @@ create: aFileDirectory
 		createFilePositionIndex.
 	^ self! !
 
-!MaObjectFiler methodsFor: 'private' stamp: 'cmm 8/15/2008 12:23'!
+!MaObjectFiler methodsFor: 'private' stamp: 'jpb 5/11/2021 17:40:16'!
 createDataFile
-	(directory fileExists: self class objectsPhysicalFilename) ifTrue: 
+	((directory // self class objectsPhysicalFilename) exists) ifTrue: 
 		[ MagmaEnvironmentError signal: directory pathName , ' already exists.' ].
 	self openObjectsFile.
 	"Write some extra blank space to allow for possible future fields."
@@ -2318,9 +2325,9 @@ initializePrimitiveAttributeAddressesMap
 magmaStatClassIds
 	^ magmaStatClassIds! !
 
-!MaObjectFiler methodsFor: 'private' stamp: 'cmm 4/29/2007 21:48'!
+!MaObjectFiler methodsFor: 'private' stamp: 'jpb 5/11/2021 17:40:39'!
 openFile: unqualifiedName 
-	^ MaAtomicFileStream fileNamed: (directory fullNameFor: unqualifiedName)! !
+	^ MaAtomicFileStream fileNamed: (directory // unqualifiedName) asString! !
 
 !MaObjectFiler methodsFor: 'private' stamp: 'cmm 4/29/2007 21:48'!
 openFilePositionIndex
@@ -6563,9 +6570,9 @@ To stop the database gracefully, use daemontools svc command:
 .' squeakToLinux
 		as: appDbDirName! !
 
-!MagmaLocalLocation methodsFor: '*magma-server-accessing' stamp: 'cmm 7/1/2007 13:52'!
+!MagmaLocalLocation methodsFor: '*magma-server-accessing' stamp: 'jpb 5/11/2021 18:04:14'!
 commitLogDirectory
-	^ FileDirectory on: (self directory fullNameFor: MaRecoveryManager commitLogDirectoryName)! !
+	^ self directory / MaRecoveryManager commitLogDirectoryName! !
 
 !MagmaLocalLocation methodsFor: '*magma-server-actions' stamp: 'cmm 7/10/2013 20:45'!
 commitRestore
@@ -6662,9 +6669,9 @@ filerDo: oneArgBlock
 	oneArgBlock value: filer ] ensure:
 		[ filer ifNotNil: [ filer close ] ]! !
 
-!MagmaLocalLocation methodsFor: '*magma-server-testing' stamp: 'cmm 11/22/2010 20:41'!
+!MagmaLocalLocation methodsFor: '*magma-server-testing' stamp: 'jpb 5/11/2021 17:22:49'!
 isMagmaRepository
-	^ self directory exists and: [ self directory fileExists: MaObjectFiler objectsPhysicalFilename ]! !
+	^ self directory exists and: [ (self directory // MaObjectFiler objectsPhysicalFilename) exists ]! !
 
 !MagmaLocalLocation methodsFor: '*magma-server-testing' stamp: 'cmm 6/24/2015 14:03'!
 isPotentiallyOpen
