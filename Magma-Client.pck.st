@@ -1,10 +1,10 @@
-'From Cuis 5.0 [latest update: #4588] on 7 May 2021 at 10:16:48 pm'!
+'From Cuis 5.0 [latest update: #4588] on 11 May 2021 at 3:58:31 am'!
 'Description Package containing the magma client implementation
 
 License: MIT
 Original Author: Chris Muller (cmm)
 Author: Josef Philip Bernhart (jpb)'!
-!provides: 'Magma-Client' 1 0!
+!provides: 'Magma-Client' 1 1!
 SystemOrganization addCategory: 'Magma-Client'!
 SystemOrganization addCategory: 'Magma-Client-Exceptions'!
 SystemOrganization addCategory: 'Magma-Client-MagmaCollections'!
@@ -3136,15 +3136,19 @@ weakValueDictionaryClass
 weakValueDictionaryClass: aClass
 	MaObjectSerializerPreferences weakValueDictionaryClass: aClass! !
 
-!MagmaRepositoryDefinition methodsFor: 'initialize' stamp: 'cmm 10/9/2009 16:21'!
+!MagmaRepositoryDefinition methodsFor: 'initialize' stamp: 'jpb 5/10/2021 16:41:54'!
 addMinimumClassesForOdbmsUsing: aMaObjectSerializer 
 	"When a MagmaRepository is initially created, it has no notion of MagmaLocations.  Only when it is initially deployed as a server will an instance of MagmaRemoteLocation be added to the MagmaNode, thereby causing those classes to be in the class-definitions.	But, if a new repository is created, then attempt to set the node, the required order of the special-oid processing, that the #refreshNode must occur before #refreshClassDefinitions, resulting in a 'class-definition not found' error will occur.	Therefore, the following ensures the necessary classes are part of the class-definitions, making this a non-issue."
-	aMaObjectSerializer classIdManager in: 
-		[ : classIdManager | 
-		{  MaServerLocation  } , MagmaLocation withAllSubclasses asArray do: 
-			[ : each | 
-			(classIdManager includesIdForClass: each) ifFalse: [ classIdManager addNewClass: each ] ].
-		self classDefinitions: classIdManager classDefinitionsById ]! !
+	| newBlock |
+	
+	newBlock _ 	[ : classIdManager | 
+		{  MaServerLocation  } , MagmaLocation withAllSubclasses asArray do: [ : each | 
+			(classIdManager includesIdForClass: each)
+				ifFalse: [ classIdManager addNewClass: each ] ].
+			
+		self classDefinitions: classIdManager classDefinitionsById ].
+	
+	newBlock value: 	aMaObjectSerializer classIdManager.! !
 
 !MagmaRepositoryDefinition methodsFor: 'initialize' stamp: 'cmm 5/29/2002 22:43'!
 classDefinitions: aDictionary

@@ -1,10 +1,10 @@
-'From Cuis 5.0 [latest update: #4588] on 8 May 2021 at 8:42:38 am'!
+'From Cuis 5.0 [latest update: #4588] on 11 May 2021 at 3:58:37 am'!
 'Description Magma core for server and client
 
 License: MIT
 Original author: Chris Muller (cmm)
 Author: Josef Philip Bernhart (jpb)'!
-!provides: 'Ma-Client-Server-Core' 1 3!
+!provides: 'Ma-Client-Server-Core' 1 4!
 !requires: 'Ma-Collections' 1 0 nil!
 !requires: 'Ma-Core' 1 1 nil!
 SystemOrganization addCategory: 'Ma-Client-Server-Core'!

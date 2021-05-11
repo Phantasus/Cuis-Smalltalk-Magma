@@ -1,4 +1,4 @@
-'From Cuis 5.0 [latest update: #4588] on 7 May 2021 at 10:10:43 am'!
+'From Cuis 5.0 [latest update: #4588] on 11 May 2021 at 3:58:34 am'!
 'Description I am a general object serialization and materialization framework.  Currently, I convert objects to ByteArrays and back.  I am used by both the "Ma client server" and "Magma" packages.  I offer a lot of flexibility in the way objects are serialized and materialized, even to the way the object graphs are traversed during serialization.
 
 The major class is MaObjectSerializer, see it for more information.  It utilizes a MaOidManager, a MaClassIdManager, and a MaObjectGraphTraversalStrategy to create a MaSerializedGraphBuffer, the final object that wraps the ByteArray.
@@ -7,7 +7,7 @@ The major class is MaObjectSerializer, see it for more information.  It utilizes
 License: MIT
 Original Author: Chris Muller (cmm)
 Author: Josef Philip Bernhart (jpb)'!
-!provides: 'Ma-Serializer-Core' 1 5!
+!provides: 'Ma-Serializer-Core' 1 7!
 !requires: 'Ma-Core' 1 1 nil!
 !requires: 'SOLHashTables' 1 4 nil!
 SystemOrganization addCategory: 'Ma-Serializer-Core'!
@@ -81,16 +81,6 @@ Object subclass: #MaObjectGraphTraversalStrategy
 	category: 'Ma-Serializer-Core'!
 !classDefinition: 'MaObjectGraphTraversalStrategy class' category: 'Ma-Serializer-Core'!
 MaObjectGraphTraversalStrategy class
-	instanceVariableNames: ''!
-
-!classDefinition: #MaStatHistory category: 'Ma-Serializer-Core'!
-Object subclass: #MaStatHistory
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Ma-Serializer-Core'!
-!classDefinition: 'MaStatHistory class' category: 'Ma-Serializer-Core'!
-MaStatHistory class
 	instanceVariableNames: ''!
 
 !classDefinition: #MaBufferPositionMap category: 'Ma-Serializer-Core'!
@@ -677,10 +667,6 @@ shouldTraverseNoGlobals: anObject
 	anObject maIsEnvironment ifTrue: [ ^ false ].
 	^ true! !
 
-!MaStatHistory methodsFor: '*ma-serializer-core' stamp: 'cmm 8/5/2011 13:26'!
-maTransientVariables
-	^ #('timer' 'guard' )! !
-
 !MaBufferPositionMap class methodsFor: 'as yet unclassified' stamp: 'cmm 8/1/2011 13:51'!
 bufferPositionOfByteCodesPlusTrailerSize
 	^ 22! !
@@ -999,31 +985,28 @@ initialize
 	self classDefinitionsById: Dictionary new.
 	self initializeMinimumClasses! !
 
-!MaClassIdManager methodsFor: 'private' stamp: 'cmm 5/19/2018 17:04'!
+!MaClassIdManager methodsFor: 'private' stamp: 'jpb 5/10/2021 15:55:12'!
 initializeMinimumClasses
 	| legacyDefinitions minimumClassDefs |
 	legacyDefinitions _ OrderedCollection new.
 	"In Squeak 3.9, there were only 14 minimumClasses numbered from (101 to: 114).  115 was the first user class-id, but as-of Squeak 4.1, the hierarchy changed and HashedCollection is extra and would try to occupy 115 when initializing the minimumClasses.  This made me realize minimumClasses could change, and therefore needed some buffer space.  Therefore, I made HashedCollection 90 and set the first user classId up to 1000 so it won't happen again!!"
-	(Smalltalk classNamed: #HashedCollection)
-		ifNil: [ Array empty ]
-		ifNotNilDo: 
-			[ : cls | 
-			legacyDefinitions add:
-				((self newDefinitionNamed: cls name)
-					id: 90 ;
-					yourself) ].
+
 	minimumClasses _ self class minimumClasses.
+	
 	self legacyClassMap do: 
 		[ : each | 
 		legacyDefinitions add:
 			((self newDefinitionNamed: each value name)
 				id: each key ;
 				yourself) ].
+			
 	"Reserve those legacy id's first."
 	minimumClassDefs _ legacyDefinitions collect: [ : each | self primAddClassDefinition: each ].
 	nextClassId _ 1000.
+	
 	"Now add them using the normal API so that their superlcass defs will get defined too."
 	minimumClassDefs do: [ : each | self addClassDefinition: each ].
+	
 	"Finally, make sure any that were added as minimumClasses since those legacy ones are also included."
 	minimumClasses do: [ : each | (self hasClassDefinitionFor: each) ifFalse: [ self addNewClass: each ] ]! !
 
@@ -1031,7 +1014,7 @@ initializeMinimumClasses
 isMutable
 	^ mutable! !
 
-!MaClassIdManager methodsFor: 'private' stamp: 'cmm 7/14/2010 14:28'!
+!MaClassIdManager methodsFor: 'private' stamp: 'jpb 5/10/2021 16:26:32'!
 legacyClassMap
 	^ { 
 		(1 -> Metaclass).
@@ -1044,7 +1027,7 @@ legacyClassMap
 		(8 -> Float).
 		(9 -> UndefinedObject).
 		(10 -> Array).
-		(11 -> ByteSymbol).
+		(11 -> MaLegacyClass).
 		(12 -> ByteString).
 		(13 -> ByteArray).
 		(14 -> Set).
@@ -1131,7 +1114,7 @@ rebuildTransientClassMaps
 				self refreshInImageDefinition: eachClass ] ] ].
 	nextClassId _ highestId max: nextClassId! !
 
-!MaClassIdManager class methodsFor: 'accessing' stamp: 'cmm 1/21/2018 14:54'!
+!MaClassIdManager class methodsFor: 'accessing' stamp: 'jpb 5/10/2021 16:26:58'!
 minimumClasses
 	"These are the classes required to transmit a MaClassDefinition, used to establish protocol between two images."
 	^ { Metaclass.  Class.  MaClassReference.  MaClassDefinition.
@@ -1139,8 +1122,7 @@ minimumClasses
 	Boolean. SmallInteger. Character. Float. UndefinedObject.
 	Array. #size class. '' class. ByteArray. Set.  OrderedCollection. Dictionary.
 	"Added these at the end for backward compatibility.  Boolean was not the right one, you need the exact classes!!"
-	True. False.
-	WideString } ! !
+	True. False. MaLegacyClass } ! !
 
 !MaGlobalReference methodsFor: 'private'!
 globalName
@@ -1317,13 +1299,13 @@ initialize
 	self version: 0.
 	aliases _ OrderedCollection new! !
 
-!MaClassDefinition methodsFor: 'private' stamp: 'cmm 6/10/2004 23:43'!
+!MaClassDefinition methodsFor: 'private' stamp: 'jpb 5/10/2021 16:08:42'!
 initializeFrom: aClass
 
 	self globalName: aClass name.
 	instVarNames _ aClass allInstVarNames.
 	classVarNames _ aClass classVarNames.
-	poolDictionaryNames _ aClass poolDictionaryNames.
+	poolDictionaryNames _ aClass sharedPools collect: [:pool | pool name ].
 	classInstVarNames _ aClass class instVarNames.
 	category _ aClass category.
 	type _ aClass typeOfClass.
@@ -3349,7 +3331,7 @@ initialize
 	postSerializers _ Dictionary new.
 	postMaterializers _ Dictionary new! !
 
-!MaObjectSerializerPreferences methodsFor: 'validate' stamp: 'cmm 9/13/2013 14:09'!
+!MaObjectSerializerPreferences methodsFor: 'validate' stamp: 'jpb 5/10/2021 16:29:08'!
 validate: className has: selector 
 	| inst cls |
 	className isSymbol ifFalse: [ MaObjectSerializationUserError signal: 'Specify the class *name*, not the class itself.' ].
@@ -3357,7 +3339,7 @@ validate: className has: selector
 		^ self ].
 	"MagmaForwardingProxy cannot understand #perform:, so we special check it by type name."
 	className = #MagmaForwardingProxy ifTrue: [ ^ self ].
-	inst _ (cls_Smalltalk at: className) someInstance
+	inst _ (cls _ Smalltalk at: className) someInstance
 		ifNil: [ cls basicNew ].
 	(inst perform: selector) ifFalse: [ MaObjectSerializationUserError signal: 'Need to implement ' , selector , ' on ' , className ]! !
 
@@ -5157,6 +5139,10 @@ maMaterializeFromGraph: aByteArray using: aMaObjectSerializer
 				newChangesFromStream: stream
 				named: changeSetName ]
 		ifFalse: [ ChangeSorter existingOrNewChangeSetNamed: changeSetName ]! !
+
+!MaStatHistory methodsFor: '*ma-serializer-core' stamp: 'cmm 8/5/2011 13:26'!
+maTransientVariables
+	^ #('timer' 'guard' )! !
 MaSerializerConstants initialize!
 MaObjectBuffer initialize!
 MaSerializedGraphBuffer initialize!

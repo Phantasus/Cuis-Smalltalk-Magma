@@ -1,10 +1,10 @@
-'From Cuis 5.0 [latest update: #4588] on 10 May 2021 at 6:16:06 am'!
+'From Cuis 5.0 [latest update: #4588] on 11 May 2021 at 3:58:36 am'!
 'Description Core of magma object oriented database
 
 License: MIT
 Original Author: Chris Muller (cmm)
 Author: Josef Philip Bernhart (jpb)'!
-!provides: 'Ma-Core' 1 3!
+!provides: 'Ma-Core' 1 4!
 SystemOrganization addCategory: 'Ma-Core'!
 
 
@@ -2822,6 +2822,10 @@ identityDifferencesWith: anObject
 	^ self
 		differencesWith: anObject
 		using: #==! !
+
+!Object methodsFor: '*ma-core' stamp: 'jpb 5/10/2021 16:56:35'!
+in: aBlock
+	^aBlock value: self! !
 
 !Object methodsFor: '*ma-core' stamp: 'cmm 3/28/2014 09:58'!
 isBoolean

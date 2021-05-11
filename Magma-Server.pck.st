@@ -1,10 +1,12 @@
-'From Cuis 5.0 [latest update: #4588] on 7 May 2021 at 10:27:56 pm'!
+'From Cuis 5.0 [latest update: #4588] on 11 May 2021 at 3:58:29 am'!
 'Description Package containing the magma server implementation
 
 License: MIT
 Original Author: Chris Muller (cmm)
 Author: Josef Philip Bernhart (jpb)'!
-!provides: 'Magma-Server' 1 0!
+!provides: 'Magma-Server' 1 2!
+!requires: 'Ma-Client-Server-Core' 1 3 nil!
+!requires: 'Ma-Statistics' 1 0 nil!
 SystemOrganization addCategory: 'Magma-Server'!
 
 
@@ -298,6 +300,16 @@ MaObject subclass: #MagmaServerPreferences
 MagmaServerPreferences class
 	instanceVariableNames: ''!
 
+!classDefinition: #MaServerRegistry category: 'Magma-Server'!
+Object subclass: #MaServerRegistry
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Magma-Server'!
+!classDefinition: 'MaServerRegistry class' category: 'Magma-Server'!
+MaServerRegistry class
+	instanceVariableNames: 'memoryHogs'!
+
 
 !MagmaPotentiallyOpenError commentStamp: 'cmm 1/15/2012 18:30' prior: 0!
 A MagmaPotentiallyOpenError is a resumable error.  It does not inherit from Warning because it is too critical to allow a program which wants to resume any Warning automatically, forcing the user to handle MagmaPotentiallyOpenError explicitly.!
@@ -428,6 +440,9 @@ Instance Variables
 	serverSerializer:  The serializer used to send certain whole graph-buffers back to the client.  (My sessions serializer cannot be used because it is optimized for a MagmaSession; i.e., only serializing each object one level deep, etc.).
 	session:  My standard session used to perform standard operations on the model, mostly for LargeCollection support.
 !
+
+!MaServerRegistry commentStamp: '<historical>' prior: 0!
+Main singleton for magma related bookkeeping and services, which are not implemented otherwise in cuis!
 
 !MagmaServerConsole methodsFor: 'accessing' stamp: 'cmm 9/25/2009 11:31'!
 definition
@@ -1114,10 +1129,14 @@ maPrintAbbreviatedOn: aStream
 assignedRecordType
 	^ 5! !
 
-!MaAtomicFileStream methodsFor: 'private' stamp: 'cmm 10/22/2014 14:02'!
+!MaAtomicFileStream methodsFor: 'private' stamp: 'jpb 5/10/2021 16:58:14'!
 addPhysicalFile
+	| fileEntry |
+
 	sizes add: 0.
-	^ (StandardFileStream newFileNamed: self nextName) in: 
+	fileEntry _ self nextName asFileEntry.
+	
+	^(fileEntry writeStream) in: 
 		[ : stream | 
 		(stream isNil or: [stream closed]) ifTrue: [ MagmaEnvironmentError signal: 'file did not open' ].
 		stream binary.
@@ -1137,11 +1156,12 @@ deleteFrom: fileIndex
 maxPhysicalFileSize
 	^ MaxPhysicalFileSize! !
 
-!MaAtomicFileStream methodsFor: 'private' stamp: 'cmm 4/20/2007 16:13'!
+!MaAtomicFileStream methodsFor: 'private' stamp: 'jpb 5/10/2021 16:43:04'!
 nameFor: fileIndex 
 	"The name of the file numbered fileIndex."
-	^ (FileDirectory default splitNameVersionExtensionFor: filename) in: 
-		[ : nameNumberAndExtension | 
+	| initBlock |
+	
+	initBlock _ [ : nameNumberAndExtension | 
 		String streamContents: 
 			[ : stream | 
 			stream
@@ -1151,7 +1171,9 @@ nameFor: fileIndex
 			nameNumberAndExtension last ifNotEmpty: 
 				[ stream
 					nextPut: $. ;
-					maPrint: nameNumberAndExtension last ] ] ]! !
+					maPrint: nameNumberAndExtension last ] ] ].
+		
+		^initBlock value: (FileDirectory default splitNameVersionExtensionFor: filename).! !
 
 !MaAtomicFileStream methodsFor: 'private' stamp: 'cmm 4/11/2007 23:03'!
 nextName
@@ -3904,9 +3926,9 @@ postOpenInitialize
 	self postOpenInitializeRecoveryManager.
 	self registerAsMemoryHog! !
 
-!MaObjectRepository methodsFor: 'initialize-release' stamp: 'cmm 7/15/2009 11:32'!
+!MaObjectRepository methodsFor: 'initialize-release' stamp: 'jpb 5/11/2021 03:56:58'!
 registerAsMemoryHog
-	(Smalltalk memoryHogs includes: self) ifFalse: [ Smalltalk memoryHogs add: self ]! !
+	MaServerRegistry registerMemoryHog: self.! !
 
 !MaObjectRepository methodsFor: 'initialize-release' stamp: 'cmm 9/25/2014 16:00'!
 reserveEmergencySpace
@@ -4419,9 +4441,9 @@ open: aMagmaLocalLocation
 	self openApplyFile.
 	self commitLogDirectory assureExistence! !
 
-!MaRecoveryManager methodsFor: 'file' stamp: 'cmm 8/3/2007 13:07'!
+!MaRecoveryManager methodsFor: 'file' stamp: 'jpb 5/11/2021 03:41:12'!
 openApplyFile
-	applyFile ifNil: [ applyFile _ self directory fileNamed: self class applyFilename ].
+	applyFile ifNil: [ applyFile _ (self directory pathName asDirectoryEntry // self class applyFilename) writeStream ].
 	applyFile
 		binary ;
 		position: 0! !
@@ -6311,6 +6333,17 @@ initialize
 
 	self debugRecovery: false! !
 
+!MaServerRegistry class methodsFor: 'as yet unclassified' stamp: 'jpb 5/11/2021 03:54:10'!
+initialize
+	super initialize.
+	
+	memoryHogs _ OrderedCollection new.! !
+
+!MaServerRegistry class methodsFor: 'as yet unclassified' stamp: 'jpb 5/11/2021 03:56:48'!
+registerMemoryHog: newMemoryHog
+	(memoryHogs includes: newMemoryHog)
+		ifFalse: [ 	memoryHogs add: newMemoryHog ]! !
+
 !Object methodsFor: '*magma-server' stamp: 'cmm 10/22/2006 15:01'!
 maIsTransactional
 	^ false! !
@@ -7357,7 +7390,7 @@ upgradeTo17At: aMagmaLocation
 				to: MagmaClause ] ].
 	session repositoryController repository filer version: 17 ] ensure: [ session disconnectAndClose ]! !
 
-!MagmaSession class methodsFor: '*magma-server' stamp: 'cmm 5/2/2013 13:34'!
+!MagmaSession class methodsFor: '*magma-server' stamp: 'jpb 5/10/2021 16:43:50'!
 upgradeTo18At: aMagmaLocalLocation 
 	| location traverser compressor session oidsBySymbol oidConversions |
 self maMarked: 'delete'.  "Decided not to automatically canoncicalize all Symbols into the RepositoryDefinition because, especially after having run a #codeBackup, it bloats the Symbols up to over 42K.  Otherwise there were just 109.
@@ -7382,7 +7415,7 @@ oidsBySymbol explore.
 					[ oidConversions
 						at: oid
 						put: eachOids first ] ] ] ].
-self halt.
+
 	"commitRestore if necessary."
 	location isLocal ifTrue:
 		[ (MagmaRepositoryController open: location) in:
@@ -7916,3 +7949,4 @@ MaObjectRepository initialize!
 MaRecoveryManager initialize!
 MagmaRepositoryController initialize!
 MagmaServerPreferences initialize!
+MaServerRegistry initialize!
