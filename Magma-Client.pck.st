@@ -1,10 +1,10 @@
-'From Cuis 5.0 [latest update: #4579] on 11 May 2021 at 5:00:03 pm'!
+'From Cuis 5.0 [latest update: #4579] on 11 May 2021 at 5:11:58 pm'!
 'Description Package containing the magma client implementation
 
 License: MIT
 Original Author: Chris Muller (cmm)
 Author: Josef Philip Bernhart (jpb)'!
-!provides: 'Magma-Client' 1 3!
+!provides: 'Magma-Client' 1 4!
 SystemOrganization addCategory: 'Magma-Client'!
 SystemOrganization addCategory: 'Magma-Client-Exceptions'!
 SystemOrganization addCategory: 'Magma-Client-MagmaCollections'!
@@ -971,6 +971,16 @@ SOLHashTable subclass: #MagmaSolHashTable
 MagmaSolHashTable class
 	instanceVariableNames: ''!
 
+!classDefinition: #MaTransaction category: 'Magma-Client-Backend'!
+WriteBarrier subclass: #MaTransaction
+	instanceVariableNames: 'readSet session largeCollectionChanges commitPackage potentialKeysChange ignoreModifiedSignals commitNumber dictionaryArrays'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Magma-Client-Backend'!
+!classDefinition: 'MaTransaction class' category: 'Magma-Client-Backend'!
+MaTransaction class
+	instanceVariableNames: ''!
+
 !classDefinition: #MagmaMutatingProxy category: 'Magma-Client-Backend'!
 MaMutatingProxy subclass: #MagmaMutatingProxy
 	instanceVariableNames: 'session oid realObject'
@@ -1189,16 +1199,6 @@ MagmaUserRequirementNotification subclass: #MagmaUserRequiredNotification
 	category: 'Magma-Client-Exceptions'!
 !classDefinition: 'MagmaUserRequiredNotification class' category: 'Magma-Client-Exceptions'!
 MagmaUserRequiredNotification class
-	instanceVariableNames: ''!
-
-!classDefinition: #MaTransaction category: 'Magma-Client-Backend'!
-ProtoObject subclass: #MaTransaction
-	instanceVariableNames: 'readSet session largeCollectionChanges commitPackage potentialKeysChange ignoreModifiedSignals commitNumber dictionaryArrays'
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Magma-Client-Backend'!
-!classDefinition: 'MaTransaction class' category: 'Magma-Client-Backend'!
-MaTransaction class
 	instanceVariableNames: ''!
 
 !classDefinition: #MagmaRepositoryRequest category: 'Magma-Client-Backend'!
@@ -1987,6 +1987,10 @@ A MagmaSolHashTable extends Tom Rushworth's SOLHashTable to substitute the inter
 Instance Variables
 !
 
+!MaTransaction commentStamp: 'cmm 8/21/2008 13:26' prior: 0!
+This class is private.  Applications should use the transaction control provided on MagmaSession.
+!
+
 !MagmaForwardingProxy commentStamp: 'cmm 7/6/2009 20:28' prior: 0!
 I refer to an object in the repository indicated by my 'magmaId'.  You send me a message and I'll signal my session to try to connect if necessary and forward the message on to the real object in that repository.!
 
@@ -2032,10 +2036,6 @@ To use:
 
 !MagmaUserRequirementNotification commentStamp: 'cmm 3/11/2005 14:13' prior: 0!
 I am used when Magma discovers it is missing an object and must get it from the user.  For example, when the user invokes a forwarding-proxy to another repository, connection credentials for that repository must be supplied.  Magma does not keep these for you, but it requires them.!
-
-!MaTransaction commentStamp: 'cmm 8/21/2008 13:26' prior: 0!
-This class is private.  Applications should use the transaction control provided on MagmaSession.
-!
 
 !MagmaRepositoryRequest commentStamp: 'cmm 1/25/2003 17:56' prior: 0!
 Superclass for all Magma request objects.!
@@ -2170,6 +2170,17 @@ name
 !MagmaForwardingProxy methodsFor: 'serialization' stamp: 'cmm 3/9/2009 20:21'!
 maWantsPreSerialization
 	^ true! !
+
+!MagmaWbClassBuilder methodsFor: 'as yet unclassified' stamp: 'cmm 5/30/2018 22:00'!
+fieldsWrittenToBySelector: selectorSymbol 
+	| allInstVarNames transientFieldNumbers |
+	"#maDirtyAdd: is a low-level method used for safe materialization of HashedCollections, do not signal modified at that time."
+	selectorSymbol = #maDirtyAdd: ifTrue: [ ^Array empty ].
+	allInstVarNames _ self targetClass allInstVarNames.
+	transientFieldNumbers _ self targetClass basicNew maTransientVariables collect:
+		[ : eachVarName | allInstVarNames indexOf: eachVarName ].
+	^ (super fieldsWrittenToBySelector: selectorSymbol) reject:
+		[ : eachFieldNumber | transientFieldNumbers includes: eachFieldNumber ]! !
 
 !MagmaDictionaryAssociation methodsFor: 'as yet unclassified' stamp: 'cmm 7/16/2010 16:07'!
 = aLookupKey 
@@ -12788,6 +12799,363 @@ defaultSegBits
 	"A MagmaArray with up to  268435456 buckets would take up roughly 1.61G on disk.  That would be a good size before creating a new one."
 	^ 28! !
 
+!MaTransaction methodsFor: 'writebarrier' stamp: 'cmm 12/1/2011 20:52'!
+add: anObject
+	"Handle special processing required by Dictionary's."
+	anObject addSelfToWriteBarrier: self! !
+
+!MaTransaction methodsFor: 'writebarrier' stamp: 'cmm 12/1/2011 21:09'!
+addHashedCollection: aHashedCollection 
+	super add: aHashedCollection.
+	super add: aHashedCollection array.
+	dictionaryArrays
+		at: aHashedCollection array
+		put: aHashedCollection! !
+
+!MaTransaction methodsFor: 'writebarrier' stamp: 'cmm 8/21/2012 21:14'!
+modified: anObject 
+	ignoreModifiedSignals ifFalse:
+		[ | obj |
+		obj _ (anObject isArray and: [ dictionaryArrays includesKey: anObject ])
+			ifTrue: [ dictionaryArrays at: anObject ]
+			ifFalse: [ anObject ].
+		commitPackage addObject: obj ]! !
+
+!MaTransaction methodsFor: 'writebarrier' stamp: 'cmm 1/17/2013 20:19'!
+newBuilderForClass: aClass
+	^ MagmaWbClassBuilder
+		target: aClass 
+		barrier: self! !
+
+!MaTransaction methodsFor: 'writebarrier' stamp: 'cmm 7/14/2009 14:33'!
+suspendWriteBarrierModifiedsWhile: aBlock 
+	"Employ 'priorValue' to support nested suspendWriteBarrierModifiedsWhile: 's."
+	| priorValue |
+	priorValue _ ignoreModifiedSignals.
+	ignoreModifiedSignals _ true.
+	^ aBlock ensure: [ ignoreModifiedSignals _ priorValue ]! !
+
+!MaTransaction methodsFor: 'writebarrier' stamp: 'cmm 5/22/2018 23:43'!
+useWriteBarrierOn: anObject 
+	^ anObject maAllowsWriteBarrier and: [ session allowWriteBarrier ]! !
+
+!MaTransaction methodsFor: 'writebarrier' stamp: 'cmm 3/27/2005 22:56'!
+validateWriteBarrier: aBoolean
+	"We can't allow them to stop using the writeBarrier in the middle of a transaction in which objects are already changed.."
+
+	aBoolean
+		ifFalse:
+			[ commitPackage objects notEmpty
+				ifTrue:
+					[ MagmaUserError signal: 'Cannot stop using writeBarrier in the middle of a transaction.' ] ]! !
+
+!MaTransaction methodsFor: 'private' stamp: 'cmm 8/21/2012 21:13'!
+addChangesFromReadSet
+	readSet keysAndValuesDo:
+		[ : eachCurrent : eachBuffer | | didChange | 
+		eachCurrent ifNotNil:
+			[ didChange _ self
+				didChange: eachCurrent
+				from: eachBuffer.
+			didChange ifTrue: [ commitPackage addObject: eachCurrent ] ] ]! !
+
+!MaTransaction methodsFor: 'private' stamp: 'cmm 3/27/2005 17:02'!
+addLargeCollectionChangesTo: aMaCommitPackage
+
+	largeCollectionChanges do:
+		[ :each |
+		each hasChanges
+			ifTrue:
+				[ aMaCommitPackage
+					addLargeCollectionChanges: each
+					using: session ] ]! !
+
+!MaTransaction methodsFor: 'private' stamp: 'cmm 12/1/2011 21:03'!
+addNormalObject: anObject
+	"ugh"
+	super add: anObject! !
+
+!MaTransaction methodsFor: 'private' stamp: 'cmm 9/18/2008 17:18'!
+bufferFor: anObject ifAbsent: aBlock 
+	^ readSet 
+		at: anObject
+		ifAbsent: aBlock! !
+
+!MaTransaction methodsFor: 'private' stamp: 'cmm 5/25/2013 17:21'!
+bufferFor: anObject is: aMaObjectBuffer 
+	anObject isBehindWriteBarrier ifTrue: [ MagmaSoftwareError signal: 'should not add objects behind WB to the readSet!!' ].
+	readSet
+		at: anObject
+		put: aMaObjectBuffer trimByteArray! !
+
+!MaTransaction methodsFor: 'private' stamp: 'cmm 7/15/2008 14:58'!
+commitNumber
+	^ commitNumber ! !
+
+!MaTransaction methodsFor: 'private' stamp: 'cmm 7/15/2008 14:56'!
+commitNumber: anInteger
+	commitNumber _ anInteger! !
+
+!MaTransaction methodsFor: 'private' stamp: 'cmm 7/10/2009 14:52'!
+commitPackage
+	^ commitPackage! !
+
+!MaTransaction methodsFor: 'private' stamp: 'cmm 7/10/2009 13:48'!
+modifiedObjects
+	"Answers the collection of objects already in the commitPackage.  When WriteBarrier is in use, many objects are added *as* they are changed, via my #modified: method."
+	^ commitPackage objects! !
+
+!MaTransaction methodsFor: 'private' stamp: 'cmm 9/25/2012 19:59'!
+resetNewLargeCollections
+	largeCollectionChanges _ largeCollectionChanges reject:
+		[ : each | (MaOidCalculator isOidForNewObject: each collectionOid) and:
+			[ each collectionOid: nil.
+			true ] ]! !
+
+!MaTransaction methodsFor: 'private'!
+session: aMagmaSession
+
+	session _ aMagmaSession
+! !
+
+!MaTransaction methodsFor: 'private' stamp: 'cmm 4/10/2005 18:00'!
+warnOfTruncationsIn: aCollection 
+	aCollection isEmptyOrNil 
+		ifFalse: 
+			[MagmaTruncationWarning 
+				signal: (String streamContents: 
+							[:stream | 
+							stream nextPutAll: 'Your definition of '.
+							(aCollection collect: [:each | each maOriginalClass name]) asSet do: 
+									[:each | 
+									stream
+										nextPutAll: each;
+										nextPutAll: ', '].
+							stream 
+								nextPutAll: 'are missing instance variables present in the repository-version.  If you proceed with this commit, information in one or more of these instances will be lost.'])]! !
+
+!MaTransaction methodsFor: 'building' stamp: 'cmm 3/22/2010 18:24'!
+captureOldHashesFor: anObject 
+	largeCollectionChanges do: 
+		[ : eachChanges | 
+		(eachChanges collection canIndex: anObject) ifTrue: 
+			[ eachChanges collection indexesDo: 
+				[ : eachIndex | 
+				| oldKeys oldHashes |
+				oldKeys _ potentialKeysChange 
+					at: anObject
+					ifAbsentPut: [ MaIdentityDictionary new ].
+				oldHashes _ oldKeys 
+					at: eachIndex attribute
+					ifAbsentPut: [ OrderedCollection new ].
+				oldHashes add: { 
+						eachChanges.
+						eachIndex.
+						(eachIndex indexHashesFor: anObject)
+					 } ] ] ]! !
+
+!MaTransaction methodsFor: 'building' stamp: 'cmm 11/12/2011 12:06'!
+markRead: anObject using: aMaObjectBuffer 
+	(session immutabilityStrategy
+		isImmutable: anObject
+		using: self) ifTrue: [ ^ anObject ].
+	anObject isImmutableInMagma ifTrue: [ ^ anObject ].
+	(self useWriteBarrierOn: anObject)
+		ifTrue:
+			[ anObject isBehindWriteBarrier ifFalse: [ self add: anObject ].
+			commitPackage removeObject: anObject ]
+		ifFalse:
+			[ self
+				bufferFor: anObject
+				is: aMaObjectBuffer ].
+	anObject maIsLargeCollection ifTrue:
+		[ self monitorLargeCollectionChanges: anObject changes.
+		anObject session: session ].
+	^ anObject! !
+
+!MaTransaction methodsFor: 'building' stamp: 'cmm 3/16/2005 12:43'!
+monitorLargeCollectionChanges: aMaLargeCollectionChanges
+
+	largeCollectionChanges add: aMaLargeCollectionChanges
+! !
+
+!MaTransaction methodsFor: 'building' stamp: 'brp 12/22/2005 18:32'!
+recordPotentialKeyChanges
+
+	potentialKeysChange keysAndValuesDo:
+		[ :eachObject :eachKeys |
+			eachKeys valuesDo: 
+				[ :eachHashes |
+					eachHashes do: 
+						[ :eachCio | "#( changes index, oldHash )"
+							self
+								recordPotentialKeyChangesFrom: eachCio last
+								of: eachObject
+								index: eachCio second
+								in: eachCio first ] ] ]
+! !
+
+!MaTransaction methodsFor: 'building' stamp: 'cmm 8/2/2009 17:32'!
+recordPotentialKeyChangesFrom: oldHashValues of: anObject index: aMaIndexDefinition in: aMagmaCollectionChanges 
+	| newHashValues |
+	anObject ifNil: [ ^ self ].
+	newHashValues _ aMaIndexDefinition indexHashesFor: anObject.
+	"If hash index value has changed."
+	(oldHashValues maConsistsOf: newHashValues) ifFalse: 
+		[ | common |
+		common _ oldHashValues intersection: newHashValues.
+		aMagmaCollectionChanges 
+			move: anObject
+			from: (oldHashValues copyWithoutAll: common)
+			to: (newHashValues copyWithoutAll: common)
+			forIndexedAttribute: aMaIndexDefinition attribute ]! !
+
+!MaTransaction methodsFor: 'building' stamp: 'cmm 11/23/2008 17:24'!
+remove: anObject 
+	super remove: anObject.
+	readSet 
+		removeKey: anObject
+		ifAbsent: 
+			[ "do nothing"
+			 ]! !
+
+!MaTransaction methodsFor: 'accessing' stamp: 'cmm 4/5/2005 21:31'!
+changedObjects
+
+	| preservedCommitPackage answer |
+	"this method must be non-destructive to the my commitPackage because it may be requested again."
+	preservedCommitPackage _ commitPackage copyWithNewLargeCollectionChanges.  "It should actually be ok to share its 'objects'."
+	self
+		addChangesFromReadSet ;  "another potential truncation warning"
+		recordPotentialKeyChanges ;
+		addLargeCollectionChangesTo: commitPackage.
+	answer _ commitPackage.
+	commitPackage _ preservedCommitPackage.
+	^ answer! !
+
+!MaTransaction methodsFor: 'accessing' stamp: 'cmm 1/19/2012 20:18'!
+commitPackageCountByClass
+	^ (commitPackage objects asArray collect: [ : each | each maOriginalClass ]) asBag sortedCounts! !
+
+!MaTransaction methodsFor: 'accessing'!
+largeCollectionChanges
+
+	^largeCollectionChanges! !
+
+!MaTransaction methodsFor: 'accessing' stamp: 'cmm 5/8/2013 22:00'!
+readSetCountByClass
+	^ (readSet keys collect:
+		[ : each | (each maIsMutatingProxy and: [ each maRealObjectIsReified ])
+			ifTrue: [ each maOriginalClass ]
+			ifFalse: [ each class ] ]) asBag sortedCounts! !
+
+!MaTransaction methodsFor: 'initializing' stamp: 'cmm 6/23/2013 15:07'!
+cleanUpWriteBarrier
+	self resetCommitPackage.
+	WeakArray removeWeakDependent: builders! !
+
+!MaTransaction methodsFor: 'initializing' stamp: 'cmm 12/1/2011 20:59'!
+initialize
+	super initialize.
+	readSet _ MaObjectSerializerPreferences newWeakIdentityKeyDictionary.
+	largeCollectionChanges _ WeakSet new.
+	self resetCommitPackage.
+	ignoreModifiedSignals _ false.
+	"Conveniently initialized to avoid nil check in code."
+	commitNumber _ 0.
+	dictionaryArrays _ MaObjectSerializerPreferences newWeakIdentityKeyDictionary! !
+
+!MaTransaction methodsFor: 'initializing' stamp: 'cmm 6/27/2013 09:49'!
+installWriteBarrierUsing: aMagmaSession
+	"Remove and re-add all objects to move them from the readSet into a WriteBarrier."
+	| changedObjects |
+	WeakArray addWeakDependent: builders.
+	changedObjects _ self changedObjects.
+	self writeBarrierStatusChangedFor: aMagmaSession.
+	changedObjects objects do: [ : each | self modified: each ]! !
+
+!MaTransaction methodsFor: 'initializing' stamp: 'cmm 3/22/2010 18:24'!
+resetCommitPackage
+	commitPackage _ MaCommitPackage new.
+	"potentialKeyChanges are only ever part of a single commit-package, so reset those too."
+	potentialKeysChange _ MaIdentityDictionary new! !
+
+!MaTransaction methodsFor: 'initializing' stamp: 'cmm 6/23/2013 15:07'!
+writeBarrierStatusChangedFor: aMagmaSession 
+	"Enumerate all persistent objects and put them appropriately either into my writeBarrier or readSet."
+	aMagmaSession serializer objectsDo:
+		[ : each | | buffer |
+		buffer _ aMagmaSession bufferFor: each.
+		self
+			 remove: each ;
+			
+			markRead: each
+			using: buffer ]! !
+
+!MaTransaction methodsFor: 'testing' stamp: 'cmm 2/17/2014 15:56'!
+didChange: anObject 
+	"Answer whether anObject has changed for this transaction."
+	(session immutabilityStrategy
+		isImmutable: anObject
+		using: self) ifTrue: [ ^ false ].
+	anObject isImmutableInMagma ifTrue: [ ^ false ].
+	^ anObject isBehindWriteBarrier
+		ifTrue: [ commitPackage includesObject: anObject ]
+		ifFalse:
+			[ "Under very heavy loads, its possible for a client to get disconnected during a long series of reads.  One of those reads could be in the middle of a materialization (maEstablishPointerReferencesFor:using:.  But since this happens before the call to #markRead:using:, it isn't in the readSet yet!!)"
+			self
+				didChange: anObject
+				from: (readSet at: anObject ifAbsent: [ ^ false ]) ]! !
+
+!MaTransaction methodsFor: 'testing' stamp: 'cmm 5/6/2013 20:23'!
+didChange: anObject from: aMaObjectBuffer 
+	"Answer whether anObject has changed for this transaction."
+	^ aMaObjectBuffer 
+		isDifferent: anObject realObjectIfMutatingProxy
+		using: session serializer! !
+
+!MaTransaction methodsFor: 'testing' stamp: 'cmm 10/12/2009 13:17'!
+isMonitoring: aMagmaLargeCollectionChanges
+	^ largeCollectionChanges includes: aMagmaLargeCollectionChanges! !
+
+!MaTransaction methodsFor: 'actions' stamp: 'cmm 3/7/2011 20:17'!
+ensureOldHashesCapturedFor: anObject 
+	"What we need to do here is capture the before-keys of any object which, potentially belonging to a MagmaCollection, potentially changing its key by way of its instVars being changed so that we may, in modified: actually determine whether we should record the changed-key in my commitPackage."
+	(potentialKeysChange includesKey: anObject yourself) ifTrue: [ ^ self ].
+	self captureOldHashesFor: anObject yourself! !
+
+!MaTransaction methodsFor: 'actions' stamp: 'cmm 5/3/2005 12:56'!
+ensureOldHashesCleanedFor: anObject
+	"What we need to do here is capture the before-keys of any object which, potentially belonging to a MagmaCollection, potentially changing its key by way of its instVars being changed so that we may, in modified: actually determine whether we should record the changed-key in my commitPackage."
+
+	potentialKeysChange 
+		removeKey: anObject
+		ifAbsent: [ "do nothing" ]! !
+
+!MaTransaction methodsFor: 'actions' stamp: 'cmm 5/22/2018 23:37'!
+finalizeOids
+	builders finalizeValues.
+	dictionaryArrays finalizeValues.
+	readSet finalizeValues! !
+
+!MaTransaction methodsFor: 'actions' stamp: 'cmm 1/10/2014 16:46'!
+restore
+	"restore all changed objects to their state as read from the repository."
+	largeCollectionChanges do: [ : each | each reset ].
+	self suspendWriteBarrierModifiedsWhile: 
+		[ readSet keysAndValuesDo: 
+			[ : eachOriginal : eachBackup | 
+			eachBackup
+				refresh: eachOriginal realObjectIfMutatingProxy
+				using: session
+				includingLocal: true ] ]! !
+
+!MaTransaction class methodsFor: 'creation'!
+session: aMagmaSession
+
+	^self new session: aMagmaSession
+! !
+
 !MagmaMutatingProxy methodsFor: 'testing' stamp: 'cmm 10/25/2010 13:27'!
 = object 
 	"The only way to answer correctly is for the fully-materialized objects to tell you.  However, if object is the same object as me, it would be true.  Getting two separate mutating-proxies for the same object is possible when a storage-object refers to a persistent object (i.e., MaCompiledMethodStorage>>'className')."
@@ -13627,363 +13995,6 @@ session: aMagmaSession
 		session: aMagmaSession ;
 		yourself! !
 
-!MaTransaction methodsFor: 'writebarrier' stamp: 'cmm 12/1/2011 20:52'!
-add: anObject
-	"Handle special processing required by Dictionary's."
-	anObject addSelfToWriteBarrier: self! !
-
-!MaTransaction methodsFor: 'writebarrier' stamp: 'cmm 12/1/2011 21:09'!
-addHashedCollection: aHashedCollection 
-	super add: aHashedCollection.
-	super add: aHashedCollection array.
-	dictionaryArrays
-		at: aHashedCollection array
-		put: aHashedCollection! !
-
-!MaTransaction methodsFor: 'writebarrier' stamp: 'cmm 8/21/2012 21:14'!
-modified: anObject 
-	ignoreModifiedSignals ifFalse:
-		[ | obj |
-		obj _ (anObject isArray and: [ dictionaryArrays includesKey: anObject ])
-			ifTrue: [ dictionaryArrays at: anObject ]
-			ifFalse: [ anObject ].
-		commitPackage addObject: obj ]! !
-
-!MaTransaction methodsFor: 'writebarrier' stamp: 'cmm 1/17/2013 20:19'!
-newBuilderForClass: aClass
-	^ MagmaWbClassBuilder
-		target: aClass 
-		barrier: self! !
-
-!MaTransaction methodsFor: 'writebarrier' stamp: 'cmm 7/14/2009 14:33'!
-suspendWriteBarrierModifiedsWhile: aBlock 
-	"Employ 'priorValue' to support nested suspendWriteBarrierModifiedsWhile: 's."
-	| priorValue |
-	priorValue _ ignoreModifiedSignals.
-	ignoreModifiedSignals _ true.
-	^ aBlock ensure: [ ignoreModifiedSignals _ priorValue ]! !
-
-!MaTransaction methodsFor: 'writebarrier' stamp: 'cmm 5/22/2018 23:43'!
-useWriteBarrierOn: anObject 
-	^ anObject maAllowsWriteBarrier and: [ session allowWriteBarrier ]! !
-
-!MaTransaction methodsFor: 'writebarrier' stamp: 'cmm 3/27/2005 22:56'!
-validateWriteBarrier: aBoolean
-	"We can't allow them to stop using the writeBarrier in the middle of a transaction in which objects are already changed.."
-
-	aBoolean
-		ifFalse:
-			[ commitPackage objects notEmpty
-				ifTrue:
-					[ MagmaUserError signal: 'Cannot stop using writeBarrier in the middle of a transaction.' ] ]! !
-
-!MaTransaction methodsFor: 'private' stamp: 'cmm 8/21/2012 21:13'!
-addChangesFromReadSet
-	readSet keysAndValuesDo:
-		[ : eachCurrent : eachBuffer | | didChange | 
-		eachCurrent ifNotNil:
-			[ didChange _ self
-				didChange: eachCurrent
-				from: eachBuffer.
-			didChange ifTrue: [ commitPackage addObject: eachCurrent ] ] ]! !
-
-!MaTransaction methodsFor: 'private' stamp: 'cmm 3/27/2005 17:02'!
-addLargeCollectionChangesTo: aMaCommitPackage
-
-	largeCollectionChanges do:
-		[ :each |
-		each hasChanges
-			ifTrue:
-				[ aMaCommitPackage
-					addLargeCollectionChanges: each
-					using: session ] ]! !
-
-!MaTransaction methodsFor: 'private' stamp: 'cmm 12/1/2011 21:03'!
-addNormalObject: anObject
-	"ugh"
-	super add: anObject! !
-
-!MaTransaction methodsFor: 'private' stamp: 'cmm 9/18/2008 17:18'!
-bufferFor: anObject ifAbsent: aBlock 
-	^ readSet 
-		at: anObject
-		ifAbsent: aBlock! !
-
-!MaTransaction methodsFor: 'private' stamp: 'cmm 5/25/2013 17:21'!
-bufferFor: anObject is: aMaObjectBuffer 
-	anObject isBehindWriteBarrier ifTrue: [ MagmaSoftwareError signal: 'should not add objects behind WB to the readSet!!' ].
-	readSet
-		at: anObject
-		put: aMaObjectBuffer trimByteArray! !
-
-!MaTransaction methodsFor: 'private' stamp: 'cmm 7/15/2008 14:58'!
-commitNumber
-	^ commitNumber ! !
-
-!MaTransaction methodsFor: 'private' stamp: 'cmm 7/15/2008 14:56'!
-commitNumber: anInteger
-	commitNumber _ anInteger! !
-
-!MaTransaction methodsFor: 'private' stamp: 'cmm 7/10/2009 14:52'!
-commitPackage
-	^ commitPackage! !
-
-!MaTransaction methodsFor: 'private' stamp: 'cmm 7/10/2009 13:48'!
-modifiedObjects
-	"Answers the collection of objects already in the commitPackage.  When WriteBarrier is in use, many objects are added *as* they are changed, via my #modified: method."
-	^ commitPackage objects! !
-
-!MaTransaction methodsFor: 'private' stamp: 'cmm 9/25/2012 19:59'!
-resetNewLargeCollections
-	largeCollectionChanges _ largeCollectionChanges reject:
-		[ : each | (MaOidCalculator isOidForNewObject: each collectionOid) and:
-			[ each collectionOid: nil.
-			true ] ]! !
-
-!MaTransaction methodsFor: 'private'!
-session: aMagmaSession
-
-	session _ aMagmaSession
-! !
-
-!MaTransaction methodsFor: 'private' stamp: 'cmm 4/10/2005 18:00'!
-warnOfTruncationsIn: aCollection 
-	aCollection isEmptyOrNil 
-		ifFalse: 
-			[MagmaTruncationWarning 
-				signal: (String streamContents: 
-							[:stream | 
-							stream nextPutAll: 'Your definition of '.
-							(aCollection collect: [:each | each maOriginalClass name]) asSet do: 
-									[:each | 
-									stream
-										nextPutAll: each;
-										nextPutAll: ', '].
-							stream 
-								nextPutAll: 'are missing instance variables present in the repository-version.  If you proceed with this commit, information in one or more of these instances will be lost.'])]! !
-
-!MaTransaction methodsFor: 'building' stamp: 'cmm 3/22/2010 18:24'!
-captureOldHashesFor: anObject 
-	largeCollectionChanges do: 
-		[ : eachChanges | 
-		(eachChanges collection canIndex: anObject) ifTrue: 
-			[ eachChanges collection indexesDo: 
-				[ : eachIndex | 
-				| oldKeys oldHashes |
-				oldKeys _ potentialKeysChange 
-					at: anObject
-					ifAbsentPut: [ MaIdentityDictionary new ].
-				oldHashes _ oldKeys 
-					at: eachIndex attribute
-					ifAbsentPut: [ OrderedCollection new ].
-				oldHashes add: { 
-						eachChanges.
-						eachIndex.
-						(eachIndex indexHashesFor: anObject)
-					 } ] ] ]! !
-
-!MaTransaction methodsFor: 'building' stamp: 'cmm 11/12/2011 12:06'!
-markRead: anObject using: aMaObjectBuffer 
-	(session immutabilityStrategy
-		isImmutable: anObject
-		using: self) ifTrue: [ ^ anObject ].
-	anObject isImmutableInMagma ifTrue: [ ^ anObject ].
-	(self useWriteBarrierOn: anObject)
-		ifTrue:
-			[ anObject isBehindWriteBarrier ifFalse: [ self add: anObject ].
-			commitPackage removeObject: anObject ]
-		ifFalse:
-			[ self
-				bufferFor: anObject
-				is: aMaObjectBuffer ].
-	anObject maIsLargeCollection ifTrue:
-		[ self monitorLargeCollectionChanges: anObject changes.
-		anObject session: session ].
-	^ anObject! !
-
-!MaTransaction methodsFor: 'building' stamp: 'cmm 3/16/2005 12:43'!
-monitorLargeCollectionChanges: aMaLargeCollectionChanges
-
-	largeCollectionChanges add: aMaLargeCollectionChanges
-! !
-
-!MaTransaction methodsFor: 'building' stamp: 'brp 12/22/2005 18:32'!
-recordPotentialKeyChanges
-
-	potentialKeysChange keysAndValuesDo:
-		[ :eachObject :eachKeys |
-			eachKeys valuesDo: 
-				[ :eachHashes |
-					eachHashes do: 
-						[ :eachCio | "#( changes index, oldHash )"
-							self
-								recordPotentialKeyChangesFrom: eachCio last
-								of: eachObject
-								index: eachCio second
-								in: eachCio first ] ] ]
-! !
-
-!MaTransaction methodsFor: 'building' stamp: 'cmm 8/2/2009 17:32'!
-recordPotentialKeyChangesFrom: oldHashValues of: anObject index: aMaIndexDefinition in: aMagmaCollectionChanges 
-	| newHashValues |
-	anObject ifNil: [ ^ self ].
-	newHashValues _ aMaIndexDefinition indexHashesFor: anObject.
-	"If hash index value has changed."
-	(oldHashValues maConsistsOf: newHashValues) ifFalse: 
-		[ | common |
-		common _ oldHashValues intersection: newHashValues.
-		aMagmaCollectionChanges 
-			move: anObject
-			from: (oldHashValues copyWithoutAll: common)
-			to: (newHashValues copyWithoutAll: common)
-			forIndexedAttribute: aMaIndexDefinition attribute ]! !
-
-!MaTransaction methodsFor: 'building' stamp: 'cmm 11/23/2008 17:24'!
-remove: anObject 
-	super remove: anObject.
-	readSet 
-		removeKey: anObject
-		ifAbsent: 
-			[ "do nothing"
-			 ]! !
-
-!MaTransaction methodsFor: 'accessing' stamp: 'cmm 4/5/2005 21:31'!
-changedObjects
-
-	| preservedCommitPackage answer |
-	"this method must be non-destructive to the my commitPackage because it may be requested again."
-	preservedCommitPackage _ commitPackage copyWithNewLargeCollectionChanges.  "It should actually be ok to share its 'objects'."
-	self
-		addChangesFromReadSet ;  "another potential truncation warning"
-		recordPotentialKeyChanges ;
-		addLargeCollectionChangesTo: commitPackage.
-	answer _ commitPackage.
-	commitPackage _ preservedCommitPackage.
-	^ answer! !
-
-!MaTransaction methodsFor: 'accessing' stamp: 'cmm 1/19/2012 20:18'!
-commitPackageCountByClass
-	^ (commitPackage objects asArray collect: [ : each | each maOriginalClass ]) asBag sortedCounts! !
-
-!MaTransaction methodsFor: 'accessing'!
-largeCollectionChanges
-
-	^largeCollectionChanges! !
-
-!MaTransaction methodsFor: 'accessing' stamp: 'cmm 5/8/2013 22:00'!
-readSetCountByClass
-	^ (readSet keys collect:
-		[ : each | (each maIsMutatingProxy and: [ each maRealObjectIsReified ])
-			ifTrue: [ each maOriginalClass ]
-			ifFalse: [ each class ] ]) asBag sortedCounts! !
-
-!MaTransaction methodsFor: 'initializing' stamp: 'cmm 6/23/2013 15:07'!
-cleanUpWriteBarrier
-	self resetCommitPackage.
-	WeakArray removeWeakDependent: builders! !
-
-!MaTransaction methodsFor: 'initializing' stamp: 'cmm 12/1/2011 20:59'!
-initialize
-	super initialize.
-	readSet _ MaObjectSerializerPreferences newWeakIdentityKeyDictionary.
-	largeCollectionChanges _ WeakSet new.
-	self resetCommitPackage.
-	ignoreModifiedSignals _ false.
-	"Conveniently initialized to avoid nil check in code."
-	commitNumber _ 0.
-	dictionaryArrays _ MaObjectSerializerPreferences newWeakIdentityKeyDictionary! !
-
-!MaTransaction methodsFor: 'initializing' stamp: 'cmm 6/27/2013 09:49'!
-installWriteBarrierUsing: aMagmaSession
-	"Remove and re-add all objects to move them from the readSet into a WriteBarrier."
-	| changedObjects |
-	WeakArray addWeakDependent: builders.
-	changedObjects _ self changedObjects.
-	self writeBarrierStatusChangedFor: aMagmaSession.
-	changedObjects objects do: [ : each | self modified: each ]! !
-
-!MaTransaction methodsFor: 'initializing' stamp: 'cmm 3/22/2010 18:24'!
-resetCommitPackage
-	commitPackage _ MaCommitPackage new.
-	"potentialKeyChanges are only ever part of a single commit-package, so reset those too."
-	potentialKeysChange _ MaIdentityDictionary new! !
-
-!MaTransaction methodsFor: 'initializing' stamp: 'cmm 6/23/2013 15:07'!
-writeBarrierStatusChangedFor: aMagmaSession 
-	"Enumerate all persistent objects and put them appropriately either into my writeBarrier or readSet."
-	aMagmaSession serializer objectsDo:
-		[ : each | | buffer |
-		buffer _ aMagmaSession bufferFor: each.
-		self
-			 remove: each ;
-			
-			markRead: each
-			using: buffer ]! !
-
-!MaTransaction methodsFor: 'testing' stamp: 'cmm 2/17/2014 15:56'!
-didChange: anObject 
-	"Answer whether anObject has changed for this transaction."
-	(session immutabilityStrategy
-		isImmutable: anObject
-		using: self) ifTrue: [ ^ false ].
-	anObject isImmutableInMagma ifTrue: [ ^ false ].
-	^ anObject isBehindWriteBarrier
-		ifTrue: [ commitPackage includesObject: anObject ]
-		ifFalse:
-			[ "Under very heavy loads, its possible for a client to get disconnected during a long series of reads.  One of those reads could be in the middle of a materialization (maEstablishPointerReferencesFor:using:.  But since this happens before the call to #markRead:using:, it isn't in the readSet yet!!)"
-			self
-				didChange: anObject
-				from: (readSet at: anObject ifAbsent: [ ^ false ]) ]! !
-
-!MaTransaction methodsFor: 'testing' stamp: 'cmm 5/6/2013 20:23'!
-didChange: anObject from: aMaObjectBuffer 
-	"Answer whether anObject has changed for this transaction."
-	^ aMaObjectBuffer 
-		isDifferent: anObject realObjectIfMutatingProxy
-		using: session serializer! !
-
-!MaTransaction methodsFor: 'testing' stamp: 'cmm 10/12/2009 13:17'!
-isMonitoring: aMagmaLargeCollectionChanges
-	^ largeCollectionChanges includes: aMagmaLargeCollectionChanges! !
-
-!MaTransaction methodsFor: 'actions' stamp: 'cmm 3/7/2011 20:17'!
-ensureOldHashesCapturedFor: anObject 
-	"What we need to do here is capture the before-keys of any object which, potentially belonging to a MagmaCollection, potentially changing its key by way of its instVars being changed so that we may, in modified: actually determine whether we should record the changed-key in my commitPackage."
-	(potentialKeysChange includesKey: anObject yourself) ifTrue: [ ^ self ].
-	self captureOldHashesFor: anObject yourself! !
-
-!MaTransaction methodsFor: 'actions' stamp: 'cmm 5/3/2005 12:56'!
-ensureOldHashesCleanedFor: anObject
-	"What we need to do here is capture the before-keys of any object which, potentially belonging to a MagmaCollection, potentially changing its key by way of its instVars being changed so that we may, in modified: actually determine whether we should record the changed-key in my commitPackage."
-
-	potentialKeysChange 
-		removeKey: anObject
-		ifAbsent: [ "do nothing" ]! !
-
-!MaTransaction methodsFor: 'actions' stamp: 'cmm 5/22/2018 23:37'!
-finalizeOids
-	builders finalizeValues.
-	dictionaryArrays finalizeValues.
-	readSet finalizeValues! !
-
-!MaTransaction methodsFor: 'actions' stamp: 'cmm 1/10/2014 16:46'!
-restore
-	"restore all changed objects to their state as read from the repository."
-	largeCollectionChanges do: [ : each | each reset ].
-	self suspendWriteBarrierModifiedsWhile: 
-		[ readSet keysAndValuesDo: 
-			[ : eachOriginal : eachBackup | 
-			eachBackup
-				refresh: eachOriginal realObjectIfMutatingProxy
-				using: session
-				includingLocal: true ] ]! !
-
-!MaTransaction class methodsFor: 'creation'!
-session: aMagmaSession
-
-	^self new session: aMagmaSession
-! !
-
 !MagmaRepositoryRequest methodsFor: 'accessing' stamp: 'cmm 2/27/2009 15:59'!
 failedLocation: aMagmaRemoteLocation 
 	failedLocation _ aMagmaRemoteLocation! !
@@ -14557,17 +14568,6 @@ addPrimitiveOverride: methodSelector
 	class
 		compileSilently: mb streamContents
 		classified: 'overriding'! !
-
-!MagmaWbClassBuilder methodsFor: 'as yet unclassified' stamp: 'cmm 5/30/2018 22:00'!
-fieldsWrittenToBySelector: selectorSymbol 
-	| allInstVarNames transientFieldNumbers |
-	"#maDirtyAdd: is a low-level method used for safe materialization of HashedCollections, do not signal modified at that time."
-	selectorSymbol = #maDirtyAdd: ifTrue: [ ^Array empty ].
-	allInstVarNames _ self targetClass allInstVarNames.
-	transientFieldNumbers _ self targetClass basicNew maTransientVariables collect:
-		[ : eachVarName | allInstVarNames indexOf: eachVarName ].
-	^ (super fieldsWrittenToBySelector: selectorSymbol) reject:
-		[ : eachFieldNumber | transientFieldNumbers includes: eachFieldNumber ]! !
 
 !MagmaWbClassBuilder methodsFor: 'as yet unclassified' stamp: 'cmm 11/11/2016 14:39'!
 installMagmaOverrides
