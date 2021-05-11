@@ -1,4 +1,4 @@
-'From Cuis 5.0 [latest update: #4588] on 10 May 2021 at 6:12:21 am'!
+'From Cuis 5.0 [latest update: #4579] on 11 May 2021 at 5:04:43 pm'!
 'Description I provide several independent, special-purpose collection classes that seem to be generally useful.
 
 MaWeakIdentityKeyDictionary and MaWeakValueDictionary wrap a collection of their Smalltalk counterparts and keeps them all under 12-bits in size, thus minimizing the number of collisions due to Squeaks 12-bits identity hash.  These provide major improvement in the #removeKey: message.
@@ -62,7 +62,7 @@ Other features are:
 License: MIT
 Original Author: Chris Muller (cmm)
 Author: Josef Philip Bernhart (jpb)'!
-!provides: 'Ma-Collections' 1 5!
+!provides: 'Ma-Collections' 1 6!
 SystemOrganization addCategory: 'Ma-Collections'!
 SystemOrganization addCategory: 'Ma-Collections-Exceptions'!
 SystemOrganization addCategory: 'Ma-Collections-Tests'!
@@ -1344,6 +1344,11 @@ initialize: sz
 	list _ WeakFinalizationList new.
 	preInitializedAssoc _ self associationClass new finList: list.! !
 
+!MaAutoWeakDictionary class methodsFor: 'initialize-release' stamp: 'jpb 5/11/2021 17:04:14'!
+initialize
+	super initialize.
+	"Smalltalk addToStartUpList: self"! !
+
 !MaAutoWeakDictionary class methodsFor: 'testing' stamp: 'cmm 7/18/2010 19:43'!
 determineIfSupported
 	"Answer whether this image can support auto-cleaning weak dictionary's.  This requires Igor's finalization enhancement produced in Q1/2010."
@@ -1374,11 +1379,6 @@ isAutoCleaning
 supportsAutoCleaning
 	"Answer whether this image can support auto-cleaning weak dictionary's.  This requires Igor's finalization enhancement produced in Q1/2010."
 	^ IsSupported ifNil: [ IsSupported _ self determineIfSupported ]! !
-
-!MaAutoWeakDictionary class methodsFor: 'initialize-release' stamp: 'cmm 6/14/2010 22:15'!
-initialize
-	super initialize.
-	Smalltalk addToStartUpList: self! !
 
 !MaAutoIdentityKeyWeakValueDictionary methodsFor: 'as yet unclassified' stamp: 'Igor.Stasenko 5/12/2010 22:42'!
 associationClass

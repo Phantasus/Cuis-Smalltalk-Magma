@@ -18,6 +18,12 @@ I added further methods to the `MaRegistry` (previously known as
 the `MaServerRegistry`), which adds now methods for uuid interaction
 and time difference calculation, which were missing from Cuis.
 
+Removed after an image crash and the resulting rage of re-declaring
+in-existent Squeak classes all of them (as some weird extensions
+were added to them). Also I commented out the `addToStartUpList:`
+calls, as they resulted in the image to block on the next startup,
+which is NOT WHAT I WANT (grml!!).
+
 
 # 10. May 2021 (jpb)
 
