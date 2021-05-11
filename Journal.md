@@ -9,6 +9,16 @@ entry is at the bottom. And people mention the author of the entry
 by his shortcut. Also people add their shortcuts to the list of
 authors at the end of the file.
 
+# 11. May 2021 (jpb)
+
+The `WriteBarrier` is not an optional package, as the transactions
+are depending on it. As it's a direct subclass, ugh! Great.
+
+I added further methods to the `MaRegistry` (previously known as
+the `MaServerRegistry`), which adds now methods for uuid interaction
+and time difference calculation, which were missing from Cuis.
+
+
 # 10. May 2021 (jpb)
 
 As I asked Chris Muller (cmm) why the test takes longer I got the
