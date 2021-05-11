@@ -1,10 +1,10 @@
-'From Cuis 5.0 [latest update: #4588] on 11 May 2021 at 3:58:29 am'!
+'From Cuis 5.0 [latest update: #4588] on 11 May 2021 at 4:34:26 pm'!
 'Description Package containing the magma server implementation
 
 License: MIT
 Original Author: Chris Muller (cmm)
 Author: Josef Philip Bernhart (jpb)'!
-!provides: 'Magma-Server' 1 2!
+!provides: 'Magma-Server' 1 3!
 !requires: 'Ma-Client-Server-Core' 1 3 nil!
 !requires: 'Ma-Statistics' 1 0 nil!
 SystemOrganization addCategory: 'Magma-Server'!
@@ -300,16 +300,6 @@ MaObject subclass: #MagmaServerPreferences
 MagmaServerPreferences class
 	instanceVariableNames: ''!
 
-!classDefinition: #MaServerRegistry category: 'Magma-Server'!
-Object subclass: #MaServerRegistry
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Magma-Server'!
-!classDefinition: 'MaServerRegistry class' category: 'Magma-Server'!
-MaServerRegistry class
-	instanceVariableNames: 'memoryHogs'!
-
 
 !MagmaPotentiallyOpenError commentStamp: 'cmm 1/15/2012 18:30' prior: 0!
 A MagmaPotentiallyOpenError is a resumable error.  It does not inherit from Warning because it is too critical to allow a program which wants to resume any Warning automatically, forcing the user to handle MagmaPotentiallyOpenError explicitly.!
@@ -440,9 +430,6 @@ Instance Variables
 	serverSerializer:  The serializer used to send certain whole graph-buffers back to the client.  (My sessions serializer cannot be used because it is optimized for a MagmaSession; i.e., only serializing each object one level deep, etc.).
 	session:  My standard session used to perform standard operations on the model, mostly for LargeCollection support.
 !
-
-!MaServerRegistry commentStamp: '<historical>' prior: 0!
-Main singleton for magma related bookkeeping and services, which are not implemented otherwise in cuis!
 
 !MagmaServerConsole methodsFor: 'accessing' stamp: 'cmm 9/25/2009 11:31'!
 definition
@@ -3926,9 +3913,9 @@ postOpenInitialize
 	self postOpenInitializeRecoveryManager.
 	self registerAsMemoryHog! !
 
-!MaObjectRepository methodsFor: 'initialize-release' stamp: 'jpb 5/11/2021 03:56:58'!
+!MaObjectRepository methodsFor: 'initialize-release' stamp: 'jpb 5/11/2021 16:17:33'!
 registerAsMemoryHog
-	MaServerRegistry registerMemoryHog: self.! !
+	MaRegistry registerMemoryHog: self.! !
 
 !MaObjectRepository methodsFor: 'initialize-release' stamp: 'cmm 9/25/2014 16:00'!
 reserveEmergencySpace
@@ -6333,17 +6320,6 @@ initialize
 
 	self debugRecovery: false! !
 
-!MaServerRegistry class methodsFor: 'as yet unclassified' stamp: 'jpb 5/11/2021 03:54:10'!
-initialize
-	super initialize.
-	
-	memoryHogs _ OrderedCollection new.! !
-
-!MaServerRegistry class methodsFor: 'as yet unclassified' stamp: 'jpb 5/11/2021 03:56:48'!
-registerMemoryHog: newMemoryHog
-	(memoryHogs includes: newMemoryHog)
-		ifFalse: [ 	memoryHogs add: newMemoryHog ]! !
-
 !Object methodsFor: '*magma-server' stamp: 'cmm 10/22/2006 15:01'!
 maIsTransactional
 	^ false! !
@@ -7949,4 +7925,3 @@ MaObjectRepository initialize!
 MaRecoveryManager initialize!
 MagmaRepositoryController initialize!
 MagmaServerPreferences initialize!
-MaServerRegistry initialize!

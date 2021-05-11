@@ -1,10 +1,10 @@
-'From Cuis 5.0 [latest update: #4588] on 11 May 2021 at 3:58:37 am'!
+'From Cuis 5.0 [latest update: #4588] on 11 May 2021 at 4:34:24 pm'!
 'Description Magma core for server and client
 
 License: MIT
 Original author: Chris Muller (cmm)
 Author: Josef Philip Bernhart (jpb)'!
-!provides: 'Ma-Client-Server-Core' 1 4!
+!provides: 'Ma-Client-Server-Core' 1 5!
 !requires: 'Ma-Collections' 1 0 nil!
 !requires: 'Ma-Core' 1 1 nil!
 SystemOrganization addCategory: 'Ma-Client-Server-Core'!
@@ -260,6 +260,16 @@ MaObject subclass: #MacsSoundTheme
 MacsSoundTheme class
 	instanceVariableNames: ''!
 
+!classDefinition: #MaRegistry category: 'Ma-Client-Server-Core'!
+Object subclass: #MaRegistry
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Ma-Client-Server-Core'!
+!classDefinition: 'MaRegistry class' category: 'Ma-Client-Server-Core'!
+MaRegistry class
+	instanceVariableNames: 'memoryHogs'!
+
 !classDefinition: #MaServerStat category: 'Ma-Client-Server-Core'!
 Object subclass: #MaServerStat
 	instanceVariableNames: 'requestsQueuedHistory socketsQueuedHistory requestSizeHistory requestProcessingTimeHistory requestProcessingTimeHistorys responseSizeHistory extractTimeHistory timeWaitingInSocketQueueHistory timeWaitingInRequestQueueHistory timeToSendResponsesHistory clientTimeoutsHistory numberOfClientConnectionsHistory timeToLoadBuffersHistory idleTimeHistory'
@@ -369,6 +379,9 @@ A MaNetworkServerLink handles the actual communications with a remotely-running 
 !MaServerLocation commentStamp: 'cmm 7/5/2008 13:21' prior: 0!
 A MaServerLocation simply encapsulates a host and port, allowing the receiver to serve as a 'bookmark' to a server resource.
 !
+
+!MaRegistry commentStamp: '<historical>' prior: 0!
+Main singleton for magma related bookkeeping and services, which are not implemented otherwise in cuis!
 
 !MaNetworkOrchestra methodsFor: 'accessing' stamp: 'cmm 1/6/2013 16:54'!
 name
@@ -2843,6 +2856,71 @@ soundFor: aMaClientServerRequest
 		at: aMaClientServerRequest maOriginalClass
 		ifAbsent: [ aMaClientServerRequest class defaultSound ]! !
 
+!MaRegistry class methodsFor: 'as yet unclassified' stamp: 'jpb 5/11/2021 16:12:48'!
+checkUuidPlugin
+	"Runs a selftest of the uuid plugin"
+	| newUuids |
+	
+	newUuids _ 	(1 to: 100) collect: 	[ :n | self newUuidString36 ].
+	
+	newUuids asSet size = 100
+		ifFalse: [ self error: 'UUID broken - please delete UUIDPlugin and restart this image.' ].
+		
+	^true! !
+
+!MaRegistry class methodsFor: 'as yet unclassified' stamp: 'jpb 5/11/2021 16:21:50'!
+findMillisecondsSince: lastTime
+	"Answer the elapsed time since last recorded in milliseconds.
+	Compensate for rollover."
+
+	^self findMillisecondsSince: lastTime with: Time now! !
+
+!MaRegistry class methodsFor: 'as yet unclassified' stamp: 'jpb 5/11/2021 16:20:34'!
+findMillisecondsSince: lastTime with: baseTime
+	"Answer the elapsed time since last recorded in milliseconds.
+	Compensate for rollover."
+
+	^baseTime millisecondClockValue - lastTime
+! !
+
+!MaRegistry class methodsFor: 'as yet unclassified' stamp: 'jpb 5/11/2021 03:54:10'!
+initialize
+	super initialize.
+	
+	memoryHogs _ OrderedCollection new.! !
+
+!MaRegistry class methodsFor: 'as yet unclassified' stamp: 'jpb 5/11/2021 16:15:39'!
+newString36With: anObject
+	"Encode the UUID as a base 36 string using 0-9 and lowercase a-z.
+	This is the shortest representation still being able to work as
+	filenames etc since it does not depend on case nor characters
+	that might cause problems, and it fits into short filenames like on
+	the old MacOS HFS filesystem. The check for 36r is to make this code
+	work in versions before Squeak 3.8."
+	| num candidate |
+
+	num _ 0.
+	
+	1 to: anObject size do: [:i | num _ num + ((256 raisedTo: i - 1) * (anObject at: i))].
+	candidate _ num printStringBase: 36.
+	
+	^((candidate beginsWith: '36r')
+			ifTrue: [candidate copyFrom: 4 to: candidate size]
+			ifFalse: [candidate]) asLowercase! !
+
+!MaRegistry class methodsFor: 'as yet unclassified' stamp: 'jpb 5/11/2021 16:11:09'!
+newUuid
+	^UUID new! !
+
+!MaRegistry class methodsFor: 'as yet unclassified' stamp: 'jpb 5/11/2021 16:15:57'!
+newUuidString36
+	^self newString36With: self newUuid.! !
+
+!MaRegistry class methodsFor: 'as yet unclassified' stamp: 'jpb 5/11/2021 03:56:48'!
+registerMemoryHog: newMemoryHog
+	(memoryHogs includes: newMemoryHog)
+		ifFalse: [ 	memoryHogs add: newMemoryHog ]! !
+
 !MaServerStat methodsFor: 'historys' stamp: 'cmm 5/7/2008 17:28'!
 clientTimeoutsHistory
 	"This history describes how often clients timed out.  When a request completes its lifecycle with no errors, a score of 0 is given.  When a network error occurs receiving the request or sending the response, a score of 1 is added.  Therefore, the sum is the total number of timeouts, #mean is how often they timed out."
@@ -3170,3 +3248,4 @@ MaClientServerPreferences initialize!
 MaClientServerRequest initialize!
 MaServer initialize!
 MaServerSocket initialize!
+MaRegistry initialize!

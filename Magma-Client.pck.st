@@ -1,10 +1,10 @@
-'From Cuis 5.0 [latest update: #4588] on 11 May 2021 at 3:58:31 am'!
+'From Cuis 5.0 [latest update: #4588] on 11 May 2021 at 4:34:21 pm'!
 'Description Package containing the magma client implementation
 
 License: MIT
 Original Author: Chris Muller (cmm)
 Author: Josef Philip Bernhart (jpb)'!
-!provides: 'Magma-Client' 1 1!
+!provides: 'Magma-Client' 1 2!
 SystemOrganization addCategory: 'Magma-Client'!
 SystemOrganization addCategory: 'Magma-Client-Exceptions'!
 SystemOrganization addCategory: 'Magma-Client-MagmaCollections'!
@@ -1592,7 +1592,7 @@ MagmaStat class
 	instanceVariableNames: ''!
 
 !classDefinition: #MaTransaction category: 'Magma-Client-Backend'!
-ProtoObject subclass: #MaTransaction
+WriteBarrier subclass: #MaTransaction
 	instanceVariableNames: 'readSet session largeCollectionChanges commitPackage potentialKeysChange ignoreModifiedSignals commitNumber dictionaryArrays'
 	classVariableNames: ''
 	poolDictionaries: ''
@@ -2170,6 +2170,17 @@ name
 !MagmaForwardingProxy methodsFor: 'serialization' stamp: 'cmm 3/9/2009 20:21'!
 maWantsPreSerialization
 	^ true! !
+
+!MagmaWbClassBuilder methodsFor: 'as yet unclassified' stamp: 'cmm 5/30/2018 22:00'!
+fieldsWrittenToBySelector: selectorSymbol 
+	| allInstVarNames transientFieldNumbers |
+	"#maDirtyAdd: is a low-level method used for safe materialization of HashedCollections, do not signal modified at that time."
+	selectorSymbol = #maDirtyAdd: ifTrue: [ ^Array empty ].
+	allInstVarNames _ self targetClass allInstVarNames.
+	transientFieldNumbers _ self targetClass basicNew maTransientVariables collect:
+		[ : eachVarName | allInstVarNames indexOf: eachVarName ].
+	^ (super fieldsWrittenToBySelector: selectorSymbol) reject:
+		[ : eachFieldNumber | transientFieldNumbers includes: eachFieldNumber ]! !
 
 !MagmaDictionaryAssociation methodsFor: 'as yet unclassified' stamp: 'cmm 7/16/2010 16:07'!
 = aLookupKey 
@@ -5637,23 +5648,26 @@ oidCount: anInteger
 prepareReadStrategy
 	readStrategy ifNotNil: [ readStrategy makeReadyForUseUsing: serializer classIdManager ]! !
 
-!MagmaSession methodsFor: 'private' stamp: 'cmm 11/22/2016 16:35'!
+!MagmaSession methodsFor: 'private' stamp: 'jpb 5/11/2021 16:21:26'!
 primConnect
 	| repositoryCommitNumber resultArray startedClientSideConnectionProcessing connectionRequest connectedToPrimary |
-	((1 to: 100) collect:
-		[ : n | UUID new asString36 ]) asSet size = 100 ifFalse: [ self error: 'UUID broken - please delete UUIDPlugin and restart this image.' ].
+	MaRegistry checkUuidPlugin.
+
 	self isConnected ifTrue: [ MagmaUserError signal: 'This session is already connected.' ].
+
 	"	Smalltalk initializeGarbageCollectorSettingsForMagma."
 	self statistics ensureActive.
 	self isLocal ifTrue: [ self ensureOpen ].
+
 	readStrategy ifNotNil: [ readStrategy beNew ].
+
 	"Calls #newSessionFor:sessionId:."
 	connectionRequest _ MaRepositoryConnectionRequest new
 		 uuid: self uuid ;
 		 commitNumber: self commitNumber ;
 		 magmaVersion: self class magmaVersion ;
 		 userId: self userId ;
-		 sessionId: (id _ UUID new) ;
+		 sessionId: (id _ MaRegistry newUuid) ;
 		 yourself.
 	resultArray _ self submit: connectionRequest.
 	startedClientSideConnectionProcessing _ Time millisecondClockValue.
@@ -5673,10 +5687,13 @@ primConnect
 	self commitNumber = 0
 		ifTrue: [ self commitNumber: repositoryCommitNumber ]
 		ifFalse: [ self statistics refreshAllTimeHistory addValue: (Time millisecondsToRun: [ self refreshTo: repositoryCommitNumber ]) ].
+		
 	transaction registerForNotifications.
+	
 	self initializeSystemChangeNotifications.
-	self statistics clientSideConnectionTimeHistory addValue: (Time millisecondsSince: startedClientSideConnectionProcessing).
+	self statistics clientSideConnectionTimeHistory addValue: (MaRegistry findMillisecondsSince: startedClientSideConnectionProcessing).
 	self isServerSession ifFalse: [MagmaNotification signal: 'Connected to ' , self linkInformation , ' as ' , self userId , '...'].
+	
 	"We've just connected.  If this session *was* in a transaction then begin one on the server."
 	self restoreTransaction! !
 
@@ -14551,17 +14568,6 @@ addPrimitiveOverride: methodSelector
 		compileSilently: mb streamContents
 		classified: 'overriding'! !
 
-!MagmaWbClassBuilder methodsFor: 'as yet unclassified' stamp: 'cmm 5/30/2018 22:00'!
-fieldsWrittenToBySelector: selectorSymbol 
-	| allInstVarNames transientFieldNumbers |
-	"#maDirtyAdd: is a low-level method used for safe materialization of HashedCollections, do not signal modified at that time."
-	selectorSymbol = #maDirtyAdd: ifTrue: [ ^Array empty ].
-	allInstVarNames _ self targetClass allInstVarNames.
-	transientFieldNumbers _ self targetClass basicNew maTransientVariables collect:
-		[ : eachVarName | allInstVarNames indexOf: eachVarName ].
-	^ (super fieldsWrittenToBySelector: selectorSymbol) reject:
-		[ : eachFieldNumber | transientFieldNumbers includes: eachFieldNumber ]! !
-
 !MagmaWbClassBuilder methodsFor: 'as yet unclassified' stamp: 'cmm 11/11/2016 14:39'!
 installMagmaOverrides
 	class
@@ -15095,6 +15101,11 @@ maIsChangedFrom: aMaByteObjectBuffer using: aMaObjectSerializer
 	^self ~= aMaByteObjectBuffer asByteArray! !
 
 !CompiledMethod methodsFor: '*magma-client' stamp: 'cmm 4/8/2005 12:34'!
+isImmutableInMagma
+
+	^ true! !
+
+!UUID methodsFor: '*magma-client' stamp: 'cmm 4/8/2005 12:34'!
 isImmutableInMagma
 
 	^ true! !
@@ -15648,11 +15659,6 @@ asMagmaLocalLocation
 	^ MagmaLocalLocation path: self directoryName! !
 
 !TTFontDescription methodsFor: '*magma-client' stamp: 'cmm 4/8/2005 12:37'!
-isImmutableInMagma
-
-	^ true! !
-
-!UUID methodsFor: '*magma-client' stamp: 'cmm 4/8/2005 12:34'!
 isImmutableInMagma
 
 	^ true! !
