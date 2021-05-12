@@ -29,6 +29,22 @@ then delete the list, accept the class in the browser, and then add
 the list back and accept it again. So the previous values are lost
 and no copying over action is trigger and no error is caused.
 
+A really tricky modification seems to be `initializeSystemChangeNotifications`
+which registers some event handling on the `SystemChangeNotifier`,
+I think I correctly changed it as the original interface is highly
+Squeak specific.
+
+Another sidenote: Magma seems to start a lot of processes, no wonder
+that it has some "memory hog" hooks here and there. I realized that
+after the image became kind of slow and that suddenly things popped
+up, which are unexpected. They all seem to be running at a priority
+of 49. Which means that when you encounter a lot of rouge processes
+through magma wasting resources, do yourself a favor and type
+that into a Workspace and do it:
+
+```smalltalk
+Process allInstancesDo: [:p| p priority = 49 ifTrue: [ p terminate ]]
+```
 
 # 11. May 2021 (jpb)
 
