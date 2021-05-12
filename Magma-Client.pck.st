@@ -1,10 +1,10 @@
-'From Cuis 5.0 [latest update: #4579] on 12 May 2021 at 11:53:13 am'!
+'From Cuis 5.0 [latest update: #4579] on 12 May 2021 at 4:37:35 pm'!
 'Description Package containing the magma client implementation
 
 License: MIT
 Original Author: Chris Muller (cmm)
 Author: Josef Philip Bernhart (jpb)'!
-!provides: 'Magma-Client' 1 11!
+!provides: 'Magma-Client' 1 16!
 SystemOrganization addCategory: 'Magma-Client'!
 SystemOrganization addCategory: 'Magma-Client-Exceptions'!
 SystemOrganization addCategory: 'Magma-Client-MagmaCollections'!
@@ -459,6 +459,16 @@ MaClientStat subclass: #MagmaSessionStatistics
 	category: 'Magma-Client'!
 !classDefinition: 'MagmaSessionStatistics class' category: 'Magma-Client'!
 MagmaSessionStatistics class
+	instanceVariableNames: ''!
+
+!classDefinition: #MagmaServerStatistics category: 'Magma-Client'!
+MaServerStat subclass: #MagmaServerStatistics
+	instanceVariableNames: 'flushTimeHistory'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Magma-Client'!
+!classDefinition: 'MagmaServerStatistics class' category: 'Magma-Client'!
+MagmaServerStatistics class
 	instanceVariableNames: ''!
 
 !classDefinition: #MaImmutabilityStrategy category: 'Magma-Client'!
@@ -1551,16 +1561,6 @@ SOLHashTable subclass: #MagmaSolHashTable
 MagmaSolHashTable class
 	instanceVariableNames: ''!
 
-!classDefinition: #MagmaServerStatistics category: 'Magma-Client'!
-MaServerStat subclass: #MagmaServerStatistics
-	instanceVariableNames: 'flushTimeHistory'
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Magma-Client'!
-!classDefinition: 'MagmaServerStatistics class' category: 'Magma-Client'!
-MagmaServerStatistics class
-	instanceVariableNames: ''!
-
 !classDefinition: #MagmaWbClassBuilder category: 'Magma-Client-Backend'!
 WBClassBuilder subclass: #MagmaWbClassBuilder
 	instanceVariableNames: ''
@@ -1693,6 +1693,11 @@ The purpose of this class is to keep track of which classes are persistent.!
 
 !MagmaOidManager commentStamp: 'cmm 6/21/2004 00:20' prior: 0!
 Because removeKey: is so slow in Squeak, I keep track of which ones are newObjects.  That way, when we return from a commit, replacement of temp to permanent oids is much faster.!
+
+!MagmaServerStatistics commentStamp: 'cmm 5/5/2008 22:57' prior: 0!
+A MagmaServerStatistics knows considerable information about the performance of a listening MagmaServerConsole.
+
+See method comments for details about each staistic.!
 
 !MaRootAnchor commentStamp: 'cmm 12/22/2008 16:47' prior: 0!
 This class represents the real root of every repository.  The #root is the user-application domain root, the definition is a meta-object describing this repository itself.!
@@ -2048,11 +2053,6 @@ A MagmaSolHashTable extends Tom Rushworth's SOLHashTable to substitute the inter
 Instance Variables
 !
 
-!MagmaServerStatistics commentStamp: 'cmm 5/5/2008 22:57' prior: 0!
-A MagmaServerStatistics knows considerable information about the performance of a listening MagmaServerConsole.
-
-See method comments for details about each staistic.!
-
 !MaTransaction commentStamp: 'cmm 8/21/2008 13:26' prior: 0!
 This class is private.  Applications should use the transaction control provided on MagmaSession.
 !
@@ -2300,6 +2300,10 @@ correctServer
 !MagmaWrongServerError methodsFor: 'accessing' stamp: 'cmm 11/4/2008 17:00'!
 correctServer: aMagmaRemoteLocation
 	correctServer _ aMagmaRemoteLocation! !
+
+!MagmaNotification methodsFor: 'as yet unclassified' stamp: 'jpb 5/12/2021 15:07:08'!
+defaultAction
+	^nil! !
 
 !MagmaLinkChange methodsFor: 'accessing' stamp: 'cmm 12/8/2012 14:01'!
 linkToReplace: aMaNetworkServerLink 
@@ -3294,6 +3298,130 @@ release
 postArchivalCopy
 	super postArchivalCopy.
 	self noteStop! !
+
+!MagmaServerStatistics methodsFor: 'chart' stamp: 'cmm 8/17/2014 17:48'!
+countProcessingTimesChart
+	^ StackedPlotMorph new
+		 addPlot: (self newIngressPlotOn: #count) ;
+		 addPlot: (self newProcessingPlotOn: #count) ;
+		 addPlot: (self newEgressPlotOn: #count)! !
+
+!MagmaServerStatistics methodsFor: 'chart' stamp: 'cmm 8/18/2014 13:58'!
+countSizesChart
+	^ StackedPlotMorph new
+		 addPlot: (self newQueueSizesPlotOn: #count) ;
+		 addPlot: (self newRequestResponseSizesPlotOn: #count) ;
+		"connections plot must use total."
+		 addPlot: (self newConnectionsPlotOn: #total)! !
+
+!MagmaServerStatistics methodsFor: 'chart' stamp: 'cmm 8/21/2014 15:21'!
+maxSizesChart
+	^ StackedPlotMorph new
+		 addPlot: (self newQueueSizesPlotOn: #max) ;
+		 addPlot: (self newRequestResponseSizesPlotOn: #max) ;
+		 addPlot: (self newConnectionsPlotOn: #max)! !
+
+!MagmaServerStatistics methodsFor: 'chart' stamp: 'cmm 8/17/2014 17:41'!
+meanProcessingTimesChart
+	^ StackedPlotMorph new
+		 addPlot: (self newIngressPlotOn: #mean) ;
+		 addPlot: (self newProcessingPlotOn: #mean) ;
+		 addPlot: (self newEgressPlotOn: #mean)! !
+
+!MagmaServerStatistics methodsFor: 'chart' stamp: 'cmm 8/17/2014 18:07'!
+meanSizesChart
+	^ StackedPlotMorph new
+		 addPlot: (self newQueueSizesPlotOn: #mean) ;
+		 addPlot: (self newRequestResponseSizesPlotOn: #mean) ;
+		 addPlot: (self newConnectionsPlotOn: #mean)! !
+
+!MagmaServerStatistics methodsFor: 'chart' stamp: 'cmm 8/17/2014 17:45'!
+totalProcessingTimesChart
+	^ StackedPlotMorph new
+		 addPlot: (self newIngressPlotOn: #total) ;
+		 addPlot: (self newProcessingPlotOn: #total) ;
+		 addPlot: (self newEgressPlotOn: #total)! !
+
+!MagmaServerStatistics methodsFor: 'chart' stamp: 'cmm 8/17/2014 18:06'!
+totalSizesChart
+	^ StackedPlotMorph new
+		 addPlot: (self newQueueSizesPlotOn: #total) ;
+		 addPlot: (self newRequestResponseSizesPlotOn: #total) ;
+		 addPlot: (self newConnectionsPlotOn: #total)! !
+
+!MagmaServerStatistics methodsFor: 'historys' stamp: 'cmm 5/7/2008 17:37'!
+flushTimeHistory
+	"Several seconds after a commit the Magma server flushes it (and all other commits in that time) to disk in a secure, atomic way.  This history captures how much time is spent doing that."
+	^ flushTimeHistory! !
+
+!MagmaServerStatistics methodsFor: 'private' stamp: 'cmm 5/7/2008 17:31'!
+historysDo: aBlock 
+	super historysDo: aBlock.
+	aBlock value: flushTimeHistory! !
+
+!MagmaServerStatistics methodsFor: 'initialize-release' stamp: 'cmm 5/7/2008 17:37'!
+initialize
+	super initialize.
+	flushTimeHistory _ MaStatHistory name: 'Flush-to-Disk Times'! !
+
+!MagmaServerStatistics methodsFor: 'chart-private' stamp: 'cmm 8/17/2014 18:05'!
+newConnectionsPlotOn: operatorSymbol
+	^ self newDateAndTimeBySizesPlot
+		 title: 'Connections / Disconnections' ;
+		 addSeries: ((numberOfClientConnectionsHistory seriesOn: operatorSymbol) color: Color green) ;
+		 addSeries: ((clientTimeoutsHistory seriesOn: operatorSymbol) color: Color red) ;
+		 yourself! !
+
+!MagmaServerStatistics methodsFor: 'chart-private' stamp: 'cmm 8/17/2014 17:53'!
+newEgressPlotOn: operatorSymbol
+	^ (operatorSymbol = #count
+		ifTrue: [ self newDateAndTimeBySizesPlot ]
+		ifFalse: [ self newDateAndTimeBySecondsPlot ])
+		title: 'Egress Times (', operatorSymbol asString, ')' ;
+		 addSeries: ((timeToSerializeHistory seriesOn: operatorSymbol) color: Color cyan twiceDarker) ;
+		 addSeries: ((timeToSendResponsesHistory seriesOn: operatorSymbol) color: (Color cyan muchLighter)) ;
+		 addSeries: ((timeToLoadBuffersHistory seriesOn: operatorSymbol) color: Color red muchDarker) ;
+		 yourself! !
+
+!MagmaServerStatistics methodsFor: 'chart-private' stamp: 'cmm 8/17/2014 17:49'!
+newIngressPlotOn: operator 
+	^ (operator = #count
+		ifTrue: [ self newDateAndTimeBySizesPlot ]
+		ifFalse: [ self newDateAndTimeBySecondsPlot ])
+		 title: 'Ingress Times (' , operator asString , ')' ;
+		 addSeries: ((timeWaitingInSocketQueueHistory seriesOn: operator) color: Color magenta twiceDarker) ;
+		 addSeries: ((extractTimeHistory seriesOn: operator) color: Color green twiceDarker) ;
+		 addSeries: ((timeWaitingInRequestQueueHistory seriesOn: operator) color: Color blue) ;
+		 addSeries: ((timeToMaterializeHistory seriesOn: operator) color: Color cyan) ;
+		 yourself! !
+
+!MagmaServerStatistics methodsFor: 'chart-private' stamp: 'cmm 8/17/2014 17:53'!
+newProcessingPlotOn: operatorSymbol
+	^ (operatorSymbol = #count
+		ifTrue: [ self newDateAndTimeBySizesPlot ]
+		ifFalse: [ self newDateAndTimeBySecondsPlot ])
+		title: 'Processing Times (', operatorSymbol asString, ')' ;
+		 addSeries: ((requestProcessingTimeHistory seriesOn: operatorSymbol) color: Color yellow twiceDarker) ;
+		 addSeries: ((idleTimeHistory seriesOn: operatorSymbol) color: Color green twiceDarker) ;
+		 addSeries: ((flushTimeHistory seriesOn: operatorSymbol) color: Color red twiceDarker) ;
+		 addSeries: ((houseCleaningTimeHistory seriesOn: operatorSymbol) color: Color red muchDarker) ;
+		 yourself! !
+
+!MagmaServerStatistics methodsFor: 'chart-private' stamp: 'cmm 8/17/2014 18:05'!
+newQueueSizesPlotOn: operatorSymbol
+	^ self newDateAndTimeBySizesPlot
+		 title: 'Queue Sizes' ;
+		 addSeries: ((socketsQueuedHistory seriesOn: operatorSymbol) color: Color blue) ;
+		 addSeries: ((requestsQueuedHistory seriesOn: operatorSymbol) color: Color blue muchLighter) ;
+		 yourself! !
+
+!MagmaServerStatistics methodsFor: 'chart-private' stamp: 'cmm 8/17/2014 18:09'!
+newRequestResponseSizesPlotOn: operatorSymbol
+	^ self newDateAndTimeBySizesPlot
+		 title: operatorSymbol, ' Bytes Received / Sent' ;
+		 addSeries: ((requestSizeHistory seriesOn: operatorSymbol) color: Color green) ;
+		 addSeries: ((responseSizeHistory seriesOn: operatorSymbol) color: Color red) ;
+		 yourself! !
 
 !MaImmutabilityStrategy methodsFor: 'private' stamp: 'cmm 11/11/2011 21:28'!
 classes
@@ -4971,13 +5099,13 @@ forceClean
 		[ lastClean _ 0.
 		self cleanIfTime ]! !
 
-!MagmaSession methodsFor: 'private' stamp: 'cmm 2/26/2009 00:23'!
+!MagmaSession methodsFor: 'private' stamp: 'jpb 5/12/2021 15:14:43'!
 handleClassModification: aModifiedClassDefinitionEvent 
 	guard critical: 
-		[ aModifiedClassDefinitionEvent isModified ifFalse: [ ^ self ].
+		[" aModifiedClassDefinitionEvent isModified ifFalse: [ ^ self ].
 		aModifiedClassDefinitionEvent item isMeta ifTrue: [ ^ self ].
 		serializer handleClassModification: aModifiedClassDefinitionEvent.
-		self prepareReadStrategy ]! !
+		self prepareReadStrategy "]! !
 
 !MagmaSession methodsFor: 'private' stamp: 'jpb 5/12/2021 11:29:59'!
 handleFailedLink: failedMaNetworkServerLink 
@@ -5081,11 +5209,11 @@ isServerSession
 	^ (Smalltalk hasClassNamed: #MagmaRepositoryController) and: 
 		[ self userId = (Smalltalk classNamed: #MagmaRepositoryController) systemSessionUserId ]! !
 
-!MagmaSession methodsFor: 'private' stamp: 'cmm 7/24/2018 17:44'!
+!MagmaSession methodsFor: 'private' stamp: 'jpb 5/12/2021 14:30:21'!
 isTimeToClean
 	^ guard critical:
-		[ (Time millisecondsSince: lastClean) > 60000 and:
-			[ proxies size > 1000 or: [ (Time millisecondsSince: lastClean) > (1000 * 60 * 5) ] ] ]! !
+		[ (MaRegistry findMillisecondsSince: lastClean) > 60000 and:
+			[ proxies size > 1000 or: [ (MaRegistry findMillisecondsSince: lastClean) > (1000 * 60 * 5) ] ] ]! !
 
 !MagmaSession methodsFor: 'private' stamp: 'cmm 10/13/2014 15:03'!
 link: aMaServerLink 
@@ -5588,13 +5716,13 @@ serializer
 
 	^serializer! !
 
-!MagmaSession methodsFor: 'private' stamp: 'jpb 5/12/2021 11:39:09'!
+!MagmaSession methodsFor: 'private' stamp: 'jpb 5/12/2021 14:35:25'!
 setGlobalReadStrategy: aMaReadStrategy ifNotIn: aSet 
 	"Set my ReadStrategy, as well as all other sessions of my sessions linked to me."
 
 self maMarked: 'dev'.  "Was just looking at this code and thinking we should enumerate all MagmaSession instances which match my magmaId, or the magmaId's of any of my 'links'."
 
-	(aSet ifAbsentAdd: self) ifFalse: [ ^ self ].
+	(aSet maIfAbsentAdd: self) ifFalse: [ ^ self ].
 	self readStrategy: aMaReadStrategy copyForOtherSession.
 	self definition ifNotNil:
 		[ : def | def links do:
@@ -6226,19 +6354,19 @@ initializeSerializer
 					setUpListener ;
 					refresh ] ]! !
 
-!MagmaSession methodsFor: 'initialize-release' stamp: 'cmm 1/26/2005 16:36'!
+!MagmaSession methodsFor: 'initialize-release' stamp: 'jpb 5/12/2021 14:29:37'!
 initializeSystemChangeNotifications
 
 	SystemChangeNotifier uniqueInstance
-		notify: self
-		ofSystemChangesOfItem: #class
-		change: #Modified
-		using: #handleClassModification:.
+		when: #classDefinitionChanged
+		send: #handleClassModification:
+		to: self.
+		
 	SystemChangeNotifier uniqueInstance
-		notify: serializer classIdManager
-		ofSystemChangesOfItem: #class
-		change: #Renamed
-		using: #handleClassRename:! !
+		when: #classRenamed
+		send: #handleClassRename:
+		to: serializer classIdManager.
+	! !
 
 !MagmaSession methodsFor: 'initialize-release' stamp: 'cmm 2/26/2009 10:26'!
 loadClassDefinitionsFrom: aByteArray 
@@ -10523,7 +10651,7 @@ removeObject: anObject
 		remove: anObject
 		ifAbsent: [ "no problem" ]! !
 
-!MaCommitPackage methodsFor: 'building' stamp: 'cmm 10/31/2018 15:53'!
+!MaCommitPackage methodsFor: 'building' stamp: 'jpb 5/12/2021 14:35:39'!
 serializeObjectsUsing: aMagmaSession 
 	"Serialize my 'objects' into a MaSerializedGraphBuffer since the server does not deal with objects, just their buffers."
 	| mustReserialize serializer numberOfClassesBefore |
@@ -10544,7 +10672,7 @@ serializeObjectsUsing: aMagmaSession
 				[ mustReserialize _ mustReserialize or: [ (aMagmaSession isMonitoringLargeCollection: each) not ].
 				aMagmaSession monitorLargeCollection: each ].
 			each isSymbol ifTrue: 
-				[ mustReserialize _ (aMagmaSession definition symbols ifAbsentAdd: each) or: [mustReserialize] ].
+				[ mustReserialize _ (aMagmaSession definition symbols maIfAbsentAdd: each) or: [mustReserialize] ].
 			each isMagmaId ifTrue: 
 				[ | canonicalizedId |
 				(aMagmaSession definition hasCanonicalizedMagmaId: each) ifFalse: [ mustReserialize _ true ].
@@ -10757,13 +10885,14 @@ bufferPositionOfPhysicalSize
 bufferPositionOfRecordType
 	^ 4! !
 
-!MaRecoveryRecord methodsFor: 'private' stamp: 'cmm 9/21/2005 09:53'!
+!MaRecoveryRecord methodsFor: 'private' stamp: 'jpb 5/12/2021 14:57:52'!
 calculatedCheckSum
 
-	^ ReusableSha 
+	^ MaRegistry 
 		maHashMessage: byteArray
 		from: 1
-		to: self physicalSize - self checkSumSize! !
+		to: self physicalSize - self checkSumSize
+		with: ReusableSha! !
 
 !MaRecoveryRecord methodsFor: 'private' stamp: 'cmm 9/21/2005 09:53'!
 checkSum: anInteger
@@ -10970,13 +11099,13 @@ timestamp
 	^ DateAndTime fromSeconds: 
 		(byteArray maUnsigned40At: self bufferPositionOfTimestamp+1)	"DateAndTime fromSeconds: (2 raisedTo: 40)"! !
 
-!MaCommitLogRecord methodsFor: 'accessing' stamp: 'cmm 6/11/2007 20:02'!
+!MaCommitLogRecord methodsFor: 'accessing' stamp: 'jpb 5/12/2021 14:41:18'!
 timestamp: aDateAndTime
 	"By storing the timestamp we can restore to a paritcular point-in-time."
 	^ byteArray 
 		maUint: 40  "DateAndTime fromSeconds: (2 raisedTo: 40)"
 		at: self bufferPositionOfTimestamp
-		put: aDateAndTime asSeconds! !
+		put: aDateAndTime secondsSinceSqueakEpoch! !
 
 !MaCommitLogRecord methodsFor: 'private' stamp: 'cmm 7/15/2009 15:43'!
 bufferPositionOfBranchCode
@@ -13585,130 +13714,6 @@ defaultSegBits
 	"A MagmaArray with up to  268435456 buckets would take up roughly 1.61G on disk.  That would be a good size before creating a new one."
 	^ 28! !
 
-!MagmaServerStatistics methodsFor: 'chart' stamp: 'cmm 8/17/2014 17:48'!
-countProcessingTimesChart
-	^ StackedPlotMorph new
-		 addPlot: (self newIngressPlotOn: #count) ;
-		 addPlot: (self newProcessingPlotOn: #count) ;
-		 addPlot: (self newEgressPlotOn: #count)! !
-
-!MagmaServerStatistics methodsFor: 'chart' stamp: 'cmm 8/18/2014 13:58'!
-countSizesChart
-	^ StackedPlotMorph new
-		 addPlot: (self newQueueSizesPlotOn: #count) ;
-		 addPlot: (self newRequestResponseSizesPlotOn: #count) ;
-		"connections plot must use total."
-		 addPlot: (self newConnectionsPlotOn: #total)! !
-
-!MagmaServerStatistics methodsFor: 'chart' stamp: 'cmm 8/21/2014 15:21'!
-maxSizesChart
-	^ StackedPlotMorph new
-		 addPlot: (self newQueueSizesPlotOn: #max) ;
-		 addPlot: (self newRequestResponseSizesPlotOn: #max) ;
-		 addPlot: (self newConnectionsPlotOn: #max)! !
-
-!MagmaServerStatistics methodsFor: 'chart' stamp: 'cmm 8/17/2014 17:41'!
-meanProcessingTimesChart
-	^ StackedPlotMorph new
-		 addPlot: (self newIngressPlotOn: #mean) ;
-		 addPlot: (self newProcessingPlotOn: #mean) ;
-		 addPlot: (self newEgressPlotOn: #mean)! !
-
-!MagmaServerStatistics methodsFor: 'chart' stamp: 'cmm 8/17/2014 18:07'!
-meanSizesChart
-	^ StackedPlotMorph new
-		 addPlot: (self newQueueSizesPlotOn: #mean) ;
-		 addPlot: (self newRequestResponseSizesPlotOn: #mean) ;
-		 addPlot: (self newConnectionsPlotOn: #mean)! !
-
-!MagmaServerStatistics methodsFor: 'chart' stamp: 'cmm 8/17/2014 17:45'!
-totalProcessingTimesChart
-	^ StackedPlotMorph new
-		 addPlot: (self newIngressPlotOn: #total) ;
-		 addPlot: (self newProcessingPlotOn: #total) ;
-		 addPlot: (self newEgressPlotOn: #total)! !
-
-!MagmaServerStatistics methodsFor: 'chart' stamp: 'cmm 8/17/2014 18:06'!
-totalSizesChart
-	^ StackedPlotMorph new
-		 addPlot: (self newQueueSizesPlotOn: #total) ;
-		 addPlot: (self newRequestResponseSizesPlotOn: #total) ;
-		 addPlot: (self newConnectionsPlotOn: #total)! !
-
-!MagmaServerStatistics methodsFor: 'historys' stamp: 'cmm 5/7/2008 17:37'!
-flushTimeHistory
-	"Several seconds after a commit the Magma server flushes it (and all other commits in that time) to disk in a secure, atomic way.  This history captures how much time is spent doing that."
-	^ flushTimeHistory! !
-
-!MagmaServerStatistics methodsFor: 'private' stamp: 'cmm 5/7/2008 17:31'!
-historysDo: aBlock 
-	super historysDo: aBlock.
-	aBlock value: flushTimeHistory! !
-
-!MagmaServerStatistics methodsFor: 'initialize-release' stamp: 'cmm 5/7/2008 17:37'!
-initialize
-	super initialize.
-	flushTimeHistory _ MaStatHistory name: 'Flush-to-Disk Times'! !
-
-!MagmaServerStatistics methodsFor: 'chart-private' stamp: 'cmm 8/17/2014 18:05'!
-newConnectionsPlotOn: operatorSymbol
-	^ self newDateAndTimeBySizesPlot
-		 title: 'Connections / Disconnections' ;
-		 addSeries: ((numberOfClientConnectionsHistory seriesOn: operatorSymbol) color: Color green) ;
-		 addSeries: ((clientTimeoutsHistory seriesOn: operatorSymbol) color: Color red) ;
-		 yourself! !
-
-!MagmaServerStatistics methodsFor: 'chart-private' stamp: 'cmm 8/17/2014 17:53'!
-newEgressPlotOn: operatorSymbol
-	^ (operatorSymbol = #count
-		ifTrue: [ self newDateAndTimeBySizesPlot ]
-		ifFalse: [ self newDateAndTimeBySecondsPlot ])
-		title: 'Egress Times (', operatorSymbol asString, ')' ;
-		 addSeries: ((timeToSerializeHistory seriesOn: operatorSymbol) color: Color cyan twiceDarker) ;
-		 addSeries: ((timeToSendResponsesHistory seriesOn: operatorSymbol) color: (Color cyan muchLighter)) ;
-		 addSeries: ((timeToLoadBuffersHistory seriesOn: operatorSymbol) color: Color red muchDarker) ;
-		 yourself! !
-
-!MagmaServerStatistics methodsFor: 'chart-private' stamp: 'cmm 8/17/2014 17:49'!
-newIngressPlotOn: operator 
-	^ (operator = #count
-		ifTrue: [ self newDateAndTimeBySizesPlot ]
-		ifFalse: [ self newDateAndTimeBySecondsPlot ])
-		 title: 'Ingress Times (' , operator asString , ')' ;
-		 addSeries: ((timeWaitingInSocketQueueHistory seriesOn: operator) color: Color magenta twiceDarker) ;
-		 addSeries: ((extractTimeHistory seriesOn: operator) color: Color green twiceDarker) ;
-		 addSeries: ((timeWaitingInRequestQueueHistory seriesOn: operator) color: Color blue) ;
-		 addSeries: ((timeToMaterializeHistory seriesOn: operator) color: Color cyan) ;
-		 yourself! !
-
-!MagmaServerStatistics methodsFor: 'chart-private' stamp: 'cmm 8/17/2014 17:53'!
-newProcessingPlotOn: operatorSymbol
-	^ (operatorSymbol = #count
-		ifTrue: [ self newDateAndTimeBySizesPlot ]
-		ifFalse: [ self newDateAndTimeBySecondsPlot ])
-		title: 'Processing Times (', operatorSymbol asString, ')' ;
-		 addSeries: ((requestProcessingTimeHistory seriesOn: operatorSymbol) color: Color yellow twiceDarker) ;
-		 addSeries: ((idleTimeHistory seriesOn: operatorSymbol) color: Color green twiceDarker) ;
-		 addSeries: ((flushTimeHistory seriesOn: operatorSymbol) color: Color red twiceDarker) ;
-		 addSeries: ((houseCleaningTimeHistory seriesOn: operatorSymbol) color: Color red muchDarker) ;
-		 yourself! !
-
-!MagmaServerStatistics methodsFor: 'chart-private' stamp: 'cmm 8/17/2014 18:05'!
-newQueueSizesPlotOn: operatorSymbol
-	^ self newDateAndTimeBySizesPlot
-		 title: 'Queue Sizes' ;
-		 addSeries: ((socketsQueuedHistory seriesOn: operatorSymbol) color: Color blue) ;
-		 addSeries: ((requestsQueuedHistory seriesOn: operatorSymbol) color: Color blue muchLighter) ;
-		 yourself! !
-
-!MagmaServerStatistics methodsFor: 'chart-private' stamp: 'cmm 8/17/2014 18:09'!
-newRequestResponseSizesPlotOn: operatorSymbol
-	^ self newDateAndTimeBySizesPlot
-		 title: operatorSymbol, ' Bytes Received / Sent' ;
-		 addSeries: ((requestSizeHistory seriesOn: operatorSymbol) color: Color green) ;
-		 addSeries: ((responseSizeHistory seriesOn: operatorSymbol) color: Color red) ;
-		 yourself! !
-
 !MagmaWbClassBuilder methodsFor: 'as yet unclassified' stamp: 'jpb 5/12/2021 11:49:20'!
 addPrimitiveOverride: methodSelector 
 	| mb |
@@ -13763,11 +13768,11 @@ installPrimitiveOverrides
 				[ eachMethod primitive > 0 and:
 					[ eachMethod selector isUnary not and: [ (class theNonWriteBarrierClass methodDictionary includesKey: eachMethod selector) not ] ] ]) ifTrue: [ self addPrimitiveOverride: eachMethod selector ] ] ]! !
 
-!MagmaWbClassBuilder methodsFor: 'as yet unclassified' stamp: 'cmm 4/10/2005 19:55'!
+!MagmaWbClassBuilder methodsFor: 'as yet unclassified' stamp: 'jpb 5/12/2021 16:36:46'!
 migrateFromTarget: oldSuperclass to: newSuperclass
 
 	| oldClass |
-self halt.
+
 	oldClass _ class.
 	"Was the immediate WriteBarrier superclass modified (or was it a superclass of that)?"
 	(oldClass superclass == newSuperclass)

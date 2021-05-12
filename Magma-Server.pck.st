@@ -1,10 +1,10 @@
-'From Cuis 5.0 [latest update: #4579] on 12 May 2021 at 11:53:14 am'!
+'From Cuis 5.0 [latest update: #4579] on 12 May 2021 at 4:37:31 pm'!
 'Description Package containing the magma server implementation
 
 License: MIT
 Original Author: Chris Muller (cmm)
 Author: Josef Philip Bernhart (jpb)'!
-!provides: 'Magma-Server' 1 9!
+!provides: 'Magma-Server' 1 20!
 !requires: 'Ma-Client-Server-Core' 1 3 nil!
 !requires: 'Ma-Statistics' 1 0 nil!
 SystemOrganization addCategory: 'Magma-Server'!
@@ -1136,10 +1136,11 @@ initialize
 	fileStreams _ OrderedCollection new.
 	sizes _ OrderedCollection new! !
 
-!MaAtomicFileStream methodsFor: 'initialize-release' stamp: 'jpb 5/11/2021 18:03:47'!
+!MaAtomicFileStream methodsFor: 'initialize-release' stamp: 'jpb 5/12/2021 16:36:35'!
 initializeStreamsAndSizes
 	"Determine which streams are available in the current directory and their sizes."
 	| fd baseName extension matchingEntries |
+
 	fd _ filename asDirectoryEntry parent. 
 	baseName _ self baseName.
 	extension _ self extension.
@@ -1160,7 +1161,7 @@ initializeStreamsAndSizes
 	"Now load my fileStreams and sizes with these correctly-ordered entries."
 	matchingEntries do: 	[ : eachEntry |
 		| physicalStream |
-		physicalStream _ (fd // eachEntry) readStream.
+		physicalStream _ eachEntry readStream.
 		
 		(physicalStream isNil or: [ physicalStream closed ]) 
 			ifTrue: [ MagmaEnvironmentError signal: 'file did not open for read-only' ].
@@ -2102,10 +2103,13 @@ objectFileSize
 
 	^file size! !
 
-!MaObjectFiler methodsFor: 'accessing' stamp: 'cmm 11/26/2010 11:51'!
+!MaObjectFiler methodsFor: 'accessing' stamp: 'jpb 5/12/2021 15:31:07'!
 open
 	directory exists ifFalse: [ MagmaEnvironmentError signal: 'Database Directory Not Found' ].
-	(directory fileExists: self class objectsPhysicalFilename) ifFalse: [ MagmaEnvironmentError signal: (directory fullNameFor: self class objectsPhysicalFilename) , ' not found.' ].
+	(directory // self class objectsPhysicalFilename) exists
+		ifFalse: [
+			 MagmaEnvironmentError signal: (directory // self class objectsPhysicalFilename) asString , ' not found.' ].
+
 	self openObjectsFile.
 	[ self
 		 validateSignature ;
@@ -2746,20 +2750,23 @@ fileManagerFor: aMaApplyRecord ifPresent: oneArgBlock ifAbsent: aBlock
 				ifAbsent: [ ^ aBlock value ]) indexForFileId: aMaApplyRecord fileId ].
 	^ oneArgBlock value: fileManager! !
 
-!MaObjectRepository methodsFor: 'recovery' stamp: 'cmm 8/30/2016 21:25'!
+!MaObjectRepository methodsFor: 'recovery' stamp: 'jpb 5/12/2021 15:06:09'!
 flushCacheSoon
 	"Flushing is horribly expensive, but essential to ensure we can survive a power-outage without corruption.  To balance these opposing forces, we apply and flush only at certain interval, only in the background, only the files that needed flushed, and each file only flushed once."
-	applyProcess ifNil: 
-		[ applyProcess _ 
-		[ | startTime |
-		startTime _ Time millisecondClockValue.
+	applyProcess ifNil: [
+		applyProcess _ 	[
+			 | startTime |
+			startTime _ Time millisecondClockValue.
 		
-		[ (Time millisecondsSince: startTime) > (repositoryController cacheFlushFrequency * 1000) or: [ wantsToClose ] ] whileFalse: [ (Delay forSeconds: 1) wait ].
-		self flushCritical: 
-			[ self commitCritical: 
-				[ self flushCache.
-				applyProcess _ nil ] ] ] forkAt: (Processor userInterruptPriority max: Processor activeProcess priority+1).
-		applyProcess name: 'flush Magma cache' ]! !
+			[ (MaRegistry findMillisecondsSince: startTime) > (repositoryController cacheFlushFrequency * 1000) 
+				or: [ wantsToClose ] ] 
+					whileFalse: [ (Delay forSeconds: 1) wait ].
+		
+			self flushCritical: [self commitCritical: [ self flushCache. applyProcess _ nil ] ]
+		]
+		forkAt: (Processor userInterruptPriority max: Processor activeProcess priority + 1)
+		named: 'flush Magma cache'
+	]! !
 
 !MaObjectRepository methodsFor: 'recovery' stamp: 'cmm 1/2/2009 20:50'!
 flushIndividualCaches
@@ -3327,7 +3334,7 @@ byteArrayAt: oidInteger using: aMaReadStrategy
 					objectWithOid: oidInteger
 					ifNone: [ MagmaSoftwareError signal: 'unknown oid' ])) trimmedByteArray ]! !
 
-!MaObjectRepository methodsFor: 'accessing' stamp: 'cmm 12/2/2004 13:41'!
+!MaObjectRepository methodsFor: 'accessing' stamp: 'jpb 5/12/2021 13:49:03'!
 classDefinitionsByteArray
 	"When initially creating the repository, before even the system root is
 	written, the classDefinitionsOid will be a new-object oid."
@@ -3564,13 +3571,9 @@ registerAsMemoryHog
 reserveEmergencySpace
 	EmergencyMemory isEmptyOrNil ifTrue: [ EmergencyMemory _ String new: 50 million ]! !
 
-!MaObjectRepository methodsFor: 'initialize-release' stamp: 'cmm 7/15/2009 11:33'!
+!MaObjectRepository methodsFor: 'initialize-release' stamp: 'jpb 5/12/2021 15:28:41'!
 unregisterAsMemoryHog
-	Smalltalk memoryHogs 
-		remove: self
-		ifAbsent: 
-			[ "just making sure"
-			 ]! !
+	MaRegistry unregisterMemoryHog: self! !
 
 !MaObjectRepository methodsFor: 'magma-collections' stamp: 'cmm 6/16/2005 10:53'!
 collectionManagerFor: oidInteger
@@ -3816,13 +3819,13 @@ warnDba: aString
 	"Signal DBA notification.."
 	self halt: 'Warn the DBA of potential trouble'! !
 
-!MaObjectRepository methodsFor: 'capacity management' stamp: 'cmm 9/28/2014 20:36'!
+!MaObjectRepository methodsFor: 'capacity management' stamp: 'jpb 5/12/2021 14:05:11'!
 isLowOnMemory
-	^ Smalltalk maMemoryAvailable < (MaSerializedGraphBuffer unreasonablePhysicalSize + EmergencyMemory size)! !
+	^ MaRegistry maMemoryAvailable < (MaSerializedGraphBuffer unreasonablePhysicalSize + EmergencyMemory size)! !
 
-!MaObjectRepository methodsFor: 'testing' stamp: 'cmm 11/15/2008 11:03'!
+!MaObjectRepository methodsFor: 'testing' stamp: 'jpb 5/12/2021 15:47:08'!
 restoreMode
-	^ restoreMode ifNil: [ restoreMode _ filer restoreMode ]! !
+	^ restoreMode ifNil: [ restoreMode _ filer ifNil: [ false ] ifNotNil: [ filer restoreMode ] ]! !
 
 !MaObjectRepository methodsFor: 'read strategies' stamp: 'cmm 9/1/2003 19:11'!
 systemReadStrategy
@@ -4078,10 +4081,10 @@ openApplyFile
 		binary ;
 		position: 0! !
 
-!MaRecoveryManager methodsFor: 'file' stamp: 'cmm 12/19/2008 14:12'!
+!MaRecoveryManager methodsFor: 'file' stamp: 'jpb 5/12/2021 14:42:48'!
 openCommitLog
 	logStartTime _ Time millisecondClockValue.
-	^ commitLogFile _ (self directory fileNamed: self activeCommitLogFilename)
+	^ commitLogFile _ (self directory // self activeCommitLogFilename) writeStream
 		binary ;
 		setToEnd ;
 		yourself	"just to be safe"! !
@@ -4122,16 +4125,18 @@ readRecoveryFile: aStandardFileStream at: filePosition
 	self validateRecord: inputRecord.
 	^ self selectPreMadeRecord: inputRecord! !
 
-!MaRecoveryManager methodsFor: 'file' stamp: 'cmm 8/2/2007 00:33'!
+!MaRecoveryManager methodsFor: 'file' stamp: 'jpb 5/12/2021 15:27:32'!
 renameActiveCommitLog
 	"To support one or more warm backups, a staging directory should be used in conjunction with Banyan (or any external copy script) to copy the files to the remote directories.  To make this easier, the current file is written in the repository directory and, when later closed, moved to the separate staging directory (commits) when it is safe to be copied to the warm backup's commitLogs.
 	If the image crashes, the active commit.log file is still in the repository directory."
 	commitLogFile ifNotNil: 
 		[ MagmaSoftwareError signal: 'expected the active-commits file to be closed.' ].
-	self hasActiveCommitLog ifTrue: 
-		[ self directory 
-			rename: self activeCommitLogFilename
-			toBe: (self commitLogDirectory fullNameFor: self archiveCommitLogFilename) ]! !
+		
+	self hasActiveCommitLog ifTrue: [ 
+		| oldFileEntry |
+		oldFileEntry _ (self directory // self activeCommitLogFilename).
+		oldFileEntry copyTo: (self commitLogDirectory // self archiveCommitLogFilename) asString.
+		oldFileEntry delete ]! !
 
 !MaRecoveryManager methodsFor: 'file' stamp: 'cmm 8/6/2007 21:29'!
 resetApplyFile
@@ -4194,9 +4199,9 @@ applyRecordsDo: aBlock
 		whileFalse:
 			[ currentPosition _ currentPosition + selectedRecord physicalSize ]! !
 
-!MaRecoveryManager methodsFor: 'recover' stamp: 'cmm 7/8/2009 14:16'!
+!MaRecoveryManager methodsFor: 'recover' stamp: 'jpb 5/12/2021 15:21:32'!
 hasActiveCommitLog
-	^ commitLogFile notNil or: [ self directory fileExists: self activeCommitLogFilename ]! !
+	^ commitLogFile notNil or: [ (self directory // self activeCommitLogFilename) exists ]! !
 
 !MaRecoveryManager methodsFor: 'recover' stamp: 'cmm 7/15/2005 16:25'!
 isRollbackNeeded
@@ -4393,9 +4398,9 @@ commitNumber
 directory
 	^location directory ! !
 
-!MaRecoveryManager methodsFor: 'accessing' stamp: 'cmm 12/19/2008 14:11'!
+!MaRecoveryManager methodsFor: 'accessing' stamp: 'jpb 5/12/2021 15:00:54'!
 logArchiveFrequency
-	^ logArchiveFrequency ifNil: [ logArchiveFrequency _ 5 minutes asMilliSeconds ]! !
+	^ logArchiveFrequency ifNil: [ logArchiveFrequency _ 5 minutes totalMilliseconds ]! !
 
 !MaRecoveryManager methodsFor: 'accessing' stamp: 'cmm 12/19/2008 14:42'!
 logArchiveFrequency: aDuration 
@@ -4533,9 +4538,9 @@ newCommitLogRecordFor: aMaCommitLogEntry
 nextCommitNumber
 	^ commitNumber _ commitNumber + 1! !
 
-!MaRecoveryManager methodsFor: 'commit-packages' stamp: 'cmm 12/19/2008 14:12'!
+!MaRecoveryManager methodsFor: 'commit-packages' stamp: 'jpb 5/12/2021 14:59:38'!
 timeToStartNewCommitLog
-	^ (Time millisecondsSince: logStartTime) > self logArchiveFrequency! !
+	^ (MaRegistry findMillisecondsSince: logStartTime) > self logArchiveFrequency! !
 
 !MaRecoveryManager methodsFor: 'preMadeRecords' stamp: 'cmm 6/5/2005 16:40'!
 preMadeBeforeImageRecord
@@ -5495,13 +5500,13 @@ newTransactionFor: sessionId
 		[ MagmaUserError signal: 'Transactions are prohibited because this repository is in restore mode.' ].
 	^ repository newTransactionFor: sessionId! !
 
-!MagmaRepositoryController methodsFor: 'private' stamp: 'cmm 6/24/2015 14:05'!
+!MagmaRepositoryController methodsFor: 'private' stamp: 'jpb 5/12/2021 15:29:56'!
 open
 	"This is called when restarting controllers during image restart."
 	| tried |
 	tried _ false.
 	localLocation isPotentiallyOpen ifTrue: [ MagmaPotentiallyOpenError signal: 'found ' , self class openIndicatorFilename , ' file, indicating this repository may currently be open.  If it is not, you may proceed.' ].
-	(FileDirectory on: self pathName) exists ifFalse: [ MagmaUserError signal: self pathName , ' not found.' ].
+	(self pathName asDirectoryEntry) exists ifFalse: [ MagmaUserError signal: self pathName , ' not found.' ].
 	[ self privateOpen: localLocation ]
 		on: MagmaCorruptionError
 		do:
@@ -5545,17 +5550,19 @@ primClose
 		repository close.
 		self removeOpenIndicator ]! !
 
-!MagmaRepositoryController methodsFor: 'private' stamp: 'cmm 8/10/2010 21:48'!
+!MagmaRepositoryController methodsFor: 'private' stamp: 'jpb 5/12/2021 15:44:06'!
 privateOpen: aMagmaLocalLocation 
 	self isOpen ifTrue: 
 		[ MagmaUserError signal: 'Repository ' , aMagmaLocalLocation asString , ' is already open.' ].
 	MagmaNotification signal: 'opening Magma repository ' , self pathName.
+	
 	self
 		initializeSession ;
 		repository: 
 			(MaObjectRepository 
 				open: aMagmaLocalLocation directory
 				controller: self).
+				
 	self restoreMode ifFalse: [ self ensurePotentiallyOpenIndicator ].
 	self postOpenInitialize! !
 
@@ -5564,9 +5571,9 @@ refreshView
 	self session refresh.
 	repository systemReadStrategy makeReadyForUseUsing: self session serializer classIdManager! !
 
-!MagmaRepositoryController methodsFor: 'private' stamp: 'cmm 5/25/2010 18:34'!
+!MagmaRepositoryController methodsFor: 'private' stamp: 'jpb 5/12/2021 15:29:15'!
 removeOpenIndicator
-	self directory deleteFileNamed: self class openIndicatorFilename! !
+	(self directory // self class openIndicatorFilename) delete! !
 
 !MagmaRepositoryController methodsFor: 'private'!
 repository
@@ -5758,11 +5765,12 @@ version
 
 	^repository version! !
 
-!MagmaRepositoryController methodsFor: 'client/server required methods' stamp: 'cmm 1/7/2014 17:09'!
+!MagmaRepositoryController methodsFor: 'client/server required methods' stamp: 'jpb 5/12/2021 14:56:27'!
 processRequest: aMagmaRepositoryRequest 
 	aMagmaRepositoryRequest repositoryController: self.
 	^ [ self requestCritical:
 		[ | result |
+			
 		result _ aMagmaRepositoryRequest process.
 		repository freeSomeSpaceIfNecessary: aMagmaRepositoryRequest sessionId.
 		result ] ]
@@ -6363,10 +6371,10 @@ readInto: aByteArray startingAt: startIndex count: numberOfBytes
 			count _ count + 1 ].
 	^ count! !
 
-!MaObjectBuffer methodsFor: '*magma-server' stamp: 'cmm 10/31/2018 15:53'!
+!MaObjectBuffer methodsFor: '*magma-server' stamp: 'jpb 5/12/2021 14:35:32'!
 appendGraphNode: oid into: aMaSerializedGraphBuffer using: aMaReadStrategy currentDepth: anInteger minDepth: minDepth with: alreadyAppendedSet filer: aMaObjectFiler
 	| buffer |
-	(alreadyAppendedSet ifAbsentAdd: oid) ifFalse: [ ^ self ].
+	(alreadyAppendedSet maIfAbsentAdd: oid) ifFalse: [ ^ self ].
 	buffer _ aMaObjectFiler
 		appendObject: oid
 		into: aMaSerializedGraphBuffer.
@@ -6517,6 +6525,10 @@ do: aBlock for: aMagmaFileTraverser using: aMaReadStrategy
 					do: aBlock
 					using: aMaReadStrategy ] ]! !
 
+!MaFileRecordBroker methodsFor: '*magma-server' stamp: 'jpb 5/12/2021 15:17:07'!
+filesDo: aBlockClosure 
+	aBlockClosure value: file! !
+
 !MagmaClientConnection methodsFor: '*magma-server' stamp: 'cmm 2/21/2015 16:59'!
 isRemote
 	^ maClientConnection notNil! !
@@ -6666,9 +6678,9 @@ filerDo: oneArgBlock
 isMagmaRepository
 	^ self directory exists and: [ (self directory // MaObjectFiler objectsPhysicalFilename) exists ]! !
 
-!MagmaLocalLocation methodsFor: '*magma-server-testing' stamp: 'cmm 6/24/2015 14:03'!
+!MagmaLocalLocation methodsFor: '*magma-server-testing' stamp: 'jpb 5/12/2021 15:29:30'!
 isPotentiallyOpen
-	^ self directory fileExists: MagmaRepositoryController openIndicatorFilename! !
+	^ (self directory // MagmaRepositoryController openIndicatorFilename) exists! !
 
 !MagmaLocalLocation methodsFor: '*magma-server-accessing' stamp: 'cmm 5/2/2013 13:30'!
 newCompressor

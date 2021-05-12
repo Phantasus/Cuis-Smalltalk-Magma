@@ -1,4 +1,4 @@
-'From Cuis 5.0 [latest update: #4579] on 12 May 2021 at 11:53:10 am'!
+'From Cuis 5.0 [latest update: #4579] on 12 May 2021 at 2:20:09 pm'!
 'Description I am a general object serialization and materialization framework.  Currently, I convert objects to ByteArrays and back.  I am used by both the "Ma client server" and "Magma" packages.  I offer a lot of flexibility in the way objects are serialized and materialized, even to the way the object graphs are traversed during serialization.
 
 The major class is MaObjectSerializer, see it for more information.  It utilizes a MaOidManager, a MaClassIdManager, and a MaObjectGraphTraversalStrategy to create a MaSerializedGraphBuffer, the final object that wraps the ByteArray.
@@ -7,7 +7,7 @@ The major class is MaObjectSerializer, see it for more information.  It utilizes
 License: MIT
 Original Author: Chris Muller (cmm)
 Author: Josef Philip Bernhart (jpb)'!
-!provides: 'Ma-Serializer-Core' 1 11!
+!provides: 'Ma-Serializer-Core' 1 13!
 !requires: 'Ma-Core' 1 1 nil!
 !requires: 'SOLHashTables' 1 4 nil!
 !requires: 'Ma-Statistics' 1 0 nil!
@@ -2431,9 +2431,10 @@ beBusy
 bpMap
 	^ MaObjectBuffer bpMapsAt: bpMapIndex + 1! !
 
-!MaObjectSerializer methodsFor: 'private' stamp: 'cmm 4/23/2013 09:50'!
+!MaObjectSerializer methodsFor: 'private' stamp: 'jpb 5/12/2021 13:47:33'!
 bufferFor: anObject storageObject: storageObject startingAt: anInteger 
 	| buffer |
+
 	buffer _ anObject == storageObject 
 		ifTrue: [ storageObject realObjectIfMutatingProxy maSelectPreMadeObjectBufferFrom: self ]
 		ifFalse: [ self preMadeStorageObjectBuffer ].
@@ -4236,19 +4237,19 @@ maStreamVariablyInto: aMaVariableBuffer for: aMaObjectSerializer
 				maInstVarAt: index
 				put: (aMaObjectSerializer oidFor: (self slotAt: index)) ]! !
 
-!Object methodsFor: '*ma-serializer-core' stamp: 'cmm 11/10/2014 13:22'!
+!Object methodsFor: '*ma-serializer-core' stamp: 'jpb 5/12/2021 13:45:48'!
 slotAt: anInteger 
 	"Answer the object referenced by the receiver at its anInteger'th slot."
 	| namedSize |
-	^ anInteger > (namedSize_self class instSize)
+	^ anInteger > (namedSize _ self class instSize)
 		ifTrue: [ self basicAt: (anInteger-namedSize) ]
 		ifFalse: [ self instVarAt: anInteger ]! !
 
-!Object methodsFor: '*ma-serializer-core' stamp: 'cmm 11/10/2014 13:14'!
+!Object methodsFor: '*ma-serializer-core' stamp: 'jpb 5/12/2021 13:46:47'!
 slotAt: anInteger put: anObject 
 	"Flat slot-access."
 	| namedSize |
-	^ anInteger > (namedSize_self class instSize)
+	^ anInteger > (namedSize _ self class instSize)
 		ifTrue:
 			[ self
 				basicAt: anInteger-namedSize
@@ -4628,15 +4629,11 @@ maMaterializeFrom: aMaByteObjectBuffer using: aMaObjectSerializer
 	"This is the standard-case for building a skeleton of a variable-byte-sized object."
 	^ aMaByteObjectBuffer asString asSymbol! !
 
-!Array methodsFor: '*ma-serializer-core' stamp: 'cmm 2/3/2005 23:27'!
+!Array methodsFor: '*ma-serializer-core' stamp: 'jpb 5/12/2021 14:03:35'!
 maAsStorageObject
 	"I am about to be written on an object file.  If I am one of two shared global arrays, write a proxy instead."
 
 	"Note this behavior copied from Array>>#objectForDataStream:."
-	self == (TextConstants at: #DefaultTabsArray)
-		ifTrue: [ ^ DiskProxy global: #TextConstants selector: #at: args: #(DefaultTabsArray) ].
-	self == (TextConstants at: #DefaultMarginTabsArray)
-		ifTrue: [ ^ DiskProxy global: #TextConstants selector: #at: args: #(DefaultMarginTabsArray) ].
 	^ super maAsStorageObject! !
 
 !Array methodsFor: '*ma-serializer-core' stamp: 'cmm 12/1/2004 23:10'!
@@ -4644,11 +4641,10 @@ maInstSize
 	"Override from Object because this is considerably faster."
 	^ self size! !
 
-!Array methodsFor: '*ma-serializer-core' stamp: 'cmm 6/27/2005 15:12'!
+!Array methodsFor: '*ma-serializer-core' stamp: 'jpb 5/12/2021 14:03:07'!
 maUsesStandardStorage
 
-	^ self ~~ (TextConstants at: #DefaultTabsArray)
-	and: [ self ~~ (TextConstants at: #DefaultMarginTabsArray) ]! !
+	^true! !
 
 !Array methodsFor: '*ma-serializer-core' stamp: 'cmm 11/10/2014 12:42'!
 slotAt: index 

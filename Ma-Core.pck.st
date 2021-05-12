@@ -1,10 +1,11 @@
-'From Cuis 5.0 [latest update: #4579] on 12 May 2021 at 11:53:09 am'!
+'From Cuis 5.0 [latest update: #4579] on 12 May 2021 at 4:33:13 pm'!
 'Description Core of magma object oriented database
 
 License: MIT
 Original Author: Chris Muller (cmm)
 Author: Josef Philip Bernhart (jpb)'!
-!provides: 'Ma-Core' 1 9!
+!provides: 'Ma-Core' 1 13!
+!requires: 'Cryptography-DigitalSignatures' 1 14 nil!
 SystemOrganization addCategory: 'Ma-Core'!
 
 
@@ -374,6 +375,12 @@ defaultAction
 !MaNotification methodsFor: 'as yet unclassified' stamp: 'cmm 10/11/2013 14:05'!
 defaultAction
 	self resume! !
+
+!MaNotification methodsFor: 'as yet unclassified' stamp: 'jpb 5/12/2021 15:07:37'!
+isResumable
+	"Answer true. Notification exceptions by default are specified to be resumable."
+
+	^true! !
 
 !MaNotification methodsFor: 'as yet unclassified' stamp: 'cmm 11/28/2011 19:40'!
 messageText
@@ -4218,6 +4225,16 @@ printOn: aStream
 			nextPutAll: 'occurrencesOf: ' ;
 			maPrint: eachKey ]! !
 
+!Set methodsFor: '*ma-core' stamp: 'jpb 5/12/2021 14:39:20'!
+maIfAbsentAdd: anObject
+	"Ensure anObject is part of the receiver.  Answer whether its membership was newly acquired."
+	| index |
+	index _ self scanFor: anObject.
+	
+	(0 = index) ifTrue: [ self add: anObject. ^true ].
+	
+	^false! !
+
 !Set methodsFor: '*ma-core' stamp: 'cmm 7/24/2002 20:41'!
 maShallowCopy
 
@@ -4342,6 +4359,15 @@ printDetailsOn: aStream
 directoryName
 	"Answer the directory to shell to for this item."
 	self subclassResponsibility ! !
+
+!DirectoryEntry methodsFor: '*ma-core' stamp: 'jpb 5/12/2021 16:33:08'!
+maFileNamed: aString do: oneArgBlock 
+	"A convenient accessing method for accessing a file without having to open and close yourself.  The oneArgBlock argument is the fileStream."
+	| fileStream |
+	fileStream _ StandardFileStream new open: (self // aString) asString forWrite: true.
+	fileStream ifNil: [ MaEnvironmentError signal: 'Could not open ' , aString , ' in use?' ].
+	
+	^ [ oneArgBlock value: fileStream ] ensure: [ fileStream close ]! !
 
 !DirectoryEntry methodsFor: '*ma-core' stamp: 'cmm 11/27/2011 23:09'!
 maFileSizeString

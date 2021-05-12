@@ -1,10 +1,10 @@
-'From Cuis 5.0 [latest update: #4579] on 12 May 2021 at 11:52:59 am'!
+'From Cuis 5.0 [latest update: #4579] on 12 May 2021 at 3:33:54 pm'!
 'Description Magma core for server and client
 
 License: MIT
 Original author: Chris Muller (cmm)
 Author: Josef Philip Bernhart (jpb)'!
-!provides: 'Ma-Client-Server-Core' 1 11!
+!provides: 'Ma-Client-Server-Core' 1 16!
 !requires: 'Ma-Collections' 1 0 nil!
 !requires: 'Ma-Core' 1 1 nil!
 SystemOrganization addCategory: 'Ma-Client-Server-Core'!
@@ -68,6 +68,16 @@ MaSerializationStat subclass: #MaClientStat
 	category: 'Ma-Client-Server-Core'!
 !classDefinition: 'MaClientStat class' category: 'Ma-Client-Server-Core'!
 MaClientStat class
+	instanceVariableNames: ''!
+
+!classDefinition: #MaServerStat category: 'Ma-Client-Server-Core'!
+MaSerializationStat subclass: #MaServerStat
+	instanceVariableNames: 'requestsQueuedHistory socketsQueuedHistory requestSizeHistory requestProcessingTimeHistory requestProcessingTimeHistorys responseSizeHistory extractTimeHistory timeWaitingInSocketQueueHistory timeWaitingInRequestQueueHistory timeToSendResponsesHistory clientTimeoutsHistory numberOfClientConnectionsHistory timeToLoadBuffersHistory idleTimeHistory'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Ma-Client-Server-Core'!
+!classDefinition: 'MaServerStat class' category: 'Ma-Client-Server-Core'!
+MaServerStat class
 	instanceVariableNames: ''!
 
 !classDefinition: #MaClientConnection category: 'Ma-Client-Server-Core'!
@@ -279,16 +289,6 @@ Object subclass: #MaRegistry
 !classDefinition: 'MaRegistry class' category: 'Ma-Client-Server-Core'!
 MaRegistry class
 	instanceVariableNames: 'memoryHogs'!
-
-!classDefinition: #MaServerStat category: 'Ma-Client-Server-Core'!
-Object subclass: #MaServerStat
-	instanceVariableNames: 'requestsQueuedHistory socketsQueuedHistory requestSizeHistory requestProcessingTimeHistory requestProcessingTimeHistorys responseSizeHistory extractTimeHistory timeWaitingInSocketQueueHistory timeWaitingInRequestQueueHistory timeToSendResponsesHistory clientTimeoutsHistory numberOfClientConnectionsHistory timeToLoadBuffersHistory idleTimeHistory'
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Ma-Client-Server-Core'!
-!classDefinition: 'MaServerStat class' category: 'Ma-Client-Server-Core'!
-MaServerStat class
-	instanceVariableNames: ''!
 
 
 !MaMalformedRequestError commentStamp: 'cmm 2/1/2005 15:26' prior: 0!
@@ -502,6 +502,220 @@ timeWaitingForResponsesHistory
 postArchivalCopy
 	timeToSubmitByRequestClassHistorys _ timeToSubmitByRequestClassHistorys copy.
 	super postArchivalCopy! !
+
+!MaServerStat methodsFor: 'historys' stamp: 'cmm 5/7/2008 17:28'!
+clientTimeoutsHistory
+	"This history describes how often clients timed out.  When a request completes its lifecycle with no errors, a score of 0 is given.  When a network error occurs receiving the request or sending the response, a score of 1 is added.  Therefore, the sum is the total number of timeouts, #mean is how often they timed out."
+	^ clientTimeoutsHistory! !
+
+!MaServerStat methodsFor: 'historys' stamp: 'cmm 5/7/2008 17:29'!
+extractTimeHistory
+	"This history describes the amount of time, in milliseconds, elapsed from the initial client socket connection to the point in which the entire request is uploaded to my server."
+	^ extractTimeHistory! !
+
+!MaServerStat methodsFor: 'historys' stamp: 'cmm 9/29/2008 22:01'!
+idleTimeHistory
+	"The time the server waited after processing a request, before a new request came in."
+	^ idleTimeHistory! !
+
+!MaServerStat methodsFor: 'historys' stamp: 'cmm 6/8/2008 11:33'!
+numberOfClientConnectionsHistory
+	"The number of client sockets simultaneously connected to this server.  There is a Process running for each one that extracts the request bytes from them."
+	^numberOfClientConnectionsHistory! !
+
+!MaServerStat methodsFor: 'historys' stamp: 'cmm 5/7/2008 17:33'!
+requestProcessingTimeHistory
+	"These statistics represent the time, in milliseconds, actually consumed by the Magma server to process client requests.  Although requests are processed one at a time, responses are sent in separate threads and request input downloads are also concurrent."
+	^ requestProcessingTimeHistory! !
+
+!MaServerStat methodsFor: 'historys' stamp: 'cmm 7/13/2009 18:06'!
+requestProcessingTimeHistoryFor: requestObject 
+	"Different requests take different amounts of time to process.  Track them by the class of request."
+	^ requestProcessingTimeHistorys 
+		at: requestObject maOriginalClass
+		ifAbsentPut: 
+			[ MaStatHistory new
+				name: 'Time to process ' , requestObject class name ;
+				transition ;
+				yourself ]! !
+
+!MaServerStat methodsFor: 'historys' stamp: 'cmm 5/7/2008 17:33'!
+requestSizeHistory
+	"The size of client requests, in bytes.  This would be related to extractTime, timeToMaterializeRequests and requestProcessingTimes."
+	^ requestSizeHistory! !
+
+!MaServerStat methodsFor: 'historys' stamp: 'cmm 5/7/2008 17:34'!
+requestsQueuedHistory
+	"The number of requests queued at each moment a new client request is queued.  How long does the request line get.."
+	^ requestsQueuedHistory! !
+
+!MaServerStat methodsFor: 'historys' stamp: 'cmm 5/7/2008 17:34'!
+responseSizeHistory
+	"A statistic about how large the responses are.  As these numbers increase so, too, should the timeToSerializeResponses and timeToSendResponses increase."
+	^ responseSizeHistory! !
+
+!MaServerStat methodsFor: 'historys' stamp: 'cmm 5/7/2008 17:34'!
+socketsQueuedHistory
+	"The number of sockets in a queue waiting solely to have the bytes of the request extracted from the socket."
+	^ socketsQueuedHistory! !
+
+!MaServerStat methodsFor: 'historys' stamp: 'cmm 6/8/2008 21:33'!
+timeToLoadBuffersHistory
+	^timeToLoadBuffersHistory! !
+
+!MaServerStat methodsFor: 'historys' stamp: 'cmm 5/7/2008 17:34'!
+timeToSendResponsesHistory
+	"The time required to send serialized responses out the TCP/IP port over the network.  Responses are sent in individual background threads."
+	^ timeToSendResponsesHistory! !
+
+!MaServerStat methodsFor: 'historys' stamp: 'cmm 5/7/2008 17:34'!
+timeWaitingInRequestQueueHistory
+	"The time, in milliseconds, from the point when the request is put into the request queue, all requests in front of it have been processed, and it is dequeued."
+	^ timeWaitingInRequestQueueHistory! !
+
+!MaServerStat methodsFor: 'historys' stamp: 'cmm 5/7/2008 17:34'!
+timeWaitingInSocketQueueHistory
+	"The duration, in milliseconds, from when the socket is queued until extraction of its ByteArray can begin.  All sockets in front of it get their ByteArray's extracted first."
+	^ timeWaitingInSocketQueueHistory! !
+
+!MaServerStat methodsFor: 'historys' stamp: 'cmm 8/18/2014 10:00'!
+topRequestProcessingTimeHistorysBy: operatorSymbol 
+	^ requestProcessingTimeHistorys asArray sort:
+		[ : a : b | (a perform: operatorSymbol) > (b perform: operatorSymbol) ]! !
+
+!MaServerStat methodsFor: 'private-chart' stamp: 'cmm 8/17/2014 23:37'!
+colorsForRankings: anInteger 
+	^ (Color wheel: anInteger * (4 / 3) rounded)
+		copyFrom: 1
+		to: anInteger! !
+
+!MaServerStat methodsFor: 'private' stamp: 'cmm 9/29/2008 21:43'!
+historysDo: aBlock 
+	super historysDo: aBlock.
+	{ 
+		socketsQueuedHistory.
+		timeWaitingInSocketQueueHistory.
+		extractTimeHistory.
+		requestsQueuedHistory.
+		timeWaitingInRequestQueueHistory.
+		requestSizeHistory.
+		requestProcessingTimeHistory.
+		responseSizeHistory.
+		timeToSendResponsesHistory.
+		clientTimeoutsHistory.
+		numberOfClientConnectionsHistory.
+		timeToLoadBuffersHistory.
+		idleTimeHistory
+	 } do: aBlock.
+	requestProcessingTimeHistorys do: aBlock! !
+
+!MaServerStat methodsFor: 'initialize-release' stamp: 'cmm 8/22/2013 17:03'!
+initialize
+	super initialize.
+	socketsQueuedHistory _ MaStatHistory name: 'Sockets Queued'.
+	requestsQueuedHistory _ MaStatHistory name: 'Requests Queued'.
+	requestSizeHistory _ MaStatHistory name: 'Request Sizes'.
+	requestProcessingTimeHistory _ MaStatHistory name: 'Request Processing Times'.
+	requestProcessingTimeHistorys _ Dictionary new.
+	responseSizeHistory _ MaStatHistory name: 'Response Sizes'.
+	extractTimeHistory _ MaStatHistory name: 'Request Upload Times'.
+	timeWaitingInSocketQueueHistory _ MaStatHistory name: 'Time Waiting in Socket Queue'.
+	timeWaitingInRequestQueueHistory _ MaStatHistory name: 'Time Waiting in Request Queue'.
+	timeToSendResponsesHistory _ MaStatHistory name: 'Response Upload Times'.
+	clientTimeoutsHistory _ MaStatHistory name: 'Failed Lifecycles'.
+	numberOfClientConnectionsHistory _ MaStatHistory name: 'Number of Connected Client Sockets'.
+	timeToLoadBuffersHistory _ MaStatHistory name: 'Time to Compress and Uncompress'.
+	idleTimeHistory _ MaStatHistory name: 'Server Idle Times'! !
+
+!MaServerStat methodsFor: 'copying' stamp: 'cmm 12/22/2008 19:56'!
+postArchivalCopy
+	requestProcessingTimeHistorys _ requestProcessingTimeHistorys copy.
+	super postArchivalCopy.
+	self noteStop! !
+
+!MaServerStat methodsFor: 'recording' stamp: 'cmm 6/5/2008 21:58'!
+recordClientTimeout
+	self clientTimeoutsHistory addValue: 1! !
+
+!MaServerStat methodsFor: 'recording' stamp: 'cmm 9/29/2008 15:28'!
+recordIdleTime: milliseconds
+	self idleTimeHistory addValue: milliseconds! !
+
+!MaServerStat methodsFor: 'recording' stamp: 'cmm 6/5/2008 21:58'!
+recordRequestSize: anInteger 
+	self requestSizeHistory addValue: anInteger! !
+
+!MaServerStat methodsFor: 'recording' stamp: 'cmm 6/5/2008 21:59'!
+recordResponseSize: anInteger 
+	self responseSizeHistory addValue: anInteger! !
+
+!MaServerStat methodsFor: 'recording' stamp: 'cmm 6/5/2008 21:59'!
+recordSuccessfulLifecycle
+	self clientTimeoutsHistory addValue: 0! !
+
+!MaServerStat methodsFor: 'recording' stamp: 'cmm 6/5/2008 21:59'!
+recordTimeToExtractRequestBytes: milliseconds 
+	self extractTimeHistory addValue: milliseconds! !
+
+!MaServerStat methodsFor: 'recording' stamp: 'cmm 6/5/2008 21:59'!
+recordTimeToSendResponse: anInteger 
+	self timeToSendResponsesHistory addValue: anInteger! !
+
+!MaServerStat methodsFor: 'recording' stamp: 'cmm 6/5/2008 21:59'!
+recordTimeWaitingInRequestQueue: anInteger
+	self timeWaitingInRequestQueueHistory addValue: anInteger! !
+
+!MaServerStat methodsFor: 'recording' stamp: 'cmm 6/5/2008 21:59'!
+recordTimeWaitingInSocketQueue: anInteger
+	self timeWaitingInSocketQueueHistory addValue: anInteger! !
+
+!MaServerStat methodsFor: 'accessing' stamp: 'cmm 5/7/2008 17:32'!
+requestsQueuedStat
+	^ requestsQueuedHistory active! !
+
+!MaServerStat methodsFor: 'chart' stamp: 'cmm 8/17/2014 23:58'!
+top: anInteger requestTypesBy: operatorAttribute 
+	| top |
+	top _ self topRequestProcessingTimeHistorysBy: operatorAttribute.
+	^ top
+		copyFrom: 1
+		to: (anInteger min: top size)! !
+
+!MaServerStat methodsFor: 'chart' stamp: 'cmm 8/18/2014 10:20'!
+topRequestTypesBy: operatorSymbol 
+	| stats colors nextStat plot stack |
+	plot _ nil.
+	stack _ StackedPlotMorph new.
+	stats _ (self
+		top: requestProcessingTimeHistorys size
+		requestTypesBy: operatorSymbol) readStream.
+	[ (nextStat _ stats next) notNil ] whileTrue:
+		[ plot ifNil:
+			[ plot _ (#(#total #sum ) includes: operatorSymbol)
+				ifTrue: [ self newDateAndTimeBySizesPlot ]
+				ifFalse: [ self newDateAndTimeBySecondsPlot ].
+			colors _ (self colorsForRankings: 4) readStream ].
+		plot addSeries: ((nextStat seriesOn: operatorSymbol) color: colors next).
+		plot series size = 4 ifTrue:
+			[ stack addPlot: plot.
+			plot _ nil ] ].
+	^ stack! !
+
+!MaServerStat methodsFor: 'chart' stamp: 'cmm 8/18/2014 10:10'!
+topRequestTypesByCount
+	^ self topRequestTypesBy: #count! !
+
+!MaServerStat methodsFor: 'chart' stamp: 'cmm 8/21/2014 15:30'!
+topRequestTypesByMax
+	^ self topRequestTypesBy: #max! !
+
+!MaServerStat methodsFor: 'chart' stamp: 'cmm 8/18/2014 10:10'!
+topRequestTypesByMean
+	^ self topRequestTypesBy: #mean! !
+
+!MaServerStat methodsFor: 'chart' stamp: 'cmm 8/18/2014 10:10'!
+topRequestTypesByTotal
+	^ self topRequestTypesBy: #total! !
 
 !MaClientConnection methodsFor: 'accessing' stamp: 'cmm 8/22/2013 13:34'!
 console
@@ -1646,10 +1860,11 @@ connectionRequest
 
 	^'connect'! !
 
-!MaRequestServer methodsFor: 'private' stamp: 'cmm 9/15/2013 15:27'!
+!MaRequestServer methodsFor: 'private' stamp: 'jpb 5/12/2021 14:56:19'!
 processRequest: aMaClientServerRequest 
 	"Here's your request object, do something with it and answer any object, though for remote connections only, every class throughout the entire request and responses graph must be part of your #protocol."
 	| answer |
+	
 	console noteAboutToProcessRequest: aMaClientServerRequest.
 	answer _ [ aMaClientServerRequest
 		caseOf:
@@ -2965,6 +3180,82 @@ initialize
 	
 	memoryHogs _ OrderedCollection new.! !
 
+!MaRegistry class methodsFor: 'as yet unclassified' stamp: 'jpb 5/12/2021 14:19:38'!
+maDefaultMaxMemory
+	"Returns a default size for the max memory, the implementation is roughly the one found in Squeak, without the check for win32"
+	^Smalltalk isSpur
+		ifTrue: [ 3800000000 ]
+		ifFalse: [ 500000000 ]! !
+
+!MaRegistry class methodsFor: 'as yet unclassified' stamp: 'jpb 5/12/2021 14:53:20'!
+maHashMessage: aStringOrByteArray from: startPos 	to: stopPos with: hashBuilder
+	"Hash the given message using the Secure Hash Algorithm."
+
+	^ self
+		maHashStream: 
+			((ReadStream on: aStringOrByteArray asByteArray)
+				position: startPos-1 ;
+				yourself)
+		to: stopPos
+		with: hashBuilder! !
+
+!MaRegistry class methodsFor: 'as yet unclassified' stamp: 'jpb 5/12/2021 14:59:23'!
+maHashStream: aPositionableStream to: endPosition with: hashBuilder
+	"Hash the contents of the given stream from the current position to endPosition using the Secure Hash Algorithm. The SHA algorithm is defined in FIPS PUB 180-1. It is also described on p. 442 of 'Applied Cryptography: Protocols, Algorithms, and Source Code in C' by Bruce Scheier, Wiley, 1996."
+	"SecureHashAlgorithm new hashStream: (ReadStream on: 'foo')"
+
+	| startPosition buf bitLength |
+	hashBuilder initializeTotals.
+
+	"(SecureHashAlgorithm new hashMessage: '') radix: 16 	
+	=> 'DA39A3EE5E6B4B0D3255BFEF95601890AFD80709'"
+	aPositionableStream position >= endPosition ifTrue: [hashBuilder processFinalBuffer: #() bitLength: 0].
+
+	startPosition _ aPositionableStream position.
+	[aPositionableStream position >= endPosition] whileFalse: [
+		buf _ aPositionableStream next: (64 min: (endPosition-aPositionableStream position)).
+		((aPositionableStream position >= endPosition) not and: [buf size = 64])
+			ifTrue: [hashBuilder processBuffer: buf]
+			ifFalse: [
+				bitLength _ ((aPositionableStream position min: endPosition) - startPosition) * 8.
+				hashBuilder processFinalBuffer: buf bitLength: bitLength]].
+
+	^hashBuilder finalHash
+! !
+
+!MaRegistry class methodsFor: 'as yet unclassified' stamp: 'jpb 5/12/2021 14:15:10'!
+maMaxMemory
+ 	 | foundMemoryArg |
+        foundMemoryArg _ false.
+
+        self startUpOptionsDo: [:each | 
+                (#('-memory' '-mmap') includes: each)
+                        ifTrue: [ foundMemoryArg _ true ]
+                        ifFalse: 
+                                [ foundMemoryArg ifTrue: 
+                                        [ | arg |
+                                        arg _ each.
+                                        (arg isEmptyOrNil or: [ arg size < 2 ]) ifFalse: 
+                                                [ | requestedMemory |
+                                                requestedMemory _ (arg 
+                                                        copyFrom: 1
+                                                        to: arg size - 1) asNumber.
+                                                requestedMemory > 0 ifTrue: 
+                                                        [ arg last = $k 
+                                                                ifTrue: [ ^ 1000 * requestedMemory ]
+                                                                ifFalse: [ arg last = $m ifTrue: [ ^ 1000000 * requestedMemory ] ] ] ] ] ] ].
+        ^ self maDefaultMaxMemory! !
+
+!MaRegistry class methodsFor: 'as yet unclassified' stamp: 'jpb 5/12/2021 14:07:29'!
+maMemoryAvailable
+	 "Answer the remaining memory available accessible by this image."
+        ^ self maMaxMemory - self maMemoryUsed
+! !
+
+!MaRegistry class methodsFor: 'as yet unclassified' stamp: 'jpb 5/12/2021 14:08:47'!
+maMemoryUsed
+	^Smalltalk vmParameterAt: 3! !
+
 !MaRegistry class methodsFor: 'as yet unclassified' stamp: 'jpb 5/11/2021 16:15:39'!
 newString36With: anObject
 	"Encode the UUID as a base 36 string using 0-9 and lowercase a-z.
@@ -3008,219 +3299,16 @@ serverSave: saveOption andExit: exitOption
 		snapshot: saveOption
 		andQuit: exitOption ] fork! !
 
-!MaServerStat methodsFor: 'historys' stamp: 'cmm 5/7/2008 17:28'!
-clientTimeoutsHistory
-	"This history describes how often clients timed out.  When a request completes its lifecycle with no errors, a score of 0 is given.  When a network error occurs receiving the request or sending the response, a score of 1 is added.  Therefore, the sum is the total number of timeouts, #mean is how often they timed out."
-	^ clientTimeoutsHistory! !
+!MaRegistry class methodsFor: 'as yet unclassified' stamp: 'jpb 5/12/2021 14:16:09'!
+startUpOptionsDo: aBlock
+	"Evaluates block for the actual found startup options for image or the VM"
 
-!MaServerStat methodsFor: 'historys' stamp: 'cmm 5/7/2008 17:29'!
-extractTimeHistory
-	"This history describes the amount of time, in milliseconds, elapsed from the initial client socket connection to the point in which the entire request is uploaded to my server."
-	^ extractTimeHistory! !
+	"do nothing, not yet implemented"! !
 
-!MaServerStat methodsFor: 'historys' stamp: 'cmm 9/29/2008 22:01'!
-idleTimeHistory
-	"The time the server waited after processing a request, before a new request came in."
-	^ idleTimeHistory! !
-
-!MaServerStat methodsFor: 'historys' stamp: 'cmm 6/8/2008 11:33'!
-numberOfClientConnectionsHistory
-	"The number of client sockets simultaneously connected to this server.  There is a Process running for each one that extracts the request bytes from them."
-	^numberOfClientConnectionsHistory! !
-
-!MaServerStat methodsFor: 'historys' stamp: 'cmm 5/7/2008 17:33'!
-requestProcessingTimeHistory
-	"These statistics represent the time, in milliseconds, actually consumed by the Magma server to process client requests.  Although requests are processed one at a time, responses are sent in separate threads and request input downloads are also concurrent."
-	^ requestProcessingTimeHistory! !
-
-!MaServerStat methodsFor: 'historys' stamp: 'cmm 7/13/2009 18:06'!
-requestProcessingTimeHistoryFor: requestObject 
-	"Different requests take different amounts of time to process.  Track them by the class of request."
-	^ requestProcessingTimeHistorys 
-		at: requestObject maOriginalClass
-		ifAbsentPut: 
-			[ MaStatHistory new
-				name: 'Time to process ' , requestObject class name ;
-				transition ;
-				yourself ]! !
-
-!MaServerStat methodsFor: 'historys' stamp: 'cmm 5/7/2008 17:33'!
-requestSizeHistory
-	"The size of client requests, in bytes.  This would be related to extractTime, timeToMaterializeRequests and requestProcessingTimes."
-	^ requestSizeHistory! !
-
-!MaServerStat methodsFor: 'historys' stamp: 'cmm 5/7/2008 17:34'!
-requestsQueuedHistory
-	"The number of requests queued at each moment a new client request is queued.  How long does the request line get.."
-	^ requestsQueuedHistory! !
-
-!MaServerStat methodsFor: 'historys' stamp: 'cmm 5/7/2008 17:34'!
-responseSizeHistory
-	"A statistic about how large the responses are.  As these numbers increase so, too, should the timeToSerializeResponses and timeToSendResponses increase."
-	^ responseSizeHistory! !
-
-!MaServerStat methodsFor: 'historys' stamp: 'cmm 5/7/2008 17:34'!
-socketsQueuedHistory
-	"The number of sockets in a queue waiting solely to have the bytes of the request extracted from the socket."
-	^ socketsQueuedHistory! !
-
-!MaServerStat methodsFor: 'historys' stamp: 'cmm 6/8/2008 21:33'!
-timeToLoadBuffersHistory
-	^timeToLoadBuffersHistory! !
-
-!MaServerStat methodsFor: 'historys' stamp: 'cmm 5/7/2008 17:34'!
-timeToSendResponsesHistory
-	"The time required to send serialized responses out the TCP/IP port over the network.  Responses are sent in individual background threads."
-	^ timeToSendResponsesHistory! !
-
-!MaServerStat methodsFor: 'historys' stamp: 'cmm 5/7/2008 17:34'!
-timeWaitingInRequestQueueHistory
-	"The time, in milliseconds, from the point when the request is put into the request queue, all requests in front of it have been processed, and it is dequeued."
-	^ timeWaitingInRequestQueueHistory! !
-
-!MaServerStat methodsFor: 'historys' stamp: 'cmm 5/7/2008 17:34'!
-timeWaitingInSocketQueueHistory
-	"The duration, in milliseconds, from when the socket is queued until extraction of its ByteArray can begin.  All sockets in front of it get their ByteArray's extracted first."
-	^ timeWaitingInSocketQueueHistory! !
-
-!MaServerStat methodsFor: 'historys' stamp: 'cmm 8/18/2014 10:00'!
-topRequestProcessingTimeHistorysBy: operatorSymbol 
-	^ requestProcessingTimeHistorys asArray sort:
-		[ : a : b | (a perform: operatorSymbol) > (b perform: operatorSymbol) ]! !
-
-!MaServerStat methodsFor: 'private-chart' stamp: 'cmm 8/17/2014 23:37'!
-colorsForRankings: anInteger 
-	^ (Color wheel: anInteger * (4 / 3) rounded)
-		copyFrom: 1
-		to: anInteger! !
-
-!MaServerStat methodsFor: 'private' stamp: 'cmm 9/29/2008 21:43'!
-historysDo: aBlock 
-	super historysDo: aBlock.
-	{ 
-		socketsQueuedHistory.
-		timeWaitingInSocketQueueHistory.
-		extractTimeHistory.
-		requestsQueuedHistory.
-		timeWaitingInRequestQueueHistory.
-		requestSizeHistory.
-		requestProcessingTimeHistory.
-		responseSizeHistory.
-		timeToSendResponsesHistory.
-		clientTimeoutsHistory.
-		numberOfClientConnectionsHistory.
-		timeToLoadBuffersHistory.
-		idleTimeHistory
-	 } do: aBlock.
-	requestProcessingTimeHistorys do: aBlock! !
-
-!MaServerStat methodsFor: 'initialize-release' stamp: 'cmm 8/22/2013 17:03'!
-initialize
-	super initialize.
-	socketsQueuedHistory _ MaStatHistory name: 'Sockets Queued'.
-	requestsQueuedHistory _ MaStatHistory name: 'Requests Queued'.
-	requestSizeHistory _ MaStatHistory name: 'Request Sizes'.
-	requestProcessingTimeHistory _ MaStatHistory name: 'Request Processing Times'.
-	requestProcessingTimeHistorys _ Dictionary new.
-	responseSizeHistory _ MaStatHistory name: 'Response Sizes'.
-	extractTimeHistory _ MaStatHistory name: 'Request Upload Times'.
-	timeWaitingInSocketQueueHistory _ MaStatHistory name: 'Time Waiting in Socket Queue'.
-	timeWaitingInRequestQueueHistory _ MaStatHistory name: 'Time Waiting in Request Queue'.
-	timeToSendResponsesHistory _ MaStatHistory name: 'Response Upload Times'.
-	clientTimeoutsHistory _ MaStatHistory name: 'Failed Lifecycles'.
-	numberOfClientConnectionsHistory _ MaStatHistory name: 'Number of Connected Client Sockets'.
-	timeToLoadBuffersHistory _ MaStatHistory name: 'Time to Compress and Uncompress'.
-	idleTimeHistory _ MaStatHistory name: 'Server Idle Times'! !
-
-!MaServerStat methodsFor: 'copying' stamp: 'cmm 12/22/2008 19:56'!
-postArchivalCopy
-	requestProcessingTimeHistorys _ requestProcessingTimeHistorys copy.
-	super postArchivalCopy.
-	self noteStop! !
-
-!MaServerStat methodsFor: 'recording' stamp: 'cmm 6/5/2008 21:58'!
-recordClientTimeout
-	self clientTimeoutsHistory addValue: 1! !
-
-!MaServerStat methodsFor: 'recording' stamp: 'cmm 9/29/2008 15:28'!
-recordIdleTime: milliseconds
-	self idleTimeHistory addValue: milliseconds! !
-
-!MaServerStat methodsFor: 'recording' stamp: 'cmm 6/5/2008 21:58'!
-recordRequestSize: anInteger 
-	self requestSizeHistory addValue: anInteger! !
-
-!MaServerStat methodsFor: 'recording' stamp: 'cmm 6/5/2008 21:59'!
-recordResponseSize: anInteger 
-	self responseSizeHistory addValue: anInteger! !
-
-!MaServerStat methodsFor: 'recording' stamp: 'cmm 6/5/2008 21:59'!
-recordSuccessfulLifecycle
-	self clientTimeoutsHistory addValue: 0! !
-
-!MaServerStat methodsFor: 'recording' stamp: 'cmm 6/5/2008 21:59'!
-recordTimeToExtractRequestBytes: milliseconds 
-	self extractTimeHistory addValue: milliseconds! !
-
-!MaServerStat methodsFor: 'recording' stamp: 'cmm 6/5/2008 21:59'!
-recordTimeToSendResponse: anInteger 
-	self timeToSendResponsesHistory addValue: anInteger! !
-
-!MaServerStat methodsFor: 'recording' stamp: 'cmm 6/5/2008 21:59'!
-recordTimeWaitingInRequestQueue: anInteger
-	self timeWaitingInRequestQueueHistory addValue: anInteger! !
-
-!MaServerStat methodsFor: 'recording' stamp: 'cmm 6/5/2008 21:59'!
-recordTimeWaitingInSocketQueue: anInteger
-	self timeWaitingInSocketQueueHistory addValue: anInteger! !
-
-!MaServerStat methodsFor: 'accessing' stamp: 'cmm 5/7/2008 17:32'!
-requestsQueuedStat
-	^ requestsQueuedHistory active! !
-
-!MaServerStat methodsFor: 'chart' stamp: 'cmm 8/17/2014 23:58'!
-top: anInteger requestTypesBy: operatorAttribute 
-	| top |
-	top _ self topRequestProcessingTimeHistorysBy: operatorAttribute.
-	^ top
-		copyFrom: 1
-		to: (anInteger min: top size)! !
-
-!MaServerStat methodsFor: 'chart' stamp: 'cmm 8/18/2014 10:20'!
-topRequestTypesBy: operatorSymbol 
-	| stats colors nextStat plot stack |
-	plot _ nil.
-	stack _ StackedPlotMorph new.
-	stats _ (self
-		top: requestProcessingTimeHistorys size
-		requestTypesBy: operatorSymbol) readStream.
-	[ (nextStat _ stats next) notNil ] whileTrue:
-		[ plot ifNil:
-			[ plot _ (#(#total #sum ) includes: operatorSymbol)
-				ifTrue: [ self newDateAndTimeBySizesPlot ]
-				ifFalse: [ self newDateAndTimeBySecondsPlot ].
-			colors _ (self colorsForRankings: 4) readStream ].
-		plot addSeries: ((nextStat seriesOn: operatorSymbol) color: colors next).
-		plot series size = 4 ifTrue:
-			[ stack addPlot: plot.
-			plot _ nil ] ].
-	^ stack! !
-
-!MaServerStat methodsFor: 'chart' stamp: 'cmm 8/18/2014 10:10'!
-topRequestTypesByCount
-	^ self topRequestTypesBy: #count! !
-
-!MaServerStat methodsFor: 'chart' stamp: 'cmm 8/21/2014 15:30'!
-topRequestTypesByMax
-	^ self topRequestTypesBy: #max! !
-
-!MaServerStat methodsFor: 'chart' stamp: 'cmm 8/18/2014 10:10'!
-topRequestTypesByMean
-	^ self topRequestTypesBy: #mean! !
-
-!MaServerStat methodsFor: 'chart' stamp: 'cmm 8/18/2014 10:10'!
-topRequestTypesByTotal
-	^ self topRequestTypesBy: #total! !
+!MaRegistry class methodsFor: 'as yet unclassified' stamp: 'jpb 5/12/2021 15:28:22'!
+unregisterMemoryHog: newMemoryHog
+	(memoryHogs includes: newMemoryHog)
+		ifTrue: [ 	memoryHogs remove: newMemoryHog ]! !
 
 !Object methodsFor: '*ma-client-server-core' stamp: 'cmm 10/28/2008 16:36'!
 wantsResponse

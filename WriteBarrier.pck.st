@@ -1,8 +1,8 @@
-'From Cuis 5.0 [latest update: #4579] on 12 May 2021 at 11:53:16 am'!
+'From Cuis 5.0 [latest update: #4579] on 12 May 2021 at 3:33:58 pm'!
 'Description License: MIT
 Original author: Chris Muller (cmm)
 Author: Josef Philip Bernhart (jpb)'!
-!provides: 'WriteBarrier' 1 2!
+!provides: 'WriteBarrier' 1 3!
 SystemOrganization addCategory: 'WriteBarrier-Collections'!
 SystemOrganization addCategory: 'WriteBarrier-Core'!
 SystemOrganization addCategory: 'WriteBarrier-Tests'!
@@ -893,9 +893,9 @@ remove: anObject
 		[ anObject writeBarrier == self ifFalse: [ ^ self ].
 		anObject primitiveChangeClassTo: anObject class superclass basicNew ]! !
 
-!WriteBarrier methodsFor: 'public' stamp: 'avi 10/6/2004 13:56'!
+!WriteBarrier methodsFor: 'public' stamp: 'jpb 5/12/2021 15:20:53'!
 unregister
-	SystemChangeNotifier uniqueInstance noMoreNotificationsFor: self! !
+	SystemChangeNotifier uniqueInstance removeActionsWithReceiver: self! !
 
 !DirtySetWriteBarrier methodsFor: 'as yet unclassified' stamp: 'avi 10/6/2004 13:58'!
 clearDirtySet
