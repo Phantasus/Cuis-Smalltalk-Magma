@@ -46,6 +46,12 @@ that into a Workspace and do it:
 Process allInstancesDo: [:p| p priority = 49 ifTrue: [ p terminate ]]
 ```
 
+Now it seems that a mutex is blocking when finally closing
+the newly created repository. In `MagmaRepositoryController>>primClose`,
+maybe the mutex is still occupied by something, or why does it block?
+Maybe the image state is dirty and I need to start with a fresh one?
+
+
 # 11. May 2021 (jpb)
 
 The `WriteBarrier` is not an optional package, as the transactions
