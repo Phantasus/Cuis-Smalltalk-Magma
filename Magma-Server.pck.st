@@ -1,14 +1,24 @@
-'From Cuis 5.0 [latest update: #4579] on 11 May 2021 at 6:05:30 pm'!
+'From Cuis 5.0 [latest update: #4579] on 12 May 2021 at 11:53:14 am'!
 'Description Package containing the magma server implementation
 
 License: MIT
 Original Author: Chris Muller (cmm)
 Author: Josef Philip Bernhart (jpb)'!
-!provides: 'Magma-Server' 1 7!
+!provides: 'Magma-Server' 1 9!
 !requires: 'Ma-Client-Server-Core' 1 3 nil!
 !requires: 'Ma-Statistics' 1 0 nil!
 SystemOrganization addCategory: 'Magma-Server'!
 
+
+!classDefinition: #MagmaPotentiallyOpenError category: 'Magma-Server'!
+MagmaEnvironmentError subclass: #MagmaPotentiallyOpenError
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Magma-Server'!
+!classDefinition: 'MagmaPotentiallyOpenError class' category: 'Magma-Server'!
+MagmaPotentiallyOpenError class
+	instanceVariableNames: ''!
 
 !classDefinition: #MagmaDeleteWarning category: 'Magma-Server'!
 MagmaWarning subclass: #MagmaDeleteWarning
@@ -48,6 +58,16 @@ MagmaWarning subclass: #MagmaRollbackRecoveryNeeded
 	category: 'Magma-Server'!
 !classDefinition: 'MagmaRollbackRecoveryNeeded class' category: 'Magma-Server'!
 MagmaRollbackRecoveryNeeded class
+	instanceVariableNames: ''!
+
+!classDefinition: #MagmaRecoveryNotification category: 'Magma-Server'!
+MagmaNotification subclass: #MagmaRecoveryNotification
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Magma-Server'!
+!classDefinition: 'MagmaRecoveryNotification class' category: 'Magma-Server'!
+MagmaRecoveryNotification class
 	instanceVariableNames: ''!
 
 !classDefinition: #MaApplyRecord category: 'Magma-Server'!
@@ -270,26 +290,6 @@ MaObject subclass: #MagmaServerPreferences
 MagmaServerPreferences class
 	instanceVariableNames: ''!
 
-!classDefinition: #MagmaPotentiallyOpenError category: 'Magma-Server'!
-MagmaEnvironmentError subclass: #MagmaPotentiallyOpenError
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Magma-Server'!
-!classDefinition: 'MagmaPotentiallyOpenError class' category: 'Magma-Server'!
-MagmaPotentiallyOpenError class
-	instanceVariableNames: ''!
-
-!classDefinition: #MagmaRecoveryNotification category: 'Magma-Server'!
-MagmaNotification subclass: #MagmaRecoveryNotification
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Magma-Server'!
-!classDefinition: 'MagmaRecoveryNotification class' category: 'Magma-Server'!
-MagmaRecoveryNotification class
-	instanceVariableNames: ''!
-
 !classDefinition: #MagmaServerConsole category: 'Magma-Server'!
 ProtoObject subclass: #MagmaServerConsole
 	instanceVariableNames: 'server controller'
@@ -300,6 +300,9 @@ ProtoObject subclass: #MagmaServerConsole
 MagmaServerConsole class
 	instanceVariableNames: ''!
 
+
+!MagmaPotentiallyOpenError commentStamp: 'cmm 1/15/2012 18:30' prior: 0!
+A MagmaPotentiallyOpenError is a resumable error.  It does not inherit from Warning because it is too critical to allow a program which wants to resume any Warning automatically, forcing the user to handle MagmaPotentiallyOpenError explicitly.!
 
 !MagmaDeleteWarning commentStamp: 'cmm 7/16/2007 22:07' prior: 0!
 A MagmaDeleteWarning is signaled when a repository is about to be deleted.!
@@ -428,9 +431,6 @@ Instance Variables
 	session:  My standard session used to perform standard operations on the model, mostly for LargeCollection support.
 !
 
-!MagmaPotentiallyOpenError commentStamp: 'cmm 1/15/2012 18:30' prior: 0!
-A MagmaPotentiallyOpenError is a resumable error.  It does not inherit from Warning because it is too critical to allow a program which wants to resume any Warning automatically, forcing the user to handle MagmaPotentiallyOpenError explicitly.!
-
 !MaBeforeImageRecord methodsFor: 'testing' stamp: 'cmm 6/3/2005 15:53'!
 isFixed
 	^ false! !
@@ -496,6 +496,10 @@ definition
 !MagmaServerConsole methodsFor: 'accessing' stamp: 'cmm 9/25/2009 11:31'!
 definition
 	^ controller ifNotNil: [ controller definition ]! !
+
+!MagmaPotentiallyOpenError methodsFor: 'as yet unclassified' stamp: 'cmm 5/25/2010 23:04'!
+isResumable 
+	^ true! !
 
 !MagmaForwardRecoveryNeeded methodsFor: 'as yet unclassified' stamp: 'cmm 3/2/2009 19:53'!
 defaultAction
@@ -2933,7 +2937,7 @@ refreshSegmentIn: aMaRefreshSegmentRequest
 		for: aMaRefreshSegmentRequest sessionId.
 	^ aMaRefreshSegmentRequest segment! !
 
-!MaObjectRepository methodsFor: 'client-requests' stamp: 'cmm 12/18/2008 20:50'!
+!MaObjectRepository methodsFor: 'client-requests' stamp: 'jpb 5/12/2021 11:32:25'!
 removeSessionFor: sessionId 
 	| clientConnection |
 	clientConnection _ sessions 
@@ -2942,7 +2946,7 @@ removeSessionFor: sessionId
 			[ "Perhaps the other session suddenly disconnected..?"
 			 ].
 	clientConnection ifNotNil: 
-		[ clientConnection maClientConnection ifNotNilDo: [ : cc | cc shouldContinue: false ] ].
+		[ clientConnection maClientConnection ifNotNil: [ : cc | cc shouldContinue: false ] ].
 	transactionLog 
 		removeEntryForSessionId: sessionId
 		ifAbsent: 
@@ -3087,7 +3091,7 @@ sendToWarmBackups: aMaCommitLogRecord
 			on: NetworkError "this is a send-only request, there will be no response and no server-generated error (i.e., we can't handle MagmaWrongCommitNumber)."
 			do: [ : err | MagmaNodeUpdate signalRemove: each ] ]! !
 
-!MaObjectRepository methodsFor: 'actions' stamp: 'cmm 1/9/2014 15:57'!
+!MaObjectRepository methodsFor: 'actions' stamp: 'jpb 5/12/2021 11:50:09'!
 applyToCache: trimmedCommitLogEntry 
 	| newObjects buffersToRefresh |
 	newObjects _ trimmedCommitLogEntry result newObjectBuffers.
@@ -3103,7 +3107,7 @@ applyToCache: trimmedCommitLogEntry
 		updateLargeCollectionsIn: trimmedCommitLogEntry commitPackage
 		recordResultsIn: trimmedCommitLogEntry result.
 	filer commitNumber: recoveryManager commitNumber.
-	^ buffersToRefresh ifNil: [ Array empty ]! !
+	^ buffersToRefresh ifNil: [ #() ]! !
 
 !MaObjectRepository methodsFor: 'actions' stamp: 'cmm 7/8/2009 21:07'!
 challengeOthersWith: aMaCommitLogEntry 
@@ -3782,13 +3786,13 @@ openLargeCollectionIfNecessary: aMagmaLargeCollection
 	^ self commitCritical: 
 		[ (self ensureManagerCreatedFor: aMagmaLargeCollection) ensureOpen ]! !
 
-!MaObjectRepository methodsFor: 'building' stamp: 'cmm 1/5/2010 22:23'!
+!MaObjectRepository methodsFor: 'building' stamp: 'jpb 5/12/2021 11:32:21'!
 removeManager: aMagmaCollectionManager 
 	self flushCritical: 
 		[ self commitCritical: 
 			[ (largeCollectionManagers 
 				removeKey: aMagmaCollectionManager collectionOid
-				ifAbsent: [ nil ]) ifNotNilDo: [ : removed | removed close ] ] ]! !
+				ifAbsent: [ nil ]) ifNotNil: [ : removed | removed close ] ] ]! !
 
 !MaObjectRepository methodsFor: 'building'!
 repositoryController: aMaRepositoryController
@@ -3838,11 +3842,11 @@ open: aFileDirectory controller: aMaRepositoryController
 		open: aFileDirectory ;
 		yourself! !
 
-!MaObjectRepository class methodsFor: 'private' stamp: 'cmm 9/24/2014 15:24'!
+!MaObjectRepository class methodsFor: 'private' stamp: 'jpb 5/12/2021 11:50:01'!
 freeSomeSpace
 	"Called by LowSpaceWatcher.  See #lowSpaceWatcher."
 	"lowSpaceWatcher requires SOME space to be freed to avoid the debugger on LowSpaceSignal.  So we free 'someSpace' for now, and I will then see it is empty and free space myself at next opportunity."
-	EmergencyMemory _ String empty.  "<--- This is the 'request' to free some space, it can only be done *between* requests."! !
+	EmergencyMemory _ ''.  "<--- This is the 'request' to free some space, it can only be done *between* requests."! !
 
 !MaObjectRepository class methodsFor: 'class initialization' stamp: 'cmm 11/7/2008 16:01'!
 initialize
@@ -4402,13 +4406,13 @@ logArchiveFrequency: aDuration
 serializer
 	^ serializer! !
 
-!MaRecoveryManager methodsFor: 'private' stamp: 'cmm 2/24/2013 19:19'!
+!MaRecoveryManager methodsFor: 'private' stamp: 'jpb 5/12/2021 11:49:42'!
 commitLogFileNamesFrom: startNumber do: oneArgBlock 
 	"Create a SortedCollection of the entries by the commitLogNumber.  Attach the original names so we don't have to reconstruct them after the sort."
 	| selectedEntries sortedEntries dir |
 	selectedEntries _ OrderedCollection new.
 	dir _ self commitLogDirectory.
-	dir exists ifFalse: [ ^ Array empty ].
+	dir exists ifFalse: [ ^ #() ].
 	dir entries do:
 		[ : each | | nameParts |
 		nameParts _ dir splitNameVersionExtensionFor: each name.
@@ -5219,9 +5223,9 @@ localLocation
 	 
 	^ localLocation! !
 
-!MagmaRepositoryController methodsFor: 'accessing' stamp: 'cmm 8/30/2008 10:14'!
+!MagmaRepositoryController methodsFor: 'accessing' stamp: 'jpb 5/12/2021 11:39:09'!
 magmaId
-	^ self definition ifNotNilDo: [ : definition | definition magmaId ]! !
+	^ self definition ifNotNil: [ : definition | definition magmaId ]! !
 
 !MagmaRepositoryController methodsFor: 'accessing' stamp: 'cmm 5/11/2007 12:36'!
 pathName
@@ -5601,22 +5605,15 @@ serverReadStrategy
 		yourself
 ! !
 
-!MagmaRepositoryController methodsFor: 'private' stamp: 'cmm 12/21/2008 15:37'!
+!MagmaRepositoryController methodsFor: 'private' stamp: 'jpb 5/12/2021 11:42:01'!
 serverSave: saveOption andExit: exitOption 
 	"Wait one second to give time for the response to be sent out so the client doesn't get a NetworkError."
-	[ (Delay forSeconds: 1) wait.
-	SmalltalkImage current 
-		snapshot: saveOption
-		andQuit: exitOption ] fork! !
+	MaRegistry serverSave: saveOption andExit: exitOption! !
 
-!MagmaRepositoryController methodsFor: 'private' stamp: 'cmm 11/7/2008 14:23'!
+!MagmaRepositoryController methodsFor: 'private' stamp: 'jpb 5/12/2021 11:42:31'!
 serverSaveAndExit
 	"Wait one second to give time for the response to be sent out so the client doesn't get a NetworkError."
-	
-	[ (Delay forSeconds: 1) wait.
-	SmalltalkImage current 
-		snapshot: true
-		andQuit: true ] fork! !
+	MaRegistry serverSave: true andExit: true! !
 
 !MagmaRepositoryController methodsFor: 'private'!
 serverSerializer
@@ -5961,10 +5958,6 @@ initialize
 
 	self debugRecovery: false! !
 
-!MagmaPotentiallyOpenError methodsFor: 'as yet unclassified' stamp: 'cmm 5/25/2010 23:04'!
-isResumable 
-	^ true! !
-
 !MagmaServerConsole methodsFor: 'accessing' stamp: 'cmm 9/5/2009 11:25'!
 compressThreshold
 	"Compressing large responses can make a significant performance improvement on slow networks.  Compression makes things worse with small responses or on really fast networks.  Answer the number of bytes a response needs for compression to occur."
@@ -5984,9 +5977,9 @@ controller
 hostname
 	^ NetNameResolver maLocalHostName ! !
 
-!MagmaServerConsole methodsFor: 'accessing' stamp: 'cmm 10/30/2008 13:55'!
+!MagmaServerConsole methodsFor: 'accessing' stamp: 'jpb 5/12/2021 11:39:09'!
 node
-	^ self definition ifNotNilDo: [ : def | def node ]! !
+	^ self definition ifNotNil: [ : def | def node ]! !
 
 !MagmaServerConsole methodsFor: 'accessing' stamp: 'cmm 10/14/2008 14:31'!
 port
@@ -6012,7 +6005,7 @@ useCompression: aBoolean
 beWarmBackup
 	self beWarmBackupFor: self node primaryLocation! !
 
-!MagmaServerConsole methodsFor: 'high-availability' stamp: 'cmm 12/21/2012 15:00'!
+!MagmaServerConsole methodsFor: 'high-availability' stamp: 'jpb 5/12/2021 11:42:51'!
 beWarmBackupFor: primaryLocation 
 	"If I am currently started on backup files created from my primary having had sent #fullBackupTo:, which means I should be in restoreMode, then establish a session to primaryLocation and bring my copy of the repository up to date.  Once up to date, the primary server will then broadcast further updates to me in real-time, and instruct clients that I am a warm backup for that primary.  If they detect the primary server is down they will start sending requests to me, at which point I will verify the server availability myself and will, if the connection is refused, #takeOverAsPrimary."
 	self isRunning ifFalse: [ MagmaUserError signal: 'Must be running to be a warm backup.' ].
@@ -6028,16 +6021,16 @@ beWarmBackupFor: primaryLocation
 		upTo: primaryLocation.
 	primarySession node addLocation: self thisLocation ] ensure:
 		[ primarySession ifNotNil: [ primarySession disconnect ] ] ]
-		on: NetworkError
+		on: MaNetworkError
 		do:
 			[ : err | "Don't do anything.  This server couldn't connect to the primary, but it will sit and wait patiently for the primary to come up.  When it does, it will seek out this server and link up.  If, before then, a client requests this to be the primary, I will become so."
 			err ]! !
 
-!MagmaServerConsole methodsFor: 'high-availability' stamp: 'cmm 3/16/2009 12:47'!
+!MagmaServerConsole methodsFor: 'high-availability' stamp: 'jpb 5/12/2021 11:29:55'!
 isPrimary
 	^ self node primaryLocation 
 		ifNil: [ false ]
-		ifNotNilDo: [ : loc | loc = self thisLocation ]! !
+		ifNotNil: [ : loc | loc = self thisLocation ]! !
 
 !MagmaServerConsole methodsFor: 'high-availability' stamp: 'cmm 12/4/2015 16:53'!
 isSecondary
@@ -6062,7 +6055,7 @@ thisLocation
 		host: NetNameResolver maLocalHostName
 		port: self port! !
 
-!MagmaServerConsole methodsFor: 'private' stamp: 'cmm 5/15/2011 20:33'!
+!MagmaServerConsole methodsFor: 'private' stamp: 'jpb 5/12/2021 11:43:01'!
 ensureCorrectNodeConfiguration
 	"Ensure I am performing the duty my MagmaNode says I should be performing, either as the primary or one of the warmBackups.  I am read-only on the node, I do not modify it.  The intended usage of this method is, you update the node to what you want it to be, then I 'make it so'."
 	self isPrimary 
@@ -6071,15 +6064,15 @@ ensureCorrectNodeConfiguration
 			self sessionsForOtherLocationsDo: 
 				[ : each | 
 				"Warning:  this is a sync request, no secondary should cause this method to be called on the primary.  Perhaps it should be async?"
-				[each ensureInRestoreMode] on: NetworkError do: [ : err | "oh well" ] ].
+				[each ensureInRestoreMode] on: MaNetworkError do: [ : err | "oh well" ] ].
 			self restoreMode ifTrue: 
 				[ "I need to become the primary, make it so."
 				controller commitRestore ].	"Now the others can become warm backups."
-			self sessionsForOtherLocationsDo: [ : each | [each ensureCorrectNodeConfiguration] on: NetworkError do: [ : err | ] ] ]
+			self sessionsForOtherLocationsDo: [ : each | [each ensureCorrectNodeConfiguration] on: MaNetworkError do: [ : err | ] ] ]
 		ifFalse: 
-			[ self node primaryLocation ifNotNilDo: [ : pl | pl isLocal ifFalse: [ self beWarmBackupFor: pl ] ] ]! !
+			[ self node primaryLocation ifNotNil: [ : pl | pl isLocal ifFalse: [ self beWarmBackupFor: pl ] ] ]! !
 
-!MagmaServerConsole methodsFor: 'private' stamp: 'cmm 1/1/2013 22:35'!
+!MagmaServerConsole methodsFor: 'private' stamp: 'jpb 5/12/2021 11:43:07'!
 findCorrectNodeConfiguration
 	"I'm just starting up, interrogate the other servers in my node to see what the current state of the party is:  who is the primary now?"
 	| nodes |
@@ -6087,7 +6080,7 @@ findCorrectNodeConfiguration
 		[ : stream | self sessionsForOtherLocationsDo:
 			[ : each | [ each ensureConnected.
 			stream nextPut: each node ]
-				on: NetworkError
+				on: MaNetworkError
 				do:
 					[ : err | "That server not up or not reachable."
 					err ] ] ].
@@ -6186,22 +6179,22 @@ processOn: portInteger
 		processOn: portInteger
 		using: self! !
 
-!MagmaServerConsole methodsFor: 'start / stop' stamp: 'cmm 12/4/2009 14:45'!
+!MagmaServerConsole methodsFor: 'start / stop' stamp: 'jpb 5/12/2021 11:43:11'!
 shutdown
 	controller ifNotNil: 
 		[ controller requestCritical: 
 			[ self isSecondary ifTrue: 
-				[ self node primarySession ifNotNilDo: 
+				[ self node primarySession ifNotNil: 
 					[ : sess | 
 					[ sess removeWarmBackup: self thisLocation ] 
-						on: NetworkError
+						on: MaNetworkError
 						do: 
 							[ : err | 
 							"don't worry about it"
 							 ] ] ].
 			server ifNotNil: [ server shutdown ].
-			self node ifNotNilDo: [ : node | node sessions do: [ : each | each disconnect ] ].
-			self statistics ifNotNilDo: [ : stat | stat release ] ] ]! !
+			self node ifNotNil: [ : node | node sessions do: [ : each | each disconnect ] ].
+			self statistics ifNotNil: [ : stat | stat release ] ] ]! !
 
 !MagmaServerConsole methodsFor: 'notifications' stamp: 'cmm 12/17/2008 17:35'!
 noteAboutToStart
@@ -6763,7 +6756,7 @@ isOpen
 repositoryController
 	^ primaryLink localRequestServer processor! !
 
-!MagmaSession class methodsFor: '*magma-server' stamp: 'cmm 6/6/2018 20:24'!
+!MagmaSession class methodsFor: '*magma-server' stamp: 'jpb 5/12/2021 11:39:09'!
 cleanUp
 	"References to MagmaSessions get stuck in old MethodContext's, preventing garbage-collection.  Run this method and these instances will be cleaned."
 	| before after proxies reals |
@@ -6787,7 +6780,7 @@ cleanUp
 			 rehashPlayers.
 		(Smalltalk classNamed: #MauiBlockMorph) allInstances do:
 			[ : each | each receiver isMauiPrototype ifTrue: [ each resetReceiver ] ] ].
-	(Smalltalk classNamed: #TeCellAddress) ifNotNilDo:
+	(Smalltalk classNamed: #TeCellAddress) ifNotNil:
 		[ : teCellAddress | teCellAddress initializeReusableAddress ].
 	proxies _ MagmaMutatingProxy allInstances select:
 		[ : each | each maRealObjectIsReified ].
@@ -7458,7 +7451,7 @@ restoreMode
 session
 	^ repositoryController session! !
 
-!MagmaRepositoryRequest methodsFor: '*magma-server' stamp: 'cmm 4/23/2018 14:28'!
+!MagmaRepositoryRequest methodsFor: '*magma-server' stamp: 'jpb 5/12/2021 11:42:40'!
 shouldBePrimary
 	"This request should only run on the primary server.  If I am in restoreMode (not the primary) then ping the primary to see whether it is still there.  If it isn't, take over, otherwise signal a MagmaWrongServerError back to the client."
 	self isSecondary ifTrue: 
@@ -7467,7 +7460,7 @@ shouldBePrimary
 		MagmaWrongServerError new
 			correctServer: self node primaryLocation ;
 			signal ] 
-			on: NetworkError
+			on: MaNetworkError
 			do: 
 				[ : netErr | 
 				console ifNotNil: 
@@ -7509,7 +7502,7 @@ shouldBePrimary
 					setPrimary: console thisLocation ;
 					processUsing: console ] ]! !
 
-!MagmaRepositoryRequest methodsFor: '*magma-server' stamp: 'cmm 3/6/2009 10:05'!
+!MagmaRepositoryRequest methodsFor: '*magma-server' stamp: 'jpb 5/12/2021 11:42:47'!
 shouldBeSecondary
 	"This request should only run on the secondary server.  If I am not in restoreMode (the primary) then ping the primary to see whether it is still there.  If it isn't, take over, otherwise signal a MagmaWrongServerError back to the client."
 	| session |
@@ -7521,7 +7514,7 @@ shouldBeSecondary
 		session _ self node sessionFor: failedLocation.
 		console removeSecondaryLocation: failedLocation.
 		[ session beWarmBackupFor: self thisLocation ] 
-			on: NetworkError
+			on: MaNetworkError
 			do: 
 				[ : err | 
 				"It really is down, don't do anything."
@@ -7872,11 +7865,11 @@ process
 
 	^ repositoryController pathName! !
 
-!MagmaReleaseReaderRequest methodsFor: '*magma-server' stamp: 'cmm 1/5/2010 13:52'!
+!MagmaReleaseReaderRequest methodsFor: '*magma-server' stamp: 'jpb 5/12/2021 11:39:09'!
 process
 	(self repository 
 		collectionManagerFor: collectionOid
-		ifAbsent: [ nil ]) ifNotNilDo: [ : aMagmaCollectionManager | aMagmaCollectionManager wantsReleased: true ]! !
+		ifAbsent: [ nil ]) ifNotNil: [ : aMagmaCollectionManager | aMagmaCollectionManager wantsReleased: true ]! !
 
 !MagmaRequestSwapPrimaryDutyRequest methodsFor: '*magma-server' stamp: 'cmm 11/23/2009 13:04'!
 nodeCheck

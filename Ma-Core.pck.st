@@ -1,10 +1,10 @@
-'From Cuis 5.0 [latest update: #4579] on 11 May 2021 at 5:59:16 pm'!
+'From Cuis 5.0 [latest update: #4579] on 12 May 2021 at 11:53:09 am'!
 'Description Core of magma object oriented database
 
 License: MIT
 Original Author: Chris Muller (cmm)
 Author: Josef Philip Bernhart (jpb)'!
-!provides: 'Ma-Core' 1 7!
+!provides: 'Ma-Core' 1 9!
 SystemOrganization addCategory: 'Ma-Core'!
 
 
@@ -46,6 +46,46 @@ MaError subclass: #MaEnvironmentError
 	category: 'Ma-Core'!
 !classDefinition: 'MaEnvironmentError class' category: 'Ma-Core'!
 MaEnvironmentError class
+	instanceVariableNames: ''!
+
+!classDefinition: #MaNetworkError category: 'Ma-Core'!
+MaError subclass: #MaNetworkError
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Ma-Core'!
+!classDefinition: 'MaNetworkError class' category: 'Ma-Core'!
+MaNetworkError class
+	instanceVariableNames: ''!
+
+!classDefinition: #MaConnectionClosedError category: 'Ma-Core'!
+MaNetworkError subclass: #MaConnectionClosedError
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Ma-Core'!
+!classDefinition: 'MaConnectionClosedError class' category: 'Ma-Core'!
+MaConnectionClosedError class
+	instanceVariableNames: ''!
+
+!classDefinition: #MaConnectionRefusedError category: 'Ma-Core'!
+MaNetworkError subclass: #MaConnectionRefusedError
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Ma-Core'!
+!classDefinition: 'MaConnectionRefusedError class' category: 'Ma-Core'!
+MaConnectionRefusedError class
+	instanceVariableNames: ''!
+
+!classDefinition: #MaConnectionTimedOutError category: 'Ma-Core'!
+MaNetworkError subclass: #MaConnectionTimedOutError
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Ma-Core'!
+!classDefinition: 'MaConnectionTimedOutError class' category: 'Ma-Core'!
+MaConnectionTimedOutError class
 	instanceVariableNames: ''!
 
 !classDefinition: #MaSoftwareError category: 'Ma-Core'!
@@ -471,9 +511,9 @@ defaultAction
 initialAnswer: aString
 	initialAnswer _ aString! !
 
-!MaStringRequest methodsFor: 'accessing' stamp: 'cmm 3/1/2012 21:30'!
+!MaStringRequest methodsFor: 'accessing' stamp: 'jpb 5/12/2021 11:49:35'!
 initialAnswer
-	^ initialAnswer ifNil: [ String empty ]! !
+	^ initialAnswer ifNil: [ '' ]! !
 
 !MaStringRequest class methodsFor: 'create' stamp: 'cmm 9/27/2005 00:49'!
 messageText: messageString initialAnswer: initialAnswerString
@@ -600,19 +640,19 @@ testAppend
 copyright
 	^ 'Copyright ', Date today year asString , ', Muller Automation LLC,, All Rights Reserved.'! !
 
-!MaAttributableObject methodsFor: 'copying' stamp: 'cmm 2/3/2016 17:39'!
+!MaAttributableObject methodsFor: 'copying' stamp: 'jpb 5/12/2021 11:51:03'!
 attributesNotToDeepCopy
-	^ (self attributeNamed: #attributesNotToDeepCopy) ifNil: [ Array empty ]! !
+	^ (self attributeNamed: #attributesNotToDeepCopy) ifNil: [ #() ]! !
 
-!MaAttributableObject methodsFor: 'copying' stamp: 'cmm 2/3/2016 17:40'!
+!MaAttributableObject methodsFor: 'copying' stamp: 'jpb 5/12/2021 11:50:57'!
 attributesNotToDeepCopy: anArray
-	^ (self attributeNamed: #attributesNotToDeepCopy) ifNil: [ Array empty ]! !
+	^ (self attributeNamed: #attributesNotToDeepCopy) ifNil: [#() ]! !
 
-!MaAttributableObject methodsFor: 'copying' stamp: 'cmm 2/3/2016 11:02'!
+!MaAttributableObject methodsFor: 'copying' stamp: 'jpb 5/12/2021 11:50:51'!
 attributesToDeepCopy
 	"Subclasses override."
 	^ (attributes
-		ifNil: [ Array empty ]
+		ifNil: [ #() ]
 		ifNotNil: [ attributes keys ]) copyWithoutAll: self attributesNotToDeepCopy! !
 
 !MaAttributableObject methodsFor: 'copying' stamp: 'cmm 7/4/2013 20:25'!
@@ -684,7 +724,7 @@ restoreAttributes
 			[ "there were no attributes when rememberAttributes was called"
 			 ]! !
 
-!MaCommandLineProcessor class methodsFor: 'api' stamp: 'cmm 10/12/2013 16:25'!
+!MaCommandLineProcessor class methodsFor: 'api' stamp: 'jpb 5/12/2021 11:29:04'!
 args
 	"Answer an Array of the command-line arguments passed in."
 	| stream |
@@ -693,9 +733,9 @@ self maMarked: 'delete'.
 	3
 		to: 1000
 		do:
-			[ : n | (SmalltalkImage current getSystemAttribute: n)
+			[ : n | (MaRegistry getImageInterface getSystemAttribute: n)
 				ifNil: [ ^ stream contents ]
-				ifNotNilDo:
+				ifNotNil:
 					[ : arg | stream nextPut: arg ] ]! !
 
 !MaCommandLineProcessor class methodsFor: 'api' stamp: 'cmm 4/1/2014 09:48'!
@@ -824,11 +864,11 @@ differences
 			differencesWith: self object2
 			using: comparisonOperator ]! !
 
-!MaObjectComparison methodsFor: 'testing' stamp: 'cmm 11/26/2012 21:13'!
+!MaObjectComparison methodsFor: 'testing' stamp: 'jpb 5/12/2021 11:50:18'!
 differencesFor: differencesKey 
 	^ self differences
 		at: differencesKey
-		ifAbsent: [ Array empty ]! !
+		ifAbsent: [ #() ]! !
 
 !MaObjectComparison methodsFor: 'testing' stamp: 'cmm 11/26/2012 21:12'!
 differsBy: differencesKey
@@ -2689,9 +2729,9 @@ embeddedMorphs
 maContextKeywordsDo: aBlock
 	self subStrings do: aBlock! !
 
-!MauiPage methodsFor: 'access' stamp: 'cmm 2/26/2016 14:11'!
+!MauiPage methodsFor: 'access' stamp: 'jpb 5/12/2021 11:49:03'!
 string
-	^ text ifNil: [ String empty ] ifNotNil: [ text mauiPageString ]! !
+	^ text ifNil: [ '' ] ifNotNil: [ text mauiPageString ]! !
 
 !MauiPage methodsFor: 'access' stamp: 'cmm 11/19/2007 21:17'!
 subStrings
@@ -4385,10 +4425,10 @@ maActualMethod
 				ifTrue: [ class >> self selector ]
 				ifFalse: [ nil ] ]! !
 
-!MethodReference methodsFor: '*ma-core' stamp: 'cmm 12/4/2008 19:38'!
+!MethodReference methodsFor: '*ma-core' stamp: 'jpb 5/12/2021 11:39:09'!
 maAuthor
 	"Answer the author initials of the current version of this method."
-	^ self maActualMethod ifNotNilDo: 
+	^ self maActualMethod ifNotNil: 
 		[ : cm | 
 		cm timeStamp subStrings ifNotEmptyDo: [ : strings | strings first ] ]! !
 
@@ -4433,17 +4473,17 @@ maSentMessages
 				addAll: (self systemNavigation allImplementorsOf: each) ;
 				yourself ]! !
 
-!MethodReference methodsFor: '*ma-core' stamp: 'cmm 12/2/2008 23:38'!
+!MethodReference methodsFor: '*ma-core' stamp: 'jpb 5/12/2021 11:30:04'!
 maSentSelectors
 	^ self maActualMethod 
 		ifNil: 
 			[ #() ]
-		ifNotNilDo: [ : cm | cm messages ]! !
+		ifNotNil: [ : cm | cm messages ]! !
 
-!MethodReference methodsFor: '*ma-core' stamp: 'cmm 12/4/2008 19:37'!
+!MethodReference methodsFor: '*ma-core' stamp: 'jpb 5/12/2021 11:39:09'!
 maTimeStamp
 	"Answer the author initials of the current version of this method."
-	^ self maActualMethod ifNotNilDo: 
+	^ self maActualMethod ifNotNil: 
 		[ : cm | 
 		cm timeStamp subStrings ifNotEmptyDo: 
 			[ : strings | 

@@ -1,4 +1,4 @@
-'From Cuis 5.0 [latest update: #4579] on 11 May 2021 at 6:10:36 pm'!
+'From Cuis 5.0 [latest update: #4579] on 12 May 2021 at 11:53:10 am'!
 'Description I am a general object serialization and materialization framework.  Currently, I convert objects to ByteArrays and back.  I am used by both the "Ma client server" and "Magma" packages.  I offer a lot of flexibility in the way objects are serialized and materialized, even to the way the object graphs are traversed during serialization.
 
 The major class is MaObjectSerializer, see it for more information.  It utilizes a MaOidManager, a MaClassIdManager, and a MaObjectGraphTraversalStrategy to create a MaSerializedGraphBuffer, the final object that wraps the ByteArray.
@@ -7,7 +7,7 @@ The major class is MaObjectSerializer, see it for more information.  It utilizes
 License: MIT
 Original Author: Chris Muller (cmm)
 Author: Josef Philip Bernhart (jpb)'!
-!provides: 'Ma-Serializer-Core' 1 9!
+!provides: 'Ma-Serializer-Core' 1 11!
 !requires: 'Ma-Core' 1 1 nil!
 !requires: 'SOLHashTables' 1 4 nil!
 !requires: 'Ma-Statistics' 1 0 nil!
@@ -657,11 +657,10 @@ idOfClass: aClass is: anInteger
 		at: aClass
 		put: anInteger! !
 
-!MaClassIdManager methodsFor: 'building' stamp: 'cmm 6/30/2013 21:13'!
+!MaClassIdManager methodsFor: 'building' stamp: 'jpb 5/12/2021 11:50:44'!
 refreshInImageDefinition: aClass 
 	"Whenever the user recompiles a class in the image (e.g., during development)."
-	({Object. 
-	ProtoObject} includes: aClass) ifTrue:
+	({Object. 	ProtoObject} includes: aClass) ifTrue:
 		[ (self hasClassDefinitionFor: aClass) ifTrue:
 			[ inImageDefinitions
 				at: aClass
@@ -672,7 +671,7 @@ refreshInImageDefinition: aClass
 		[ : eachClass | | knownDefinitions | (eachClass = aClass or: [ self includesIdForClass: eachClass ]) ifTrue:
 			[ knownDefinitions _ (self hasClassDefinitionFor: eachClass)
 				ifTrue: [ self classDefinitionsForClass: eachClass ]
-				ifFalse: [ Array empty ].
+				ifFalse: [ #() ].
 			inImageDefinitions
 				at: eachClass
 				put:
@@ -1198,14 +1197,13 @@ allSuperclassDefinitionsDo: oneArgBlock
 
 	superclassDefinition ifNotNil: [ superclassDefinition withAllSuperclassDefinitionsDo: oneArgBlock ]! !
 
-!MaClassDefinition methodsFor: 'actions' stamp: 'cmm 3/8/2005 13:51'!
+!MaClassDefinition methodsFor: 'actions' stamp: 'jpb 5/12/2021 11:31:53'!
 createClassUsing: aMaObjectSerializer
 	| superClass |
 	superClass _ self superclassDefinition ensureClassUsing: aMaObjectSerializer.
 	^ SystemChangeNotifier uniqueInstance doSilently:
 		[ ((ClassBuilder new)
 			name: self className
-			inEnvironment: superClass environment 
 			subclassOf: superClass
 			type: type 
 			instanceVariableNames: self instanceVariablesString 
@@ -1213,7 +1211,7 @@ createClassUsing: aMaObjectSerializer
 			poolDictionaries: self sharedPoolsString
 			category: category)
 			
-			ifNotNilDo:
+			ifNotNil:
 				[ : class |
 				aMaObjectSerializer classIdManager
 					idOfClass: class
@@ -2734,7 +2732,7 @@ protocol: aCollection
 	sc do: [ : each | classIdManager addNewClass: each ].
 	self classIdManager beImmutable! !
 
-!MaObjectSerializer methodsFor: 'initializing' stamp: 'cmm 9/21/2013 18:01'!
+!MaObjectSerializer methodsFor: 'initializing' stamp: 'jpb 5/12/2021 11:49:54'!
 setUpClassDefinitionProcessing
 	preferences
 		
@@ -2746,7 +2744,8 @@ setUpClassDefinitionProcessing
 				ifAbsent: [ (classIdManager addNewClass: aMaClassReference classObject theNonMetaClass) id ].
 			defs _ classIdManager
 				classDefinitionsForId: id
-				ifAbsent: [ Array empty ].
+				ifAbsent: [ #() ].
+				
 			aMaClassReference isDefinition ifTrue:
 				[ (defs noneSatisfy:
 					[ : each | each isKnownAs: aMaClassReference name ]) ifTrue: [ MaObjectSerializationUserError signal: 'MaClassDefinitions are private to serializers, you must not serialize MaClassDefinitions from other serializers.' ] ].
@@ -2758,7 +2757,7 @@ setUpClassDefinitionProcessing
 				receiver: classIdManager
 				selector: #addClassDefinition:)! !
 
-!MaObjectSerializer methodsFor: 'initializing' stamp: 'cmm 4/16/2018 20:11'!
+!MaObjectSerializer methodsFor: 'initializing' stamp: 'jpb 5/12/2021 11:34:35'!
 setUpPreAndPostProcessing
 	"Initiailize the pre and post-materializers for classes that come with standard Squeak.  Base Squeak uses one of two methods for serializing objects; ReferenceStream and ImageSegments.  MaObjectSerialization more-closely resembles ReferenceStream.  While the setup for these processors is based on the behavior in those other two frameworks, there are bound to be some minor differences."
 	self setUpClassDefinitionProcessing.
@@ -2781,25 +2780,7 @@ preferences
 			[ : aPasteUpMorph | 
 			aPasteUpMorph prepareToBeSaved.	"Amen"
 			thisContext home removeSelf ].
-	"preferences
-	afterSerializingAny: #ScriptEditorMorph
-	do: [ : aScriptEditorMorph | aScriptEditorMorph class = BooleanScriptEditor ifFalse: [ aScriptEditorMorph unhibernate ] ].
-preferences
-	afterMaterializingAny: #ScriptEditorMorph
-	do: [ : aScriptEditorMorph | aScriptEditorMorph class = BooleanScriptEditor ifFalse: [ aScriptEditorMorph unhibernate ] ]."
-	preferences 
-		beforeSerializingAny: #TTCFont
-		do: 
-			[ : aTTCFont | 
-			aTTCFont flushCache.
-			thisContext home removeSelf ].
 
-	"preferences
-		beforeSerializingAny: #Wonderland
-		do: [ : aWonderland | aWonderland prepareToBeSaved ].
-preferences
-	beforeSerializingAny: #ViewerFlapTab
-	do: [ : aViewFlapTab | aViewFlapTab hibernate ]."
 	self maMarked: 'dev'.
 	"You've got this commented out because it changes the shape of the object while you're serializing it, which ends up causing the graphBuffer to not be #isWhole (which causes problems on materialization).
 Do we need this?  It appears that Project>>exportSegmentWithChangeSet:  fileName:  directory: calls it at the end.  Also, Project>>exportSegmentWithCatagories: classes: fileName: directory:"
@@ -2811,65 +2792,17 @@ preferences
 	do: [ : aViewerFlapTab | aViewerFlapTab unhibernate ]."
 	preferences
 		beforeSerializingAny: #CompiledMethod
-			do: [ : aCompiledMethod | aCompiledMethod fixForWriteBarrier ] ;
+			do: [ : aCompiledMethod | aCompiledMethod fixForWriteBarrier ].
+	
+	preferences		
 		beforeSerializingAny: #Context
 			do:
 				[ : aContext | aContext removeSelf.
-				1 to: aContext numArgs do: [ : n | aContext tempAt: n put: nil ] ] ;
+				1 to: aContext numArgs do: [ : n | aContext tempAt: n put: nil ] ].
+			
+	preferences		
 		afterMaterializingAny: #Context
-			do: [ : aContext | aContext privRefresh ].
-	(Smalltalk hasClassNamed: #Project) ifTrue: 
-		[ preferences 
-			beforeSerializingAny: #Project
-			do: 
-				[ : aProject | 
-				| world |
-				world _ aProject world.
-				aProject world 
-					setProperty: #optimumExtentFromAuthor
-					toValue: aProject world extent.	"As suggested by Project>>#storeOnServerAssumingNameValid"
-				(Smalltalk classNamed: #Utilities) ifNotNilDo: 
-					[ : utilities | 
-					"The following is from Project>>#exportSegmentWithChangeSet:fileName:directory:"
-					utilities emptyScrapsBook ].
-				world currentHand pasteBuffer: nil.	"don't write the paste buffer."
-				world currentHand mouseOverHandler initialize.	"forget about any references here"
-				"Display checkCurrentHandForObjectToPaste."
-				(Smalltalk classNamed: #Command) ifNotNilDo: [ : command | command initialize ].
-				world clearCommandHistory.
-				world
-					fullReleaseCachedState ;
-					releaseViewers.
-				world cleanseStepList.
-				world releaseSqueakPages.
-				(Smalltalk classNamed: #ScriptEditorMorph) ifNotNilDo: 
-					[ : sem | 
-					sem writingUniversalTiles: (aProject 
-							projectParameterAt: #universalTiles
-							ifAbsent: [ false ]) ].
-				thisContext home removeSelf ].
-		preferences 
-			afterMaterializingAny: #Project
-			do: 
-				[ : aProject | 
-				aProject setParent: (Smalltalk classNamed: #Project) current.
-				aProject world beWorldForProject: aProject.	"sets aProject's worldState"
-				"This behavior suggested by ImageSegment>>#comeFullyUpOnReload:"
-				aProject ensureChangeSetNameUnique.
-				(Smalltalk classNamed: #Project) addingProject: aProject.
-				aProject restoreReferences.
-				self maMarked: 'dev'.	"need to restore dependents??"
-				(Smalltalk classNamed: #ScriptEditorMorph) ifNotNilDo: 
-					[ : sem | 
-					sem writingUniversalTiles: ((aProject projectPreferenceAt: #universalTiles) ifNil: [ false ]) ].
-				thisContext home removeSelf ]
-		"preferences
-	afterMaterializingAny: #WorldState
-	do:
-		[ : aWorldState |
-		aWorldState
-			convertStepList ;
-			convertAlarms ]." ]! !
+			do: [ : aContext | aContext privRefresh ].! !
 
 !MaObjectSerializer methodsFor: 'accessing'!
 byteArray
@@ -4194,9 +4127,9 @@ maSizeIn: aMaObjectBuffer
 
 	^ self maBufferInstSize * aMaObjectBuffer slotSize! !
 
-!ProtoObject methodsFor: '*ma-serializer-core' stamp: 'cmm 7/29/2011 09:51'!
+!ProtoObject methodsFor: '*ma-serializer-core' stamp: 'jpb 5/12/2021 11:48:47'!
 maTransientVariables
-	^ Array empty! !
+	^#()! !
 
 !ProtoObject methodsFor: '*ma-serializer-core' stamp: 'cmm 2/3/2005 17:30'!
 maUsesStandardStorage
@@ -4462,9 +4395,9 @@ maMaterializeFromGraph: aByteArray using: aMaObjectSerializer
 	diskProxy _ aMaObjectSerializer materializeGraph: aByteArray.
 	^ diskProxy comeFullyUpOnReload: nil! !
 
-!SystemOrganizer methodsFor: '*ma-serializer-core' stamp: 'cmm 3/1/2012 21:32'!
+!SystemOrganizer methodsFor: '*ma-serializer-core' stamp: 'jpb 5/12/2021 11:48:34'!
 maAsStorageObject 
-	^ String empty! !
+	^''! !
 
 !SystemOrganizer methodsFor: '*ma-serializer-core' stamp: 'cmm 2/4/2005 17:13'!
 maUsesStandardStorage 
@@ -4669,11 +4602,11 @@ maCopyAndDisconnect
 		setMethod: nil ;
 		yourself! !
 
-!ProcessorScheduler methodsFor: '*ma-serializer-core' stamp: 'cmm 3/1/2012 21:31'!
+!ProcessorScheduler methodsFor: '*ma-serializer-core' stamp: 'jpb 5/12/2021 11:48:51'!
 maAsStorageObject
 	"We don't even need to store the name of the global.  It's class
 	gives it away."
-	^ String empty! !
+	^''! !
 
 !ProcessorScheduler methodsFor: '*ma-serializer-core' stamp: 'cmm 11/29/2004 11:01'!
 maUsesStandardStorage
@@ -5006,10 +4939,10 @@ maIsLogicallyVariable
 newSkeletonFor: aMaVariableObjectBuffer
 	^ self new: aMaVariableObjectBuffer objectInstSize / 2 "key + value"! !
 
-!SystemDictionary methodsFor: '*ma-serializer-core' stamp: 'cmm 3/1/2012 21:32'!
+!SystemDictionary methodsFor: '*ma-serializer-core' stamp: 'jpb 5/12/2021 11:48:40'!
 maAsStorageObject
 	"We don't need to store the name of the global.  It's class gives it away."
-	^ String empty! !
+	^''! !
 
 !SystemDictionary methodsFor: '*ma-serializer-core' stamp: 'cmm 11/29/2004 11:01'!
 maUsesStandardStorage
@@ -5131,10 +5064,10 @@ transientOwner: aBoolean
 				toValue: aBoolean ]
 		ifFalse: [ self removeProperty: #transientOwner ]! !
 
-!HandMorph methodsFor: '*ma-serializer-core' stamp: 'cmm 3/1/2012 21:30'!
+!HandMorph methodsFor: '*ma-serializer-core' stamp: 'jpb 5/12/2021 11:51:07'!
 maAsStorageObject
 	"We don't yet support serialization of individual HandMorphs.  For now, we restore any HandMorph as a logical link to the ActiveHand."
-	^ String empty! !
+	^''! !
 
 !HandMorph methodsFor: '*ma-serializer-core' stamp: 'cmm 11/29/2004 11:01'!
 maUsesStandardStorage

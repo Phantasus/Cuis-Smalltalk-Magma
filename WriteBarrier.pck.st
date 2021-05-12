@@ -1,8 +1,8 @@
-'From Cuis 5.0 [latest update: #4579] on 11 May 2021 at 5:59:24 pm'!
+'From Cuis 5.0 [latest update: #4579] on 12 May 2021 at 11:53:16 am'!
 'Description License: MIT
 Original author: Chris Muller (cmm)
 Author: Josef Philip Bernhart (jpb)'!
-!provides: 'WriteBarrier' 1 1!
+!provides: 'WriteBarrier' 1 2!
 SystemOrganization addCategory: 'WriteBarrier-Collections'!
 SystemOrganization addCategory: 'WriteBarrier-Core'!
 SystemOrganization addCategory: 'WriteBarrier-Tests'!
@@ -792,10 +792,10 @@ generateTemporaryDeclarations
 			 nextPutAll: i asString ].
 	stream nextPutAll: ' returnValue |'! !
 
-!WBMethodBuilder methodsFor: 'private' stamp: 'cmm 12/3/2011 16:48'!
+!WBMethodBuilder methodsFor: 'private' stamp: 'jpb 5/12/2021 11:48:30'!
 initialize
 	super initialize.
-	stream _ WriteStream on: String empty! !
+	stream _ WriteStream on: ''! !
 
 !WBMethodBuilder methodsFor: 'private' stamp: 'avi 10/6/2004 13:51'!
 initializeWithSelector: aSymbol class: aClass fields: anArray

@@ -1,4 +1,4 @@
-'From Cuis 5.0 [latest update: #4579] on 11 May 2021 at 5:04:43 pm'!
+'From Cuis 5.0 [latest update: #4579] on 12 May 2021 at 11:53:01 am'!
 'Description I provide several independent, special-purpose collection classes that seem to be generally useful.
 
 MaWeakIdentityKeyDictionary and MaWeakValueDictionary wrap a collection of their Smalltalk counterparts and keeps them all under 12-bits in size, thus minimizing the number of collisions due to Squeaks 12-bits identity hash.  These provide major improvement in the #removeKey: message.
@@ -62,7 +62,7 @@ Other features are:
 License: MIT
 Original Author: Chris Muller (cmm)
 Author: Josef Philip Bernhart (jpb)'!
-!provides: 'Ma-Collections' 1 6!
+!provides: 'Ma-Collections' 1 8!
 SystemOrganization addCategory: 'Ma-Collections'!
 SystemOrganization addCategory: 'Ma-Collections-Exceptions'!
 SystemOrganization addCategory: 'Ma-Collections-Tests'!
@@ -1885,10 +1885,10 @@ at: key ifAbsent: aBlock
 		at: key
 		ifAbsent: [ ^ aBlock value ]) at: 1! !
 
-!WeakValueBTree methodsFor: 'accessing' stamp: 'cmm 10/28/2011 15:52'!
+!WeakValueBTree methodsFor: 'accessing' stamp: 'jpb 5/12/2021 11:48:21'!
 at: anObject ifPresent: oneArgBlock ifAbsent: zeroArgBlock 
 	| current uniqueObject |
-	uniqueObject _ String empty.
+	uniqueObject _ ''.
 	^ (current _ self
 		at: anObject
 		ifAbsent: [ uniqueObject ]) == uniqueObject
@@ -2102,9 +2102,9 @@ removeKey: aString ifAbsent: errorBlock
 values
 	^ Array streamContents: [:s | self do: [:ea | s nextPut: ea]]! !
 
-!TSTree methodsFor: 'enumerating' stamp: 'avi 9/7/2005 21:56'!
+!TSTree methodsFor: 'enumerating' stamp: 'jpb 5/12/2021 11:39:09'!
 do: aBlock
-	emptyValue ifNotNilDo: aBlock.
+	emptyValue ifNotNil: aBlock.
 	root ifNotNil: [root do: aBlock]! !
 
 !TSTree methodsFor: 'enumerating' stamp: 'avi 9/7/2005 21:55'!
@@ -7178,14 +7178,14 @@ childForKey: aMagnitude
 childrenDo: aBlock
 	self valuesDo: aBlock! !
 
-!BTreeInteriorNode methodsFor: 'as yet unclassified' stamp: 'lr 4/15/2009 09:50'!
+!BTreeInteriorNode methodsFor: 'as yet unclassified' stamp: 'jpb 5/12/2021 11:31:34'!
 commonKeysWith: aNode keysAndValuesDo: aBlock flip: aBoolean
 	| index |
 	aNode firstKey < self firstKey ifTrue: [^ aNode commonKeysWith: self keysAndValuesDo: aBlock flip: aBoolean not].
 	index _ (keys findIndexForKey: aNode firstKey) max: 1.
 	index to: self size do:
 		[:i |
-		(self at: i) ifNotNilDo: [:c | c commonKeysWith: aNode keysAndValuesDo: aBlock flip: aBoolean]]! !
+		(self at: i) ifNotNil: [:c | c commonKeysWith: aNode keysAndValuesDo: aBlock flip: aBoolean]]! !
 
 !BTreeInteriorNode methodsFor: 'as yet unclassified' stamp: 'avi 4/21/2005 02:28'!
 depth
@@ -7570,9 +7570,9 @@ cullNode: aNode
 	equal == aNode ifTrue: [^ equal _ nil].
 	high == aNode ifTrue: [^ high _ nil]! !
 
-!TSTreeNode methodsFor: 'private' stamp: 'avi 9/22/2004 01:00'!
+!TSTreeNode methodsFor: 'private' stamp: 'jpb 5/12/2021 11:39:09'!
 do: aBlock
-	self nodesDo: [:ea | ea value ifNotNilDo: aBlock]! !
+	self nodesDo: [:ea | ea value ifNotNil: aBlock]! !
 
 !TSTreeNode methodsFor: 'private' stamp: 'lr 4/15/2009 09:50'!
 initializeWithKey: aCharacter

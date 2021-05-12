@@ -1,10 +1,10 @@
-'From Cuis 5.0 [latest update: #4579] on 11 May 2021 at 5:59:14 pm'!
+'From Cuis 5.0 [latest update: #4579] on 12 May 2021 at 11:52:59 am'!
 'Description Magma core for server and client
 
 License: MIT
 Original author: Chris Muller (cmm)
 Author: Josef Philip Bernhart (jpb)'!
-!provides: 'Ma-Client-Server-Core' 1 8!
+!provides: 'Ma-Client-Server-Core' 1 11!
 !requires: 'Ma-Collections' 1 0 nil!
 !requires: 'Ma-Core' 1 1 nil!
 SystemOrganization addCategory: 'Ma-Client-Server-Core'!
@@ -58,6 +58,16 @@ MaNotification subclass: #MaClientServerNotification
 	category: 'Ma-Client-Server-Core'!
 !classDefinition: 'MaClientServerNotification class' category: 'Ma-Client-Server-Core'!
 MaClientServerNotification class
+	instanceVariableNames: ''!
+
+!classDefinition: #MaClientStat category: 'Ma-Client-Server-Core'!
+MaSerializationStat subclass: #MaClientStat
+	instanceVariableNames: 'timeToConnectSocketHistory timeToLoadBuffersHistory timeToSendRequestsHistory timeWaitingForResponsesHistory timeReceivingResponsesHistory timeToSubmitByRequestClassHistorys'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Ma-Client-Server-Core'!
+!classDefinition: 'MaClientStat class' category: 'Ma-Client-Server-Core'!
+MaClientStat class
 	instanceVariableNames: ''!
 
 !classDefinition: #MaClientConnection category: 'Ma-Client-Server-Core'!
@@ -280,16 +290,6 @@ Object subclass: #MaServerStat
 MaServerStat class
 	instanceVariableNames: ''!
 
-!classDefinition: #MaClientStat category: 'Ma-Client-Server-Core'!
-ProtoObject subclass: #MaClientStat
-	instanceVariableNames: 'timeToConnectSocketHistory timeToLoadBuffersHistory timeToSendRequestsHistory timeWaitingForResponsesHistory timeReceivingResponsesHistory timeToSubmitByRequestClassHistorys'
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Ma-Client-Server-Core'!
-!classDefinition: 'MaClientStat class' category: 'Ma-Client-Server-Core'!
-MaClientStat class
-	instanceVariableNames: ''!
-
 
 !MaMalformedRequestError commentStamp: 'cmm 2/1/2005 15:26' prior: 0!
 I am signaled when a request is received from a client that could not be materialized.!
@@ -425,6 +425,84 @@ expected: anInteger
 		 expectedSequenceNumber: anInteger ;
 		 yourself! !
 
+!MaClientStat methodsFor: 'enumerate' stamp: 'cmm 5/9/2008 17:46'!
+historysDo: aBlock 
+	super historysDo: aBlock.
+	{ 
+		timeToConnectSocketHistory.
+		timeToLoadBuffersHistory.
+		timeToSendRequestsHistory.
+		timeWaitingForResponsesHistory.
+		timeReceivingResponsesHistory
+	 } do: aBlock.
+	timeToSubmitByRequestClassHistorys do: aBlock! !
+
+!MaClientStat methodsFor: 'initialize-release' stamp: 'cmm 5/9/2008 17:45'!
+initialize
+	super initialize.
+	timeToSubmitByRequestClassHistorys _ Dictionary new.
+	timeToConnectSocketHistory _ MaStatHistory name: 'Time to Connect Sockets to Server'.
+	timeToLoadBuffersHistory _ MaStatHistory name: 'Time to Load Buffers'.
+	timeToSendRequestsHistory _ MaStatHistory name: 'Time to Send Requests'.
+	timeWaitingForResponsesHistory _ MaStatHistory name: 'Time for Initial Response'.
+	timeReceivingResponsesHistory _ MaStatHistory name: 'Time to Download Full Response'! !
+
+!MaClientStat methodsFor: 'historys' stamp: 'cmm 4/27/2009 20:50'!
+networkStats
+	"Statistics related to the networking."
+	^ { 
+		timeToConnectSocketHistory.
+		timeToLoadBuffersHistory.
+		timeToSendRequestsHistory.
+		timeWaitingForResponsesHistory.
+		timeReceivingResponsesHistory
+	 }! !
+
+!MaClientStat methodsFor: 'historys' stamp: 'cmm 4/27/2009 21:03'!
+requestHistory
+	^ timeToSubmitByRequestClassHistorys asSortedCollection: [ : a : b | a name < b name ]! !
+
+!MaClientStat methodsFor: 'historys' stamp: 'cmm 5/9/2008 17:32'!
+timeReceivingResponsesHistory
+	"The time from when the initial response is received from the server to when all bytes of the response are downloaded.  By excluding the time waiting for the *initial* response, this stat attempts to measure the speed of downloading responses over the network."
+	^timeReceivingResponsesHistory! !
+
+!MaClientStat methodsFor: 'historys' stamp: 'cmm 5/9/2008 17:33'!
+timeToConnectSocketHistory
+	"Time to initiate a socket-connections, performed for for each request of the server."
+	^timeToConnectSocketHistory! !
+
+!MaClientStat methodsFor: 'historys' stamp: 'cmm 5/9/2008 17:33'!
+timeToLoadBuffersHistory
+	"For now Ma client server makes lots of copies of ByteArrays.  Until this is optimized, this stat tracks it to see how big of an impact it is."
+	^timeToLoadBuffersHistory! !
+
+!MaClientStat methodsFor: 'historys' stamp: 'cmm 5/9/2008 17:34'!
+timeToSendRequestsHistory
+	"The time needed just to send requests to the server."
+	^timeToSendRequestsHistory! !
+
+!MaClientStat methodsFor: 'historys' stamp: 'cmm 6/25/2008 14:43'!
+timeToSubmitHistoryFor: requestClass 
+	"The total time, by request class, including serialization, materialization, and all other house keeping.  A useful set of stats measuring the total reality for the client, by request type."
+	^ timeToSubmitByRequestClassHistorys 
+		at: requestClass
+		ifAbsentPut: 
+			[ MaStatHistory new
+				name: 'Time waiting for ' , requestClass name , ' requests' ;
+				transition ;
+				yourself ]! !
+
+!MaClientStat methodsFor: 'historys' stamp: 'cmm 5/9/2008 17:40'!
+timeWaitingForResponsesHistory
+	"When all bytes for a request have been pumped into the TCP/IP socket connected to the server, this stat immediately starts timing until we get the *first* initial response bytes back (which won't occur until the server has completely processed our request and is now sending back the response).  Therefore, this stat is a approximate measure of the time the server spends processing each request, including any time waiting in its request queue."
+	^timeWaitingForResponsesHistory! !
+
+!MaClientStat methodsFor: 'copying' stamp: 'cmm 12/22/2008 19:54'!
+postArchivalCopy
+	timeToSubmitByRequestClassHistorys _ timeToSubmitByRequestClassHistorys copy.
+	super postArchivalCopy! !
+
 !MaClientConnection methodsFor: 'accessing' stamp: 'cmm 8/22/2013 13:34'!
 console
 	^ serverSocket console! !
@@ -545,7 +623,7 @@ monitorForUdpByteArrayRequests
 priorLifecycle: aMaServerRequestLifecycle
 	priorLifecycle _ aMaServerRequestLifecycle! !
 
-!MaClientConnection methodsFor: 'private' stamp: 'cmm 9/8/2015 15:05'!
+!MaClientConnection methodsFor: 'private' stamp: 'jpb 5/12/2021 11:40:02'!
 receiveOneByteArrayRequestFrom: aMaRequestLifecycle 
 	"Wait up to 3 seconds for something from the client.  If data is received from aMaRequestLifecycle's socket be sure the entire data is received.  Otherwise answer nil."
 	| header bytesExpected incomingSequenceNumber answer firstDataReceived compressed priorTimeout |
@@ -554,7 +632,7 @@ receiveOneByteArrayRequestFrom: aMaRequestLifecycle
 	[ aMaRequestLifecycle socketStream timeout: 3.
 	header _ aMaRequestLifecycle socketStream next: 8.
 	aMaRequestLifecycle socketStream timeout: priorTimeout ]
-		on: ConnectionTimedOut
+		on: MaConnectionTimedOutError
 		do: [ : err | ^ nil ].
 	firstDataReceived _ Time millisecondClockValue.
 	bytesExpected _ header maUnsigned32At: 1.
@@ -572,7 +650,7 @@ receiveOneByteArrayRequestFrom: aMaRequestLifecycle
 	incomingSequenceNumber > aMaRequestLifecycle sequenceNumber ifTrue: [ "Maybe should just allow this?  It probably wouldn't ever happen, but if it did the client is 'satisfied', and maybe because of having sent #wantsResponse=false requests?" (MaClientServerOutOfSequence expected: aMaRequestLifecycle sequenceNumber) signal ].
 	answer _ aMaRequestLifecycle socketStream next: bytesExpected - serverSocket headerSize.
 	self console noteTimeToExtractRequestBytes: (Time millisecondsSince: firstDataReceived).
-	aMaRequestLifecycle socketStream isDataAvailable ifTrue: [ NetworkError signal: 'Unexpected client behavior, more bytes received than client stated sending.' ].
+	aMaRequestLifecycle socketStream isDataAvailable ifTrue: [ MaNetworkError signal: 'Unexpected client behavior, more bytes received than client stated sending.' ].
 	compressed ifTrue: [ answer _ answer lzUncompressed ].
 	^ answer! !
 
@@ -660,9 +738,9 @@ initialize
 	super initialize.
 	Debug _ false! !
 
-!MaClientServerRequest methodsFor: 'accessing' stamp: 'cmm 9/21/2008 15:45'!
+!MaClientServerRequest methodsFor: 'accessing' stamp: 'jpb 5/12/2021 11:32:17'!
 clientConnection
-	^ self lifecycle ifNotNilDo: [ : lc | lc clientConnection ]! !
+	^ self lifecycle ifNotNil: [ : lc | lc clientConnection ]! !
 
 !MaClientServerRequest methodsFor: 'accessing' stamp: 'cmm 9/20/2008 17:08'!
 lifecycle
@@ -1457,12 +1535,12 @@ launch
 	| displayType | displayType _ Smalltalk isHeadless ifTrue: [ 'none' ] ifFalse: [ 'X11 -iconic' ].
 	OSProcess command: Smalltalk vmFileName, ' -vm display=', displayType, ' ' , self imageName, ' ', self port asString, ' ''', name , ''' > ' , name , '.log 2>' , name , '.err &'! !
 
-!MaNetworkPlayer methodsFor: 'client side' stamp: 'cmm 9/18/2013 20:37'!
+!MaNetworkPlayer methodsFor: 'client side' stamp: 'jpb 5/12/2021 11:50:25'!
 remotePerform: selectorSymbol 
 	"Perform selectorSymbol on my server's processor in my player image."
 	^ self
 		remotePerform: selectorSymbol
-		withArguments: Array empty! !
+		withArguments: #()! !
 
 !MaNetworkPlayer methodsFor: 'client side' stamp: 'cmm 1/3/2013 12:45'!
 remotePerform: selectorSymbol with: argument 
@@ -1861,12 +1939,12 @@ maxConnections
 primQueueRequest: aMaServerRequestLifecycle 
 	requestQueue nextPut: aMaServerRequestLifecycle! !
 
-!MaServerSocket methodsFor: 'private' stamp: 'cmm 9/19/2014 10:41'!
+!MaServerSocket methodsFor: 'private' stamp: 'jpb 5/12/2021 11:39:09'!
 primShutdown
 	running _ false.
 	console note: 'Server is shutting down right now.'.
 	[ socketQueue isEmpty ] whileFalse: [ (Delay forSeconds: 1) wait ].
-	socketQueueMonitorProcess ifNotNilDo:
+	socketQueueMonitorProcess ifNotNil:
 		[ : proc | proc terminate ].
 	processRequestProcess ifNotNil: [processRequestProcess terminate].
 	socket ifNotNil: [ socket closeAndDestroy: self timeoutSeconds ].
@@ -2206,10 +2284,11 @@ noteRequestDequeued: aMaRequestLifecycle
 					since: lastRequestFinish).
 			self noteLastRequestFinish: nil ] ]! !
 
-!MaServerConsole methodsFor: 'notifications' stamp: 'cmm 10/12/2015 20:08'!
+!MaServerConsole methodsFor: 'notifications' stamp: 'jpb 5/12/2021 11:21:53'!
 noteRequestProcessed: requestObject 
 	| time sound |
-	time _ Time millisecondsSince: lastRequestStart.
+	time _ MaRegistry findMillisecondsSince: lastRequestStart.
+	
 	(playAuditorialization and: [ (sound _ soundTheme soundFor: requestObject) notNil ]) ifTrue:
 		[ soundQueue ifNil: [ soundQueue _ QueueSound new play ].
 		soundQueue add: (sound copy duration: time / 1000.0) ].
@@ -2613,12 +2692,12 @@ port: portInteger
 			[ port = aMaServerLocation port and: 
 				[ myAddress = otherAddress or: [ myAddress maIsLocalHost and: [ otherAddress maIsLocalHost ] ] ] ]! !
 
-!MaServerLocation methodsFor: 'testing' stamp: 'cmm 3/2/2009 17:20'!
+!MaServerLocation methodsFor: 'testing' stamp: 'jpb 5/12/2021 11:29:15'!
 hash
 	"Local addresses may be anything that begins with 127."
 	^ self hostAddress 
 		ifNil: [ nil hash bitXor: port hash ]
-		ifNotNilDo: 
+		ifNotNil: 
 			[ : addr | 
 			| simplifiedAddress |
 			simplifiedAddress _ addr maIsLocalHost 
@@ -2868,20 +2947,17 @@ checkUuidPlugin
 		
 	^true! !
 
-!MaRegistry class methodsFor: 'as yet unclassified' stamp: 'jpb 5/11/2021 16:21:50'!
+!MaRegistry class methodsFor: 'as yet unclassified' stamp: 'jpb 5/12/2021 11:25:51'!
 findMillisecondsSince: lastTime
 	"Answer the elapsed time since last recorded in milliseconds.
 	Compensate for rollover."
 
-	^self findMillisecondsSince: lastTime with: Time now! !
+	^Time millisecondClockValue - lastTime! !
 
-!MaRegistry class methodsFor: 'as yet unclassified' stamp: 'jpb 5/11/2021 16:20:34'!
-findMillisecondsSince: lastTime with: baseTime
-	"Answer the elapsed time since last recorded in milliseconds.
-	Compensate for rollover."
-
-	^baseTime millisecondClockValue - lastTime
-! !
+!MaRegistry class methodsFor: 'as yet unclassified' stamp: 'jpb 5/12/2021 11:28:55'!
+getImageInterface
+	"Returns something which interacts with the running Smalltalk system. Normally that would be Smalltalk global"
+	^Smalltalk! !
 
 !MaRegistry class methodsFor: 'as yet unclassified' stamp: 'jpb 5/11/2021 03:54:10'!
 initialize
@@ -2924,6 +3000,13 @@ registerForNotifications: anObject
 registerMemoryHog: newMemoryHog
 	(memoryHogs includes: newMemoryHog)
 		ifFalse: [ 	memoryHogs add: newMemoryHog ]! !
+
+!MaRegistry class methodsFor: 'as yet unclassified' stamp: 'jpb 5/12/2021 11:41:48'!
+serverSave: saveOption andExit: exitOption
+	[ (Delay forSeconds: 1) wait.
+		Smalltalk 
+		snapshot: saveOption
+		andQuit: exitOption ] fork! !
 
 !MaServerStat methodsFor: 'historys' stamp: 'cmm 5/7/2008 17:28'!
 clientTimeoutsHistory
@@ -3138,84 +3221,6 @@ topRequestTypesByMean
 !MaServerStat methodsFor: 'chart' stamp: 'cmm 8/18/2014 10:10'!
 topRequestTypesByTotal
 	^ self topRequestTypesBy: #total! !
-
-!MaClientStat methodsFor: 'enumerate' stamp: 'cmm 5/9/2008 17:46'!
-historysDo: aBlock 
-	super historysDo: aBlock.
-	{ 
-		timeToConnectSocketHistory.
-		timeToLoadBuffersHistory.
-		timeToSendRequestsHistory.
-		timeWaitingForResponsesHistory.
-		timeReceivingResponsesHistory
-	 } do: aBlock.
-	timeToSubmitByRequestClassHistorys do: aBlock! !
-
-!MaClientStat methodsFor: 'initialize-release' stamp: 'cmm 5/9/2008 17:45'!
-initialize
-	super initialize.
-	timeToSubmitByRequestClassHistorys _ Dictionary new.
-	timeToConnectSocketHistory _ MaStatHistory name: 'Time to Connect Sockets to Server'.
-	timeToLoadBuffersHistory _ MaStatHistory name: 'Time to Load Buffers'.
-	timeToSendRequestsHistory _ MaStatHistory name: 'Time to Send Requests'.
-	timeWaitingForResponsesHistory _ MaStatHistory name: 'Time for Initial Response'.
-	timeReceivingResponsesHistory _ MaStatHistory name: 'Time to Download Full Response'! !
-
-!MaClientStat methodsFor: 'historys' stamp: 'cmm 4/27/2009 20:50'!
-networkStats
-	"Statistics related to the networking."
-	^ { 
-		timeToConnectSocketHistory.
-		timeToLoadBuffersHistory.
-		timeToSendRequestsHistory.
-		timeWaitingForResponsesHistory.
-		timeReceivingResponsesHistory
-	 }! !
-
-!MaClientStat methodsFor: 'historys' stamp: 'cmm 4/27/2009 21:03'!
-requestHistory
-	^ timeToSubmitByRequestClassHistorys asSortedCollection: [ : a : b | a name < b name ]! !
-
-!MaClientStat methodsFor: 'historys' stamp: 'cmm 5/9/2008 17:32'!
-timeReceivingResponsesHistory
-	"The time from when the initial response is received from the server to when all bytes of the response are downloaded.  By excluding the time waiting for the *initial* response, this stat attempts to measure the speed of downloading responses over the network."
-	^timeReceivingResponsesHistory! !
-
-!MaClientStat methodsFor: 'historys' stamp: 'cmm 5/9/2008 17:33'!
-timeToConnectSocketHistory
-	"Time to initiate a socket-connections, performed for for each request of the server."
-	^timeToConnectSocketHistory! !
-
-!MaClientStat methodsFor: 'historys' stamp: 'cmm 5/9/2008 17:33'!
-timeToLoadBuffersHistory
-	"For now Ma client server makes lots of copies of ByteArrays.  Until this is optimized, this stat tracks it to see how big of an impact it is."
-	^timeToLoadBuffersHistory! !
-
-!MaClientStat methodsFor: 'historys' stamp: 'cmm 5/9/2008 17:34'!
-timeToSendRequestsHistory
-	"The time needed just to send requests to the server."
-	^timeToSendRequestsHistory! !
-
-!MaClientStat methodsFor: 'historys' stamp: 'cmm 6/25/2008 14:43'!
-timeToSubmitHistoryFor: requestClass 
-	"The total time, by request class, including serialization, materialization, and all other house keeping.  A useful set of stats measuring the total reality for the client, by request type."
-	^ timeToSubmitByRequestClassHistorys 
-		at: requestClass
-		ifAbsentPut: 
-			[ MaStatHistory new
-				name: 'Time waiting for ' , requestClass name , ' requests' ;
-				transition ;
-				yourself ]! !
-
-!MaClientStat methodsFor: 'historys' stamp: 'cmm 5/9/2008 17:40'!
-timeWaitingForResponsesHistory
-	"When all bytes for a request have been pumped into the TCP/IP socket connected to the server, this stat immediately starts timing until we get the *first* initial response bytes back (which won't occur until the server has completely processed our request and is now sending back the response).  Therefore, this stat is a approximate measure of the time the server spends processing each request, including any time waiting in its request queue."
-	^timeWaitingForResponsesHistory! !
-
-!MaClientStat methodsFor: 'copying' stamp: 'cmm 12/22/2008 19:54'!
-postArchivalCopy
-	timeToSubmitByRequestClassHistorys _ timeToSubmitByRequestClassHistorys copy.
-	super postArchivalCopy! !
 
 !Object methodsFor: '*ma-client-server-core' stamp: 'cmm 10/28/2008 16:36'!
 wantsResponse

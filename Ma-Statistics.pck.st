@@ -1,10 +1,11 @@
-'From Cuis 5.0 [latest update: #4588] on 10 May 2021 at 8:14:12 am'!
+'From Cuis 5.0 [latest update: #4579] on 12 May 2021 at 11:43:35 am'!
 'Description Adds mandatory statistics domain objects to the magma server
 
 License: MIT
 Original Author: Chris Muller (cmm)
 Author: Josef Philip Bernhart (jpb)'!
-!provides: 'Ma-Statistics' 1 0!
+!provides: 'Ma-Statistics' 1 2!
+!requires: 'Ma-Core' 1 7 nil!
 SystemOrganization addCategory: 'Ma-Statistics'!
 
 
@@ -189,18 +190,6 @@ maPrintAbbreviatedOn: aStream
 mauiDefaultColumns
 	^ #(#count #min #max #mean #sum #last )! !
 
-!MaHistoricalStat methodsFor: 'summarize' stamp: 'cmm 12/22/2008 14:39'!
-+ aMaStat 
-	| answer myEndTime otherEndTime |
-	answer _ super + aMaStat.
-	answer
-		name: self name ;
-		startTime: (self startTime min: aMaStat startTime).
-	myEndTime _ self endTime ifNil: [ DateAndTime now ].
-	otherEndTime _ aMaStat endTime ifNil: [ DateAndTime now ].
-	answer endTime: (myEndTime max: otherEndTime).
-	^ answer! !
-
 !MaHistoricalStat methodsFor: 'accessing' stamp: 'cmm 5/5/2008 23:55'!
 endTime
 	^endTime! !
@@ -224,6 +213,18 @@ startTime: aDateAndTime
 !MaHistoricalStat methodsFor: 'accessing' stamp: 'cmm 6/12/2009 11:52'!
 timeSpan
 	^ self startTime to: self endTime! !
+
+!MaHistoricalStat methodsFor: 'summarize' stamp: 'cmm 12/22/2008 14:39'!
++ aMaStat 
+	| answer myEndTime otherEndTime |
+	answer _ super + aMaStat.
+	answer
+		name: self name ;
+		startTime: (self startTime min: aMaStat startTime).
+	myEndTime _ self endTime ifNil: [ DateAndTime now ].
+	otherEndTime _ aMaStat endTime ifNil: [ DateAndTime now ].
+	answer endTime: (myEndTime max: otherEndTime).
+	^ answer! !
 
 !MaHistoricalStat methodsFor: 'initialize' stamp: 'cmm 5/6/2008 13:31'!
 initialize
@@ -738,9 +739,9 @@ plot
 		[ MaEnvironmentError signal: 'PlotMorph must be loaded to perform this function' ].
 	^ self plotOn: (Smalltalk classNamed: #PlotMorph) new! !
 
-!MaStatHistory methodsFor: 'plot' stamp: 'cmm 4/27/2009 21:28'!
+!MaStatHistory methodsFor: 'plot' stamp: 'jpb 5/12/2021 11:39:09'!
 plot: datasets on: aPlotMorph 
-	^ (Smalltalk classNamed: #PlotMorph) ifNotNilDo: 
+	^ (Smalltalk classNamed: #PlotMorph) ifNotNil: 
 		[ : plotMorphClass | 
 		| pm |
 		pm _ plotMorphClass new
@@ -786,115 +787,3 @@ name: aString
 	^ self new
 		name: aString ;
 		yourself! !
-
-!DirectoryEntryDirectory methodsFor: '*ma-statistics' stamp: 'cmm 9/13/2007 17:24'!
-addToDirectoryCount: anInteger 
-	self directoryCountStat addValue: anInteger! !
-
-!DirectoryEntryDirectory methodsFor: '*ma-statistics' stamp: 'cmm 9/13/2007 17:24'!
-addToFileCount: anInteger 
-	self fileCountStat addValue: anInteger! !
-
-!DirectoryEntryDirectory methodsFor: '*ma-statistics' stamp: 'cmm 9/13/2007 17:19'!
-addToTotalSize: anInteger 
-	self fileSizeStat addValue: anInteger! !
-
-!DirectoryEntryDirectory methodsFor: '*ma-statistics' stamp: 'cmm 9/13/2007 17:54'!
-contributeStatisticsTo: aDirectoryEntryDirectory 
-	"Add my size information to the cumulative total in aDirectoryEntryDirectory."
-	self initializeStatistics.
-	aDirectoryEntryDirectory
-		addToTotalSize: self totalFileSize ;
-		addToDirectoryCount: self directoryCount ;
-		addToFileCount: self fileCount! !
-
-!DirectoryEntryDirectory methodsFor: '*ma-statistics' stamp: 'cmm 9/19/2007 15:41'!
-directoryCount
-	"Answer the total number of directory entries in my directory, including all subdirectories."
-	^ self directoryCountStat sum! !
-
-!DirectoryEntryDirectory methodsFor: '*ma-statistics' stamp: 'cmm 9/28/2007 12:33'!
-directoryCountStat
-	"Statistics about the number of directories per folder."
-	^ self 
-		attributeNamed: #directoryCountStat
-		ifAbsent: 
-			[ self
-				initializeStatistics ;
-				directoryCountStat ]! !
-
-!DirectoryEntryDirectory methodsFor: '*ma-statistics' stamp: 'cmm 9/13/2007 17:22'!
-directoryCountStat: aMaStat 
-	self 
-		attributeNamed: #directoryCountStat
-		put: aMaStat! !
-
-!DirectoryEntryDirectory methodsFor: '*ma-statistics' stamp: 'cmm 2/12/2009 18:56'!
-directoryName
-	"Answer the directory to shell to for this item."
-	^ self asFileDirectory pathName! !
-
-!DirectoryEntryDirectory methodsFor: '*ma-statistics' stamp: 'cmm 9/19/2007 15:41'!
-fileCount
-	"Answer the total number of file entries in my directory, including all subdirectories."
-	^ self fileCountStat sum! !
-
-!DirectoryEntryDirectory methodsFor: '*ma-statistics' stamp: 'cmm 9/28/2007 12:32'!
-fileCountStat
-	"Statistics about the number of files per folder."
-	^ self 
-		attributeNamed: #fileCountStat
-		ifAbsent: 
-			[ self
-				initializeStatistics ;
-				fileCountStat ]! !
-
-!DirectoryEntryDirectory methodsFor: '*ma-statistics' stamp: 'cmm 9/13/2007 17:21'!
-fileCountStat: aMaStat 
-	self 
-		attributeNamed: #fileCountStat
-		put: aMaStat! !
-
-!DirectoryEntryDirectory methodsFor: '*ma-statistics' stamp: 'cmm 9/13/2007 17:19'!
-fileSizeStat
-	^ self 
-		attributeNamed: #fileSizeStat
-		ifAbsent: 
-			[ self
-				initializeStatistics ;
-				fileSizeStat ]! !
-
-!DirectoryEntryDirectory methodsFor: '*ma-statistics' stamp: 'cmm 9/13/2007 17:19'!
-fileSizeStat: aMaStat 
-	self 
-		attributeNamed: #fileSizeStat
-		put: aMaStat! !
-
-!DirectoryEntryDirectory methodsFor: '*ma-statistics' stamp: 'cmm 9/13/2007 17:48'!
-incrementDirectoryOrFileCount: twoElementArray 
-	twoElementArray 
-		at: 1
-		put: (twoElementArray at: 1) + 1! !
-
-!DirectoryEntryDirectory methodsFor: '*ma-statistics' stamp: 'cmm 9/13/2007 17:51'!
-initializeStatistics
-	"Enumerate my entire directory tree to gather my statistics."
-	| directoryAndFileCount |
-	self
-		fileSizeStat: MaStat new ;
-		fileCountStat: MaStat new ;
-		directoryCountStat: MaStat new.
-	directoryAndFileCount _ {  0. 0  }.
-	self asFileDirectory entries in: 
-		[ : myEntries | 
-		myEntries
-			do: [ : eachEntry | eachEntry contributeStatisticsTo: self ] ;
-			do: [ : eachEntry | eachEntry incrementDirectoryOrFileCount: directoryAndFileCount ] ].
-	self
-		addToDirectoryCount: (directoryAndFileCount at: 1) ;
-		addToFileCount: (directoryAndFileCount at: 2)! !
-
-!DirectoryEntryDirectory methodsFor: '*ma-statistics' stamp: 'cmm 9/13/2007 17:19'!
-totalFileSize
-	"Answer the cumulative size of all files and folders in the directories I contain, including their totalFileSize."
-	^ self fileSizeStat sum ifNil: [ 0 ]! !
