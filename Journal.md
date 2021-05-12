@@ -9,6 +9,27 @@ entry is at the bottom. And people mention the author of the entry
 by his shortcut. Also people add their shortcuts to the list of
 authors at the end of the file.
 
+# 12. May 2021 (jpb)
+
+In the morning I fixed the missing classes from Squeak for the Network
+errors. Some calls to `String empty` and `Array empty`, which were
+replaced by the literals `''` and `#()`. Also `ifNotNilDo:` was
+changed to `ifNotNil:`. Some classes which derived from the wrong
+parent class, due to it's missing constant at loading time, which
+changed them to `ProtoObject` were derived from the correct one.
+
+A sidenote: When you try to change the layout of a `ProtoObject`
+subclass and it has instance variables to something which now
+derives from say `Object`, the debugger will get invoked, because
+the existing instances with variable values will be accessed
+for copying over the variable values into the new class with `instVarAt:`,
+but `ProtoObject` does not have `instVarAt:` which causes an error.
+For fixing that, you just copy the variable list in the browser, 
+then delete the list, accept the class in the browser, and then add
+the list back and accept it again. So the previous values are lost
+and no copying over action is trigger and no error is caused.
+
+
 # 11. May 2021 (jpb)
 
 The `WriteBarrier` is not an optional package, as the transactions
