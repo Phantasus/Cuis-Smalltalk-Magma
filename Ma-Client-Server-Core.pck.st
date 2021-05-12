@@ -1,11 +1,12 @@
-'From Cuis 5.0 [latest update: #4579] on 12 May 2021 at 3:33:54 pm'!
+'From Cuis 5.0 [latest update: #4579] on 12 May 2021 at 8:31:30 pm'!
 'Description Magma core for server and client
 
 License: MIT
 Original author: Chris Muller (cmm)
 Author: Josef Philip Bernhart (jpb)'!
-!provides: 'Ma-Client-Server-Core' 1 16!
+!provides: 'Ma-Client-Server-Core' 1 23!
 !requires: 'Ma-Collections' 1 0 nil!
+!requires: 'Network-Kernel' 1 5 nil!
 !requires: 'Ma-Core' 1 1 nil!
 SystemOrganization addCategory: 'Ma-Client-Server-Core'!
 
@@ -280,6 +281,16 @@ MaObject subclass: #MacsSoundTheme
 MacsSoundTheme class
 	instanceVariableNames: ''!
 
+!classDefinition: #MaGuard category: 'Ma-Client-Server-Core'!
+Object subclass: #MaGuard
+	instanceVariableNames: 'guardMutex guardFlag haltFlag'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Ma-Client-Server-Core'!
+!classDefinition: 'MaGuard class' category: 'Ma-Client-Server-Core'!
+MaGuard class
+	instanceVariableNames: 'globalHaltMode globallyUnguarded globalHaltFlag'!
+
 !classDefinition: #MaRegistry category: 'Ma-Client-Server-Core'!
 Object subclass: #MaRegistry
 	instanceVariableNames: ''
@@ -379,6 +390,9 @@ A MaNetworkServerLink handles the actual communications with a remotely-running 
 !MaServerLocation commentStamp: 'cmm 7/5/2008 13:21' prior: 0!
 A MaServerLocation simply encapsulates a host and port, allowing the receiver to serve as a 'bookmark' to a server resource.
 !
+
+!MaGuard commentStamp: '<historical>' prior: 0!
+Represents a guard for critical sections, basically a mutex like object, with some utilities for better debugging of mutex!
 
 !MaRegistry commentStamp: '<historical>' prior: 0!
 Main singleton for magma related bookkeeping and services, which are not implemented otherwise in cuis!
@@ -1502,12 +1516,12 @@ removePlayer: aMaNetworkPlayer
 		 remove: aMaNetworkPlayer ;
 		 changed! !
 
-!MaNetworkOrchestra methodsFor: 'initialize-release' stamp: 'cmm 3/15/2015 15:12'!
+!MaNetworkOrchestra methodsFor: 'initialize-release' stamp: 'jpb 5/12/2021 19:49:10'!
 initialize
 	super initialize.
 	players _ OrderedCollection new.
 	firstPort _ 44441.
-	guard _ Mutex new.
+	guard _ MaGuard new.
 	prepareImageSelector _ #createImage.
 	onePlayerImage _ true.
 	self maxCores: 4! !
@@ -2365,13 +2379,14 @@ timeoutSeconds: anInteger
 doBlock: aBlock
 	doBlock _ aBlock! !
 
-!MaServerSocket methodsFor: 'initialize-release' stamp: 'cmm 8/22/2013 12:47'!
+!MaServerSocket methodsFor: 'initialize-release' stamp: 'jpb 5/12/2021 20:03:38'!
 initialize
 	super initialize.
 	running _ false.
 	self initializeQueues.
+	
 	clientConnections _ OrderedCollection new.
-	clientConnectionsGuard _ Mutex new.
+	clientConnectionsGuard _ MaGuard new.
 	preferences _ MaClientServerPreferences new
 		compressThreshold: MaSerializedGraphBuffer unreasonablePhysicalSize * 2 ;
 		yourself.
@@ -2837,11 +2852,11 @@ socket: aMaClientSocket
 
 	socket _ aMaClientSocket! !
 
-!MaNetworkServerLink methodsFor: 'initialize-release' stamp: 'cmm 9/23/2008 14:25'!
+!MaNetworkServerLink methodsFor: 'initialize-release' stamp: 'jpb 5/12/2021 19:49:40'!
 initialize
 	super initialize.
 	self initializeSerializer.
-	submitGuard _ Mutex new! !
+	submitGuard _ MaGuard new! !
 
 !MaNetworkServerLink methodsFor: 'initialize-release' stamp: 'cmm 6/10/2005 12:21'!
 initializeSerializer
@@ -3094,10 +3109,10 @@ postCopyForNewRequest
 critical: aBlock
 	^ guard critical: aBlock! !
 
-!MaServerRequestLifecycle methodsFor: 'initialize-release' stamp: 'cmm 7/29/2012 12:29'!
+!MaServerRequestLifecycle methodsFor: 'initialize-release' stamp: 'jpb 5/12/2021 19:49:58'!
 initialize
 	super initialize.
-	guard _ Mutex new! !
+	guard _ MaGuard new! !
 
 !MaServerRequestLifecycle methodsFor: 'initialize-release' stamp: 'cmm 5/1/2008 16:30'!
 noteSocketDequeued
@@ -3149,6 +3164,76 @@ soundFor: aMaClientServerRequest
 	^ sounds
 		at: aMaClientServerRequest maOriginalClass
 		ifAbsent: [ aMaClientServerRequest class defaultSound ]! !
+
+!MaGuard methodsFor: 'as yet unclassified' stamp: 'jpb 5/12/2021 20:25:02'!
+critical: aBlock
+	self isHalting
+		ifTrue: [ self halt ].
+
+	self isGuarded 
+		ifTrue: [ ^guardMutex critical: aBlock. ].
+	
+	self isUnguarded	
+		ifTrue: [ ^aBlock value ].
+		
+	^self! !
+
+!MaGuard methodsFor: 'as yet unclassified' stamp: 'jpb 5/12/2021 20:22:34'!
+guard
+	guardFlag _ true.
+
+	^true! !
+
+!MaGuard methodsFor: 'as yet unclassified' stamp: 'jpb 5/12/2021 20:23:47'!
+initialize
+	guardMutex _ Mutex new.
+	guardFlag _ true.
+	haltFlag _ false.! !
+
+!MaGuard methodsFor: 'as yet unclassified' stamp: 'jpb 5/12/2021 20:22:14'!
+isGuarded
+ 	MaGuard isGloballyUnguarded
+		ifTrue: [ ^false ]
+		ifFalse: [ 	^guardFlag ]
+	! !
+
+!MaGuard methodsFor: 'as yet unclassified' stamp: 'jpb 5/12/2021 20:30:39'!
+isHalting
+	^self class isGloballyHalting or: [ true = haltFlag ]! !
+
+!MaGuard methodsFor: 'as yet unclassified' stamp: 'jpb 5/12/2021 20:16:35'!
+isUnguarded
+	^self isGuarded not! !
+
+!MaGuard methodsFor: 'as yet unclassified' stamp: 'jpb 5/12/2021 20:21:59'!
+unguard
+	guardFlag _ false.
+	
+	^true! !
+
+!MaGuard class methodsFor: 'as yet unclassified' stamp: 'jpb 5/12/2021 20:11:00'!
+disableGuarding
+	globallyUnguarded _ true! !
+
+!MaGuard class methodsFor: 'as yet unclassified' stamp: 'jpb 5/12/2021 20:26:58'!
+disableHalting
+	globalHaltFlag _ false! !
+
+!MaGuard class methodsFor: 'as yet unclassified' stamp: 'jpb 5/12/2021 20:10:52'!
+enableGuarding
+	globallyUnguarded _ false! !
+
+!MaGuard class methodsFor: 'as yet unclassified' stamp: 'jpb 5/12/2021 20:26:45'!
+enableHalting
+	globalHaltFlag _ true! !
+
+!MaGuard class methodsFor: 'as yet unclassified' stamp: 'jpb 5/12/2021 20:27:23'!
+isGloballyHalting
+	^true = globalHaltFlag! !
+
+!MaGuard class methodsFor: 'as yet unclassified' stamp: 'jpb 5/12/2021 20:10:36'!
+isGloballyUnguarded
+	^globallyUnguarded = true! !
 
 !MaRegistry class methodsFor: 'as yet unclassified' stamp: 'jpb 5/11/2021 16:12:48'!
 checkUuidPlugin

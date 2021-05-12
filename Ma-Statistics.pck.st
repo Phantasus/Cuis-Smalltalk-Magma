@@ -1,10 +1,10 @@
-'From Cuis 5.0 [latest update: #4579] on 12 May 2021 at 11:43:35 am'!
+'From Cuis 5.0 [latest update: #4579] on 12 May 2021 at 7:52:51 pm'!
 'Description Adds mandatory statistics domain objects to the magma server
 
 License: MIT
 Original Author: Chris Muller (cmm)
 Author: Josef Philip Bernhart (jpb)'!
-!provides: 'Ma-Statistics' 1 2!
+!provides: 'Ma-Statistics' 1 3!
 !requires: 'Ma-Core' 1 7 nil!
 SystemOrganization addCategory: 'Ma-Statistics'!
 
@@ -685,9 +685,9 @@ self maMarked: 'delete'.
 	statAttributeSelector = #sum ifTrue: [ ^ Color lightGray ].
 	^ Color blue! !
 
-!MaStatHistory methodsFor: 'private' stamp: 'cmm 9/23/2008 14:25'!
+!MaStatHistory methodsFor: 'private' stamp: 'jpb 5/12/2021 19:52:02'!
 guard
-	^ guard ifNil: [ guard _ Mutex new ]! !
+	^ guard ifNil: [ guard _ MaGuard new ]! !
 
 !MaStatHistory methodsFor: 'private' stamp: 'cmm 6/5/2008 22:23'!
 resetTimer
@@ -704,11 +704,11 @@ resetTimer
 selectHistory: aBlock
 	history _ history select: aBlock! !
 
-!MaStatHistory methodsFor: 'initialize-release' stamp: 'cmm 4/27/2009 20:26'!
+!MaStatHistory methodsFor: 'initialize-release' stamp: 'jpb 5/12/2021 19:52:07'!
 initialize
 	super initialize.
 	history _ OrderedCollection new.
-	guard _ Mutex new.
+	guard _ MaGuard new.
 	"Keep 5-minute snapshots of the last 4 days (an entire holiday weekend) at all times."
 	self snapshotInterval: (5 to: 60*24*4 by: 5)! !
 

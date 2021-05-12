@@ -1,10 +1,10 @@
-'From Cuis 5.0 [latest update: #4579] on 12 May 2021 at 4:37:35 pm'!
+'From Cuis 5.0 [latest update: #4579] on 12 May 2021 at 7:52:52 pm'!
 'Description Package containing the magma client implementation
 
 License: MIT
 Original Author: Chris Muller (cmm)
 Author: Josef Philip Bernhart (jpb)'!
-!provides: 'Magma-Client' 1 16!
+!provides: 'Magma-Client' 1 17!
 SystemOrganization addCategory: 'Magma-Client'!
 SystemOrganization addCategory: 'Magma-Client-Exceptions'!
 SystemOrganization addCategory: 'Magma-Client-MagmaCollections'!
@@ -6269,12 +6269,12 @@ ensureConnected
 		user ifNil: [ MagmaUserError signal: 'A user to connect must be supplied.' ].
 		self connect: user ]! !
 
-!MagmaSession methodsFor: 'initialize-release' stamp: 'cmm 4/15/2013 18:15'!
+!MagmaSession methodsFor: 'initialize-release' stamp: 'jpb 5/12/2021 19:52:15'!
 initialize
 	super initialize.
 	transaction _ MaTransaction session: self.
 	preferences _ MagmaPreferences new.
-	guard _ Mutex new.
+	guard _ MaGuard new.
 	allowFailover _ true.
 	oidCount _ requiredProgress _ 0.
 	strongReferences _ OrderedCollection new.

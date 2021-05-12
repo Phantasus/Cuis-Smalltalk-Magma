@@ -51,6 +51,23 @@ the newly created repository. In `MagmaRepositoryController>>primClose`,
 maybe the mutex is still occupied by something, or why does it block?
 Maybe the image state is dirty and I need to start with a fresh one?
 
+I added a kind of annotated `Mutex` for debugging mutexes in magma,
+it's called a `MaGuard` borrowing the name usage of magma for saying
+that any mutex is a "guard". Actually that is a kind of helpful name,
+so I stuck with it. `MaGuard`s can be globally enabled or disabled (unguarded)
+they can enable halting on each mutex `critical:` call, maybe in the 
+future logging of each access could be enabled too.
+
+I found out, that the `ControllersGuard` was still using a mutex, after
+everything else was using a `MaGuard` I changed it to one and the
+code for closing continued in `primClose` of the `MagmaRepositoryController`.
+
+After that I saw that now for some reason the existing Magma code "thought"
+that a power outage occured somewhere and it should start recovering the
+database. 
+
+Here an image of that notification:
+![Screenshot of a Magma recovery notification](/JournalAssets/recovery_mode_20210512.png)
 
 # 11. May 2021 (jpb)
 

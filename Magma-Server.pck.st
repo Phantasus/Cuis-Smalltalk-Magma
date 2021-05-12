@@ -1,10 +1,10 @@
-'From Cuis 5.0 [latest update: #4579] on 12 May 2021 at 4:37:31 pm'!
+'From Cuis 5.0 [latest update: #4579] on 12 May 2021 at 9:10:47 pm'!
 'Description Package containing the magma server implementation
 
 License: MIT
 Original Author: Chris Muller (cmm)
 Author: Josef Philip Bernhart (jpb)'!
-!provides: 'Magma-Server' 1 20!
+!provides: 'Magma-Server' 1 25!
 !requires: 'Ma-Client-Server-Core' 1 3 nil!
 !requires: 'Ma-Statistics' 1 0 nil!
 SystemOrganization addCategory: 'Magma-Server'!
@@ -212,7 +212,7 @@ MaObjectFiler class
 
 !classDefinition: #MaObjectRepository category: 'Magma-Server'!
 MaObject subclass: #MaObjectRepository
-	instanceVariableNames: 'transactionLog sessions filer repositoryController largeCollectionManagers systemReadStrategy nextOid recoveryManager commitGuard applyProcess wantsToClose filePool flushGuard restoreMode'
+	instanceVariableNames: 'transactionLog sessions filer repositoryController largeCollectionManagers systemReadStrategy nextOid recoveryManager commitGuard applyFinished wantsToClose filePool flushGuard restoreMode'
 	classVariableNames: 'EmergencyMemory SimulateOutage'
 	poolDictionaries: 'MaSerializerConstants'
 	category: 'Magma-Server'!
@@ -1125,12 +1125,12 @@ filename: aString
 
 	filename _ aString! !
 
-!MaAtomicFileStream methodsFor: 'initialize-release' stamp: 'cmm 9/23/2008 14:26'!
+!MaAtomicFileStream methodsFor: 'initialize-release' stamp: 'jpb 5/12/2021 19:49:19'!
 initialize
 	super initialize.
 	self initializeWriters.
 	position _ 0.
-	guard _ Mutex new.
+	guard _ MaGuard new.
 	"To make code simple, everyone gets a default pool, which is just a pool of one, me."
 	pool _ MaFileStreamPool maxSize: 1.
 	fileStreams _ OrderedCollection new.
@@ -1305,11 +1305,11 @@ renewAccess: aStandardFileStream
 					[ MagmaEnvironmentError signal: 'Could not open ' , aStandardFileStream name , '.  File in use?' ] ].
 			openStreams addLast: aStandardFileStream ] ]! !
 
-!MaFileStreamPool methodsFor: 'initialize' stamp: 'cmm 9/23/2008 14:25'!
+!MaFileStreamPool methodsFor: 'initialize' stamp: 'jpb 5/12/2021 19:49:24'!
 initialize
 	super initialize.
 	openStreams _ OrderedCollection new.
-	guard _ Mutex new! !
+	guard _ MaGuard new! !
 
 !MaFileStreamPool methodsFor: 'initialize' stamp: 'cmm 10/22/2006 15:18'!
 setMaxPoolSize: anInteger 
@@ -2750,11 +2750,14 @@ fileManagerFor: aMaApplyRecord ifPresent: oneArgBlock ifAbsent: aBlock
 				ifAbsent: [ ^ aBlock value ]) indexForFileId: aMaApplyRecord fileId ].
 	^ oneArgBlock value: fileManager! !
 
-!MaObjectRepository methodsFor: 'recovery' stamp: 'jpb 5/12/2021 15:06:09'!
+!MaObjectRepository methodsFor: 'recovery' stamp: 'jpb 5/12/2021 21:05:35'!
 flushCacheSoon
 	"Flushing is horribly expensive, but essential to ensure we can survive a power-outage without corruption.  To balance these opposing forces, we apply and flush only at certain interval, only in the background, only the files that needed flushed, and each file only flushed once."
-	applyProcess ifNil: [
-		applyProcess _ 	[
+	applyFinished ifTrue: [
+	
+		applyFinished _ false.
+	
+		[
 			 | startTime |
 			startTime _ Time millisecondClockValue.
 		
@@ -2762,7 +2765,7 @@ flushCacheSoon
 				or: [ wantsToClose ] ] 
 					whileFalse: [ (Delay forSeconds: 1) wait ].
 		
-			self flushCritical: [self commitCritical: [ self flushCache. applyProcess _ nil ] ]
+			self flushCritical: [self commitCritical: [ self flushCache. applyFinished _ true ] ]
 		]
 		forkAt: (Processor userInterruptPriority max: Processor activeProcess priority + 1)
 		named: 'flush Magma cache'
@@ -3507,11 +3510,11 @@ version
 wantsToClose
 	^ wantsToClose ! !
 
-!MaObjectRepository methodsFor: 'initialize-release' stamp: 'cmm 8/22/2011 22:35'!
+!MaObjectRepository methodsFor: 'initialize-release' stamp: 'jpb 5/12/2021 21:01:01'!
 close
 	self isOpen ifFalse: [ ^ self ].
 	wantsToClose _ true.
-	[ applyProcess notNil and: [ applyProcess isTerminated not ] ] whileTrue: [ (Delay forSeconds: 1) wait ].
+	[ applyFinished ] whileFalse: [ (Delay forSeconds: 1) wait ].
 	[ largeCollectionManagers anySatisfy: [ : each | each isLoading ] ] whileTrue: [ (Delay forMilliseconds: 500) wait ].
 	self commitCritical: 
 		[ (self isOpen and: [recoveryManager notNil and: [ self restoreMode not ] ]) ifTrue: [ self flushCritical: [ self flushCache	"just to be sure" ] ] ].
@@ -3520,16 +3523,18 @@ close
 	recoveryManager ifNotNil: [ recoveryManager close ].
 	self unregisterAsMemoryHog! !
 
-!MaObjectRepository methodsFor: 'initialize-release' stamp: 'cmm 8/12/2014 12:03'!
+!MaObjectRepository methodsFor: 'initialize-release' stamp: 'jpb 5/12/2021 21:00:25'!
 initialize
 	super initialize.
 	transactionLog _ MaTransactionLog new.
 	largeCollectionManagers _ Dictionary new.
 	sessions _ Dictionary new.
-	commitGuard _ Mutex new.
-	flushGuard _ Mutex new.
+	commitGuard _ MaGuard new.
+	flushGuard _ MaGuard new.
 	filePool _ MaFileStreamPool maxSize: 180.
 	wantsToClose _ false.
+	applyFinished _ true.
+	
 	self reserveEmergencySpace! !
 
 !MaObjectRepository methodsFor: 'initialize-release' stamp: 'cmm 1/20/2014 20:18'!
@@ -4074,9 +4079,9 @@ open: aMagmaLocalLocation
 	self openApplyFile.
 	self commitLogDirectory assureExistence! !
 
-!MaRecoveryManager methodsFor: 'file' stamp: 'jpb 5/11/2021 03:41:12'!
+!MaRecoveryManager methodsFor: 'file' stamp: 'jpb 5/12/2021 21:10:34'!
 openApplyFile
-	applyFile ifNil: [ applyFile _ (self directory pathName asDirectoryEntry // self class applyFilename) writeStream ].
+	applyFile ifNil: [ applyFile _ (self directory pathName asDirectoryEntry // self class applyFilename) appendStream ].
 	applyFile
 		binary ;
 		position: 0! !
@@ -4454,10 +4459,10 @@ commitLogRecordsFrom: anInteger in: aStandardFileStream do: oneArgBlock until: u
 		currentPosition _ currentPosition + selectedRecord physicalSize ].
 	^ untilReached! !
 
-!MaRecoveryManager methodsFor: 'private' stamp: 'cmm 8/6/2007 21:19'!
+!MaRecoveryManager methodsFor: 'private' stamp: 'jpb 5/12/2021 21:10:09'!
 deleteApplyFile
 	applyFile ifNotNil: [ applyFile close ].
-	self directory deleteFileNamed: self class applyFilename! !
+	(self directory // self class applyFilename) delete! !
 
 !MaRecoveryManager methodsFor: 'private' stamp: 'cmm 7/16/2008 20:04'!
 validateRecord: inputRecord 
@@ -5539,13 +5544,14 @@ postOpenInitialize
 	repository initializeMagmaStatClassIds.
 	OpenControllers add: self! !
 
-!MagmaRepositoryController methodsFor: 'private' stamp: 'cmm 5/25/2010 14:10'!
+!MagmaRepositoryController methodsFor: 'private' stamp: 'jpb 5/12/2021 20:33:02'!
 primClose
-	self requestCritical:
-		[ session ifNotNil:
+	self requestCritical: [
+		 session ifNotNil:
 			[ session disconnect.
 			session linksDo:
 				[ : each | each localRequestServer shutdown ] ].
+			
 		self serverStatistics release.
 		repository close.
 		self removeOpenIndicator ]! !
@@ -5702,10 +5708,10 @@ connect
 	session connect: (MagmaUser id: self class systemSessionUserId).
 	repository initializeSpecialOidsList! !
 
-!MagmaRepositoryController methodsFor: 'initializing' stamp: 'cmm 12/17/2008 17:14'!
+!MagmaRepositoryController methodsFor: 'initializing' stamp: 'jpb 5/12/2021 19:47:28'!
 initialize
 	super initialize.
-	requestInterruptGuard _ Mutex new.
+	requestInterruptGuard _ MaGuard new.
 	preferences _ MagmaServerPreferences new.
 	self serverStatistics: MagmaServerStatistics new! !
 
@@ -5806,9 +5812,9 @@ initialize
 		after: self
 	"! !
 
-!MagmaRepositoryController class methodsFor: 'initializing' stamp: 'cmm 9/23/2008 14:26'!
+!MagmaRepositoryController class methodsFor: 'initializing' stamp: 'jpb 5/12/2021 19:44:25'!
 initializeControllersGuard
-	^ ControllersGuard _ Mutex new! !
+	^ ControllersGuard _ MaGuard new.! !
 
 !MagmaRepositoryController class methodsFor: 'utilities' stamp: 'cmm 9/17/2011 22:35'!
 commitRestore: pathOrMagmaLocalLocation 
@@ -5874,7 +5880,7 @@ openedOn: aMagmaLocalLocation
 			ifNil: [ self open: aMagmaLocalLocation ]
 			ifNotNil: [ existingController ] ]! !
 
-!MagmaRepositoryController class methodsFor: 'private' stamp: 'cmm 8/8/2007 23:58'!
+!MagmaRepositoryController class methodsFor: 'private' stamp: 'jpb 5/12/2021 19:44:39'!
 controllersGuard: aBlock 
 	^ (ControllersGuard ifNil: [ self initializeControllersGuard ]) critical: aBlock! !
 
@@ -6978,13 +6984,13 @@ shouldServerRefresh
 	^ allLargeCollectionChanges notNil
 	and: [ allLargeCollectionChanges anySatisfy: [ :each | each requiresServerRefresh ] ]! !
 
-!MaRecoveryRecord methodsFor: '*magma-server' stamp: 'cmm 12/26/2009 13:16'!
+!MaRecoveryRecord methodsFor: '*magma-server' stamp: 'jpb 5/12/2021 20:47:57'!
 writeTo: applyFile 
 	self resetChecksum.
 	applyFile
 		next: self physicalSize
-			putAll: byteArray
-			startingAt: 1! !
+		putAll: byteArray
+		startingAt: 1! !
 
 !MaTerm methodsFor: '*magma-server-private' stamp: 'cmm 8/12/2007 20:41'!
 shouldInclude: oid using: aMagmaCollectionManager 

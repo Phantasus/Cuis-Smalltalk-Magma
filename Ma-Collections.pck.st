@@ -1,4 +1,4 @@
-'From Cuis 5.0 [latest update: #4579] on 12 May 2021 at 11:53:01 am'!
+'From Cuis 5.0 [latest update: #4579] on 12 May 2021 at 7:51:48 pm'!
 'Description I provide several independent, special-purpose collection classes that seem to be generally useful.
 
 MaWeakIdentityKeyDictionary and MaWeakValueDictionary wrap a collection of their Smalltalk counterparts and keeps them all under 12-bits in size, thus minimizing the number of collisions due to Squeaks 12-bits identity hash.  These provide major improvement in the #removeKey: message.
@@ -62,7 +62,7 @@ Other features are:
 License: MIT
 Original Author: Chris Muller (cmm)
 Author: Josef Philip Bernhart (jpb)'!
-!provides: 'Ma-Collections' 1 8!
+!provides: 'Ma-Collections' 1 9!
 SystemOrganization addCategory: 'Ma-Collections'!
 SystemOrganization addCategory: 'Ma-Collections-Exceptions'!
 SystemOrganization addCategory: 'Ma-Collections-Tests'!
@@ -5400,10 +5400,10 @@ createRecord
 				yourself.
 	broker recordSize: record bufferSize! !
 
-!MaHashIndex methodsFor: 'initializing' stamp: 'cmm 9/23/2008 14:25'!
+!MaHashIndex methodsFor: 'initializing' stamp: 'jpb 5/12/2021 19:49:04'!
 initialize
 	super initialize.
-	guard _ Mutex new! !
+	guard _ MaGuard new! !
 
 !MaHashIndex methodsFor: 'initializing'!
 initializeRecordFactory

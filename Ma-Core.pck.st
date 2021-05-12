@@ -1,10 +1,10 @@
-'From Cuis 5.0 [latest update: #4579] on 12 May 2021 at 4:33:13 pm'!
+'From Cuis 5.0 [latest update: #4579] on 12 May 2021 at 7:52:48 pm'!
 'Description Core of magma object oriented database
 
 License: MIT
 Original Author: Chris Muller (cmm)
 Author: Josef Philip Bernhart (jpb)'!
-!provides: 'Ma-Core' 1 13!
+!provides: 'Ma-Core' 1 14!
 !requires: 'Cryptography-DigitalSignatures' 1 14 nil!
 SystemOrganization addCategory: 'Ma-Core'!
 
@@ -955,10 +955,10 @@ expired
 	"Answer whether the waiting period before executing my do block has elapsed.  It does not indicate whether the do block has executed or not."
 	^ self started and: [ monitor critical: [ expired ] ]! !
 
-!MaTimer methodsFor: 'access' stamp: 'cmm 12/25/2014 20:12'!
+!MaTimer methodsFor: 'access' stamp: 'jpb 5/12/2021 19:52:11'!
 in: aDuration do: aBlock 
 	process _ 
-	[ monitor _ Mutex new.
+	[ monitor _ MaGuard new.
 	expired _ false.
 	delay _ (Delay forDuration: aDuration).
 	delay wait.
