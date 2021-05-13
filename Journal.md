@@ -33,6 +33,21 @@ or something similiar as Magma is molten stone in the crust, before the
 fact that it was erupted and Lava is after the fact it erupted into
 the outside world.
 
+To summarize current issues:
+
+1. Process startup (commit log, cache flushing, error handling, etc)
+   was disabled, because it caused problems in Cuis. Too much
+   processes after creating a new repository
+2. Extension of base classes and squeak specific classes,
+   which add hooks everywhere. These need to be re-engineered and
+   removed. Until there is a coherent concept of environments, projects,
+   monticello specifics that stuff can't be included in sensfully
+   in Cuis
+3. Notifications, NetworkErrors, etc. need to be re-implemented the
+   base for that was layed by me by subclassing them. But the rest
+   is still missing and will cause errors here and there.
+4. What will be done with magma specifics (or what is Maui?)
+
 
 # 12. May 2021 (jpb)
 
