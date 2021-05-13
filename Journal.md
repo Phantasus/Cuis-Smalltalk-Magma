@@ -9,6 +9,31 @@ entry is at the bottom. And people mention the author of the entry
 by his shortcut. Also people add their shortcuts to the list of
 authors at the end of the file.
 
+# 13. May 2021 (jpb)
+
+I don't see light at the end of the tunnel. Magma is so well
+integrated into Squeak, that any porting effort to Cuis is not
+really a porting effort as in that it will behave 1:1 as someone
+would a database system expect to be working. But essentially
+you need to throw out all reports, ui extensions, class
+extensions and other changes to the system just to get it working.
+
+After that you can't probably expect 1:1 compatibility. Or that
+people can take their previous code and it will work in Cuis.
+
+Squeak for example has environments, magma is aware of that, Cuis
+doesn't provide environments. The handling of that, when I found
+I threw it out. There seems to be not a distinction between the
+system and the database, which is good from an "seamless" viewpoint,
+but a bad one in designing in separating these things.
+
+Maybe the changed system, running in Cuis and other Smalltalks (if
+that is ever possible, who am I kidding?), should be called "Lava"
+or something similiar as Magma is molten stone in the crust, before the 
+fact that it was erupted and Lava is after the fact it erupted into
+the outside world.
+
+
 # 12. May 2021 (jpb)
 
 In the morning I fixed the missing classes from Squeak for the Network
