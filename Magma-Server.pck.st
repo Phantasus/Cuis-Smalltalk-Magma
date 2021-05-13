@@ -1,10 +1,10 @@
-'From Cuis 5.0 [latest update: #4579] on 12 May 2021 at 9:10:47 pm'!
+'From Cuis 5.0 [latest update: #4579] on 13 May 2021 at 1:13:31 pm'!
 'Description Package containing the magma server implementation
 
 License: MIT
 Original Author: Chris Muller (cmm)
 Author: Josef Philip Bernhart (jpb)'!
-!provides: 'Magma-Server' 1 25!
+!provides: 'Magma-Server' 1 27!
 !requires: 'Ma-Client-Server-Core' 1 3 nil!
 !requires: 'Ma-Statistics' 1 0 nil!
 SystemOrganization addCategory: 'Magma-Server'!
@@ -3403,7 +3403,7 @@ getNextOid
 
 	^nextOid _ nextOid + 1! !
 
-!MaObjectRepository methodsFor: 'accessing' stamp: 'cmm 10/8/2014 19:42'!
+!MaObjectRepository methodsFor: 'accessing' stamp: 'jpb 5/12/2021 21:51:55'!
 graphBufferAt: oidInteger using: aMaReadStrategy 
 	"Answers a MaSerializedGraphBuffer."
 	| answer rootBuffer |
@@ -3416,7 +3416,7 @@ graphBufferAt: oidInteger using: aMaReadStrategy
 		into: answer
 		currentDepth: 1
 		minDepth: aMaReadStrategy minimumDepth
-		with: (PluggableSet integerSet add: oidInteger; yourself)
+		with: (Set with: oidInteger)
 		filer: filer.
 	^ answer! !
 
@@ -5480,10 +5480,10 @@ initializeSystemReadStrategy
 
 	repository initializeSystemReadStrategyUsing: self serverSerializer classIdManager! !
 
-!MagmaRepositoryController methodsFor: 'private' stamp: 'cmm 6/10/2005 10:59'!
+!MagmaRepositoryController methodsFor: 'private' stamp: 'jpb 5/12/2021 21:44:33'!
 materializeClassDefinitions
 	"This is needed because, when opening the repository, the default classes do not include MagmaRepositoryDefinition, which is delivered as part of any session-connection.  When the system-session attempts to connect, it tries to read the repository-definition but can't because it can't get a proper read-strategy for it."
-
+	self halt.
 	[ session loadClassDefinitionsFrom: repository classDefinitionsByteArray ]
 		on: Error
 		do:
@@ -5505,17 +5505,20 @@ newTransactionFor: sessionId
 		[ MagmaUserError signal: 'Transactions are prohibited because this repository is in restore mode.' ].
 	^ repository newTransactionFor: sessionId! !
 
-!MagmaRepositoryController methodsFor: 'private' stamp: 'jpb 5/12/2021 15:29:56'!
+!MagmaRepositoryController methodsFor: 'private' stamp: 'jpb 5/12/2021 21:40:44'!
 open
 	"This is called when restarting controllers during image restart."
 	| tried |
 	tried _ false.
-	localLocation isPotentiallyOpen ifTrue: [ MagmaPotentiallyOpenError signal: 'found ' , self class openIndicatorFilename , ' file, indicating this repository may currently be open.  If it is not, you may proceed.' ].
-	(self pathName asDirectoryEntry) exists ifFalse: [ MagmaUserError signal: self pathName , ' not found.' ].
+	localLocation isPotentiallyOpen
+		ifTrue: [ MagmaPotentiallyOpenError signal: 'found ' , self class openIndicatorFilename , ' file, indicating this repository may currently be open.  If it is not, you may proceed.' ].
+		
+	(self pathName asDirectoryEntry) exists 
+		ifFalse: [ MagmaUserError signal: self pathName , ' not found.' ].
+		
 	[ self privateOpen: localLocation ]
 		on: MagmaCorruptionError
-		do:
-			[ : err | 
+		do: [ :err | 
 			tried
 				ifTrue: [ err pass ]
 				ifFalse:
@@ -5524,6 +5527,7 @@ open
 					self close.
 					tried _ true.
 					err retry ] ].
+			
 	"Do NOT cascade the following messages.  rollbackIfNecessary may replace my repository with a new one."
 	repository rollbackIfNecessary.
 	repository rollforwardIfPossible! !
@@ -6774,7 +6778,7 @@ isOpen
 repositoryController
 	^ primaryLink localRequestServer processor! !
 
-!MagmaSession class methodsFor: '*magma-server' stamp: 'jpb 5/12/2021 11:39:09'!
+!MagmaSession class methodsFor: '*magma-server' stamp: 'jpb 5/13/2021 13:03:30'!
 cleanUp
 	"References to MagmaSessions get stuck in old MethodContext's, preventing garbage-collection.  Run this method and these instances will be cleaned."
 	| before after proxies reals |
@@ -6784,22 +6788,14 @@ cleanUp
 "	self disconnectAndCloseAllConnectedSessions.
 	WBMethodBuilder initialize.
 	MagmaRepositoryController initialize.
-	MCMagmaRepository allSubInstances do:
-		[ : each | each cleanUp ].
+
 	MaObjectRepository allInstances do:
 		[ : each | each unregisterAsMemoryHog ].
-	World cleanseStepList.
-	WorldState cleanUp.
+
+
 	Smalltalk garbageCollect.
 	before _ self allSubInstances size.
-	Smalltalk hasMaui ifTrue:
-		[ (Smalltalk classNamed: #MauiWorld) current
-			 clipboard: nil ;
-			 rehashPlayers.
-		(Smalltalk classNamed: #MauiBlockMorph) allInstances do:
-			[ : each | each receiver isMauiPrototype ifTrue: [ each resetReceiver ] ] ].
-	(Smalltalk classNamed: #TeCellAddress) ifNotNil:
-		[ : teCellAddress | teCellAddress initializeReusableAddress ].
+	
 	proxies _ MagmaMutatingProxy allInstances select:
 		[ : each | each maRealObjectIsReified ].
 	reals _ proxies collect:
@@ -6808,22 +6804,16 @@ cleanUp
 		elementsForwardIdentityTo: reals
 		copyHash: false.
 	Smalltalk garbageCollect.
-	self allSubInstances do:
-		[ : each | (PointerFinder pointersTo: each) do:
-			[ : referencer | (referencer class = Context and: [referencer isMethodContext]) ifTrue: [ referencer receiver: nil ] ] ].
-	Smalltalk garbageCollect.
+	
 	after _ self allSubInstances size.
-	(after > 0 and: [ Smalltalk hasMaui ]) ifTrue:
-		[ (Smalltalk classNamed: #MauiMorph) allSubInstances do:
-			[ : each | each object isMauiPrototype ifTrue: [ each resetObject ] ].
-		Smalltalk garbageCollect.
-		after _ self allSubInstances size ].
-	SystemNavigation default allObjectsDo:
+	
+	Smalltalk allObjectsDo:
 		[ : e | ((e class inheritsFrom: Object) and: [ e isBehindWriteBarrier ]) ifTrue:
 			[ [ e primitiveChangeClassTo: e class superclass basicNew ]
 				on: Error
 				do:
 					[ : err | err ] ] ].
+			
 	MaStatHistory cleanUp.
 	^ 'MagmaSession instances (before->after):  ' , (before -> after) printString! !
 

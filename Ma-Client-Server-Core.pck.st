@@ -1,10 +1,10 @@
-'From Cuis 5.0 [latest update: #4579] on 12 May 2021 at 8:31:30 pm'!
+'From Cuis 5.0 [latest update: #4579] on 13 May 2021 at 1:13:28 pm'!
 'Description Magma core for server and client
 
 License: MIT
 Original author: Chris Muller (cmm)
 Author: Josef Philip Bernhart (jpb)'!
-!provides: 'Ma-Client-Server-Core' 1 23!
+!provides: 'Ma-Client-Server-Core' 1 25!
 !requires: 'Ma-Collections' 1 0 nil!
 !requires: 'Network-Kernel' 1 5 nil!
 !requires: 'Ma-Core' 1 1 nil!
@@ -1234,12 +1234,12 @@ sendData: requestByteArray
 		count: requestByteArray size
 		waitForReplyIn: (self isUdp ifFalse: [ #[] ])! !
 
-!MaClientSocket methodsFor: 'send' stamp: 'cmm 10/28/2014 09:59'!
+!MaClientSocket methodsFor: 'send' stamp: 'jpb 5/13/2021 10:17:35'!
 sendData: requestByteArray startingAt: startIndex count: numberOfBytes waitForReplyIn: answerByteArray 
 	"Perform a synchronous TCP call, sending count bytes of requestByteArray from position startIndex to my peer socket and then wait up to my timeout period for a reply, which I'll put in answerByteArray.  If I run out of room in answerByteArray, I'll create you a new one and return it, otherwise you'll get your own answerByteArray back.  If communications are disrupted, I'll signal a NetworkError."
 	"Do a retry logic to help with the case where the server has dropped only momentarily.  Sockets will be invalid but, unfortunately, they don't always correctly report they are invalid, as if they don't 'realize' it yet."
 	| tries |
-	sequenceNumber_sequenceNumber+1.
+	sequenceNumber _ sequenceNumber+1.
 	tries _ 0.
 	[ | startedSending header toSend compressed totalToSend |
 	(numberOfBytes > MaClientSocket mtuSize and: [ self isUdp ]) ifTrue: [ MaClientServerUserError signal: '#udp transmissions should be less than ' , MaClientSocket mtuSize-self headerSize , ' bytes' ].
@@ -1526,15 +1526,17 @@ initialize
 	onePlayerImage _ true.
 	self maxCores: 4! !
 
-!MaNetworkOrchestra methodsFor: 'start / stop' stamp: 'cmm 1/5/2016 16:53'!
+!MaNetworkOrchestra methodsFor: 'start / stop' stamp: 'jpb 5/13/2021 13:01:49'!
 launch
 	"Players treat first command-line args as a port number, not a script."
 	players ifEmpty: [ MaClientServerUserError signal: 'No players.  Launching is useless.' ].
+	
 	"Allow multiple parameters, don't assume a .st file input."
 	Preferences readDocumentAtStartup: false.
-	MCFileBasedRepository flushAllCaches.
+	
 	Smalltalk saveAs: self conductorImageName.
 	imageTimestamp _ Smalltalk imageEntry modificationTime.
+	
 	"v------ Players continue here -----v"
 	self isConductorImage ifTrue:
 		[ startBlock value.
@@ -3367,6 +3369,10 @@ newUuid
 !MaRegistry class methodsFor: 'as yet unclassified' stamp: 'jpb 5/11/2021 16:15:57'!
 newUuidString36
 	^self newString36With: self newUuid.! !
+
+!MaRegistry class methodsFor: 'as yet unclassified' stamp: 'jpb 5/13/2021 12:56:26'!
+registerAsFileReader: anObject
+	"(FileServices registeredFileReaderClasses includes: self) ifFalse: [ FileServices registerFileReader: self ]"! !
 
 !MaRegistry class methodsFor: 'as yet unclassified' stamp: 'jpb 5/11/2021 17:30:41'!
 registerForNotifications: anObject

@@ -1,4 +1,4 @@
-'From Cuis 5.0 [latest update: #4579] on 12 May 2021 at 7:51:48 pm'!
+'From Cuis 5.0 [latest update: #4579] on 13 May 2021 at 12:59:25 pm'!
 'Description I provide several independent, special-purpose collection classes that seem to be generally useful.
 
 MaWeakIdentityKeyDictionary and MaWeakValueDictionary wrap a collection of their Smalltalk counterparts and keeps them all under 12-bits in size, thus minimizing the number of collisions due to Squeaks 12-bits identity hash.  These provide major improvement in the #removeKey: message.
@@ -62,7 +62,7 @@ Other features are:
 License: MIT
 Original Author: Chris Muller (cmm)
 Author: Josef Philip Bernhart (jpb)'!
-!provides: 'Ma-Collections' 1 9!
+!provides: 'Ma-Collections' 1 10!
 SystemOrganization addCategory: 'Ma-Collections'!
 SystemOrganization addCategory: 'Ma-Collections-Exceptions'!
 SystemOrganization addCategory: 'Ma-Collections-Tests'!
@@ -1045,9 +1045,9 @@ checkForUnderflow: forceRehash
 grow
 	"do nothing"! !
 
-!MaDictionary methodsFor: 'private' stamp: 'cmm 5/5/2013 20:30'!
+!MaDictionary methodsFor: 'private' stamp: 'jpb 5/13/2021 10:39:11'!
 inspectorClass
-	^ BasicInspector! !
+	^ Inspector! !
 
 !MaDictionary methodsFor: 'private' stamp: 'cmm 10/13/2014 21:22'!
 keyHash: key

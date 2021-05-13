@@ -1,10 +1,10 @@
-'From Cuis 5.0 [latest update: #4579] on 12 May 2021 at 7:52:52 pm'!
+'From Cuis 5.0 [latest update: #4579] on 13 May 2021 at 1:13:24 pm'!
 'Description Package containing the magma client implementation
 
 License: MIT
 Original Author: Chris Muller (cmm)
 Author: Josef Philip Bernhart (jpb)'!
-!provides: 'Magma-Client' 1 17!
+!provides: 'Magma-Client' 1 18!
 SystemOrganization addCategory: 'Magma-Client'!
 SystemOrganization addCategory: 'Magma-Client-Exceptions'!
 SystemOrganization addCategory: 'Magma-Client-MagmaCollections'!
@@ -4338,10 +4338,10 @@ bucketAt: anInteger
 "	array refresh."
 	^ answer! !
 
-!MagmaPreallocatedDictionary methodsFor: 'private' stamp: 'cmm 11/2/2010 15:23'!
+!MagmaPreallocatedDictionary methodsFor: 'private' stamp: 'jpb 5/13/2021 12:58:42'!
 errorKeyNotFound: key
 	"Signal KeyNotFound error"
-	^(KeyNotFound key: key) signal! !
+	^(MaKeyNotFoundError key: key) signal! !
 
 !MagmaPreallocatedDictionary methodsFor: 'private' stamp: 'cmm 11/6/2010 19:13'!
 keyHash: key
@@ -6734,32 +6734,14 @@ send: aMessage to: anObject
 		on: MagmaSessionRequest
 		do: [ : req | req handleAndResumeUsing: handlingSession ]! !
 
-!MagmaSession methodsFor: 'maui support' stamp: 'cmm 3/17/2013 20:29'!
+!MagmaSession methodsFor: 'maui support' stamp: 'jpb 5/13/2021 13:11:38'!
 uiBackup
-	MagmaNotification signal: 'User-interface backup.'.
-	(Smalltalk hasClassNamed: #MauiWorld) ifTrue:
-		[ | thisFamily persistentFamily |
-		thisFamily _ (Smalltalk classNamed: #MauiWorld) current family.
-		persistentFamily _ self definition uiFamily.
-		thisFamily ~= persistentFamily ifTrue:
-			[ self
-				 timeoutSeconds: 600 ;
-				 retrySeconds: 600 ;
-				 commit:
-					[ persistentFamily
-						ifNil: [ self definition uiFamily: thisFamily ]
-						ifNotNil: [ persistentFamily merge: thisFamily ] ] ;
-				 timeoutSeconds: 30 ] ]! !
+	MagmaNotification signal: 'User-interface backup.'.! !
 
-!MagmaSession methodsFor: 'maui support' stamp: 'cmm 11/13/2015 13:15'!
+!MagmaSession methodsFor: 'maui support' stamp: 'jpb 5/13/2021 13:11:23'!
 uiRestore
 	"If Maui is loaded and an application UI panels were backed up with #uiBackup, merge those panels into the current MauiWorld's Family."
-	Smalltalk hasMaui
-		ifTrue:
-			[ self ensureConnected.
-			self definition uiFamily ifNotNil:
-				[ : family | (Smalltalk classNamed: #MauiWorld) current family merge: family ] ]
-		ifFalse: [ MagmaUserError signal: 'Maui is not installed.' ]! !
+	MagmaUserError signal: 'Maui is not installed and is not supported.'! !
 
 !MagmaSession methodsFor: 'accessing' stamp: 'cmm 4/28/2007 19:30'!
 objectWithOid: anInteger 
@@ -9100,10 +9082,10 @@ at: keyObject put: valueObject
 						value: valueObject)
 				at: hash ]) value! !
 
-!MagmaDictionary methodsFor: 'access' stamp: 'cmm 4/24/2013 22:03'!
+!MagmaDictionary methodsFor: 'access' stamp: 'jpb 5/13/2021 12:58:56'!
 errorKeyNotFound: key
 	"Signal KeyNotFound error"
-	^(KeyNotFound key: key) signal! !
+	^(MaKeyNotFoundError key: key) signal! !
 
 !MagmaDictionary methodsFor: 'access' stamp: 'cmm 4/11/2011 14:36'!
 lastKnownSize
@@ -12630,121 +12612,11 @@ asFailedResult
 	^self
 ! !
 
-!MaFailedCommitResult methodsFor: 'private' stamp: 'cmm 3/28/2013 13:30'!
-attributeColumn
-	^ (MaFixedWidthReportColumn dataAccessBlock:
-		[ : anAssociation | anAssociation key ])
-		 headingText: nil ;
-		 alignLeft ;
-		 width: 20 ;
-		 repeatDuplicateValues: true ;
-		 yourself! !
-
-!MaFailedCommitResult methodsFor: 'private' stamp: 'cmm 3/28/2013 13:46'!
-comparisonSpec
-	^ MaFixedWidthRowSpecification new
-		addColumn: self oidColumn ;
-		addColumn: self objectColumn ;
-		yourself! !
-
-!MaFailedCommitResult methodsFor: 'private' stamp: 'cmm 3/28/2013 13:47'!
-conflictReport
-	^ MaFixedWidthReport new
-		for: MagmaCommitConflict
-		use: self conflictSpec ;
-		for: MagmaCommitConflict
-		subReportOn: [ : eachConflict | eachConflict comparisons ] ;
-
-		for: MaObjectComparison
-		use: self comparisonSpec ;
-		for: MaObjectComparison
-		subReportOn: [ : eachComparison | eachComparison differences ] ;
-
-		for: Association
-		use: self differenceSpec ;
-		yourself! !
-
-!MaFailedCommitResult methodsFor: 'private' stamp: 'cmm 3/27/2013 21:56'!
-conflictSpec
-	^ MaFixedWidthRowSpecification new
-		addColumn: self sessionIdColumn ;
-		addColumn: self userIdColumn ;
-		yourself! !
-
-!MaFailedCommitResult methodsFor: 'private' stamp: 'cmm 3/28/2013 13:43'!
-differenceSpec
-	^ MaFixedWidthRowSpecification new
-		addColumn: self attributeColumn ;
-		addColumn: self winningValueColumn ;
-		addColumn: self losingValueColumn ;
-		yourself! !
-
-!MaFailedCommitResult methodsFor: 'private' stamp: 'cmm 3/28/2013 13:42'!
-losingValueColumn
-	^ (MaFixedWidthReportColumn dataAccessBlock:
-		[ : anAssociation | anAssociation value second ])
-		 headingText: nil ;
-		 alignLeft ;
-		 width: 50 ;
-		 repeatDuplicateValues: true ;
-		 yourself! !
-
-!MaFailedCommitResult methodsFor: 'private' stamp: 'cmm 4/5/2013 10:02'!
-objectColumn
-	^ (MaFixedWidthReportColumn dataAccessBlock:
-		[ : aMaObjectComparison | aMaObjectComparison object1 ])
-		 headingText: nil ;
-		 alignLeft ;
-		 width: 120 ;
-		 repeatDuplicateValues: true ;
-		 yourself! !
-
-!MaFailedCommitResult methodsFor: 'private' stamp: 'cmm 4/5/2013 10:01'!
-oidColumn
-	^ (MaFixedWidthReportColumn dataAccessBlock:
-		[ : aMaObjectComparison | 'oid:  ', aMaObjectComparison object1 magmaOid asString ])
-		 headingText: nil ;
-		 alignLeft ;
-		 width: 20 ;
-		 repeatDuplicateValues: false ;
-		 yourself! !
-
 !MaFailedCommitResult methodsFor: 'private' stamp: 'cmm 6/26/2002 00:33'!
 populateConflictingObjectsFromOidsUsing: aMaObjectSerializer
 
 	commitConflicts do: [ :each | each initializeConflictingObjectsUsing: aMaObjectSerializer ]
 ! !
-
-!MaFailedCommitResult methodsFor: 'private' stamp: 'cmm 4/5/2013 09:54'!
-sessionIdColumn
-	^ (MaFixedWidthReportColumn dataAccessBlock:
-		[ : aMagmaCommitConflict | aMagmaCommitConflict connection sessionId ])
-		 headingText: 'sessionId' ;
-		 alignLeft ;
-		 width: UUID new asString size ;
-		 repeatDuplicateValues: false ;
-		 yourself! !
-
-!MaFailedCommitResult methodsFor: 'private' stamp: 'cmm 4/5/2013 09:59'!
-userIdColumn
-	^ (MaFixedWidthReportColumn dataAccessBlock:
-		[ : aMagmaCommitConflict | aMagmaCommitConflict connection userId ])
-		 headingText: 'userId' ;
-		 alignLeft ;
-		 width: 50 ;
-		 repeatDuplicateValues: true ;
-		 useEllipsisOnTruncate: true ;
-		 yourself! !
-
-!MaFailedCommitResult methodsFor: 'private' stamp: 'cmm 3/28/2013 13:42'!
-winningValueColumn
-	^ (MaFixedWidthReportColumn dataAccessBlock:
-		[ : anAssociation | anAssociation value first ])
-		 headingText: nil ;
-		 alignLeft ;
-		 width: 50 ;
-		 repeatDuplicateValues: true ;
-		 yourself! !
 
 !MaFailedCommitResult methodsFor: 'accessing' stamp: 'cmm 6/26/2002 22:16'!
 commitConflicts

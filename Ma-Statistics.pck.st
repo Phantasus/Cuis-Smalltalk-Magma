@@ -1,10 +1,10 @@
-'From Cuis 5.0 [latest update: #4579] on 12 May 2021 at 7:52:51 pm'!
+'From Cuis 5.0 [latest update: #4579] on 13 May 2021 at 1:13:23 pm'!
 'Description Adds mandatory statistics domain objects to the magma server
 
 License: MIT
 Original Author: Chris Muller (cmm)
 Author: Josef Philip Bernhart (jpb)'!
-!provides: 'Ma-Statistics' 1 3!
+!provides: 'Ma-Statistics' 1 4!
 !requires: 'Ma-Core' 1 7 nil!
 SystemOrganization addCategory: 'Ma-Statistics'!
 
@@ -282,123 +282,6 @@ postArchive: aTimespan
 				instVarNamed: each
 				put: (eachPotentialHistory archive: aTimespan) ] ].
 	self noteNewSpan: aTimespan! !
-
-!MaStatCollection methodsFor: 'private-reporting' stamp: 'cmm 5/9/2008 14:28'!
-countColumn
-	^ (MaFixedWidthReportColumn dataAccessBlock: [ : aMaHistoricalStat | aMaHistoricalStat count ])
-		headingText: 'Count' ;
-		alignRight ;
-		width: 8 ;
-		repeatDuplicateValues: true ;
-		useEllipsisOnTruncate: true ;
-		yourself! !
-
-!MaStatCollection methodsFor: 'private-reporting' stamp: 'cmm 5/9/2008 14:27'!
-endTimeColumn
-	^ (MaFixedWidthReportColumn dataAccessBlock: [ : aMaHistoricalStat | aMaHistoricalStat endTime ])
-		headingText: 'End Time' ;
-		alignLeft ;
-		width: DateAndTime now printString size + 4 ;
-		repeatDuplicateValues: true ;
-		useEllipsisOnTruncate: false ;
-		yourself! !
-
-!MaStatCollection methodsFor: 'private-reporting' stamp: 'cmm 6/27/2008 17:40'!
-historicalStatNameColumn
-	^ (MaFixedWidthReportColumn dataAccessBlock: [ : eachHistory | eachHistory name ])
-		headingText: 'Name' ;
-		width: 40 ;
-		useEllipsisOnTruncate: true ;
-		repeatDuplicateValues: true ;
-		yourself! !
-
-!MaStatCollection methodsFor: 'private-reporting' stamp: 'cmm 6/27/2008 00:04'!
-historicalStatRowSpec
-	^ MaFixedWidthRowSpecification new
-		addColumn: self endTimeColumn ;
-		addColumn: self historicalStatNameColumn ;
-		addColumn: self countColumn ;
-		addColumn: self minColumn ;
-		addColumn: self maxColumn ;
-		addColumn: self sumColumn ;
-		addColumn: self meanColumn ;
-		addColumn: self lastColumn! !
-
-!MaStatCollection methodsFor: 'private-reporting' stamp: 'cmm 5/9/2008 14:28'!
-lastColumn
-	^ (MaFixedWidthReportColumn dataAccessBlock: [ : aMaHistoricalStat | aMaHistoricalStat last ])
-		headingText: 'last' ;
-		alignRight ;
-		width: 10 ;
-		repeatDuplicateValues: true ;
-		useEllipsisOnTruncate: true ;
-		yourself! !
-
-!MaStatCollection methodsFor: 'private-reporting' stamp: 'cmm 5/9/2008 14:28'!
-maxColumn
-	^ (MaFixedWidthReportColumn dataAccessBlock: [ : aMaHistoricalStat | aMaHistoricalStat max ])
-		headingText: 'max' ;
-		alignRight ;
-		width: 10 ;
-		repeatDuplicateValues: true ;
-		useEllipsisOnTruncate: true ;
-		yourself! !
-
-!MaStatCollection methodsFor: 'private-reporting' stamp: 'cmm 5/9/2008 14:27'!
-meanColumn
-	^ (MaFixedWidthReportColumn dataAccessBlock: [ : aMaHistoricalStat | aMaHistoricalStat mean ])
-		headingText: 'mean' ;
-		alignRight ;
-		width: 10 ;
-		repeatDuplicateValues: true ;
-		useEllipsisOnTruncate: false ;
-		yourself! !
-
-!MaStatCollection methodsFor: 'private-reporting' stamp: 'cmm 5/9/2008 14:27'!
-minColumn
-	^ (MaFixedWidthReportColumn dataAccessBlock: [ : aMaHistoricalStat | aMaHistoricalStat min ])
-		headingText: 'min' ;
-		alignRight ;
-		width: 10 ;
-		repeatDuplicateValues: true ;
-		useEllipsisOnTruncate: true ;
-		yourself! !
-
-!MaStatCollection methodsFor: 'private-reporting' stamp: 'cmm 5/9/2008 14:27'!
-nameColumn
-	^ (MaFixedWidthReportColumn dataAccessBlock: [ : eachHistory | eachHistory name ])
-		width: 75 ;
-		useEllipsisOnTruncate: true ;
-		yourself! !
-
-!MaStatCollection methodsFor: 'private-reporting' stamp: 'cmm 6/27/2008 10:11'!
-reportDefinition
-	^ MaFixedWidthReport new
-		for: MaStatHistory
-			use: self statHistoryRowSpec ;
-		for: MaStatHistory
-			subReportOn: [ : eachStatHistory | eachStatHistory allStats ] ;
-		for: MaStatHistory
-			subReportOn: [ : eachStatHistory | Array with: eachStatHistory summary ] ;
-		for: MaHistoricalStat
-			use: self historicalStatRowSpec ;
-		yourself! !
-
-!MaStatCollection methodsFor: 'private-reporting' stamp: 'cmm 5/9/2008 14:27'!
-statHistoryRowSpec
-	^ MaFixedWidthRowSpecification new
-		addColumn: self nameColumn ;
-		yourself! !
-
-!MaStatCollection methodsFor: 'private-reporting' stamp: 'cmm 5/9/2008 14:27'!
-sumColumn
-	^ (MaFixedWidthReportColumn dataAccessBlock: [ : aMaHistoricalStat | aMaHistoricalStat sum ])
-		headingText: 'sum' ;
-		alignRight ;
-		width: 10 ;
-		repeatDuplicateValues: true ;
-		useEllipsisOnTruncate: true ;
-		yourself! !
 
 !MaStatCollection methodsFor: 'accessing' stamp: 'cmm 6/4/2008 10:34'!
 ensureActive

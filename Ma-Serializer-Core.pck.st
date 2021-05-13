@@ -1,4 +1,4 @@
-'From Cuis 5.0 [latest update: #4579] on 12 May 2021 at 2:20:09 pm'!
+'From Cuis 5.0 [latest update: #4579] on 13 May 2021 at 1:13:18 pm'!
 'Description I am a general object serialization and materialization framework.  Currently, I convert objects to ByteArrays and back.  I am used by both the "Ma client server" and "Magma" packages.  I offer a lot of flexibility in the way objects are serialized and materialized, even to the way the object graphs are traversed during serialization.
 
 The major class is MaObjectSerializer, see it for more information.  It utilizes a MaOidManager, a MaClassIdManager, and a MaObjectGraphTraversalStrategy to create a MaSerializedGraphBuffer, the final object that wraps the ByteArray.
@@ -7,7 +7,7 @@ The major class is MaObjectSerializer, see it for more information.  It utilizes
 License: MIT
 Original Author: Chris Muller (cmm)
 Author: Josef Philip Bernhart (jpb)'!
-!provides: 'Ma-Serializer-Core' 1 13!
+!provides: 'Ma-Serializer-Core' 1 16!
 !requires: 'Ma-Core' 1 1 nil!
 !requires: 'SOLHashTables' 1 4 nil!
 !requires: 'Ma-Statistics' 1 0 nil!
@@ -691,17 +691,12 @@ classDefinitionsById
 	^classDefinitionsById
 ! !
 
-!MaClassIdManager methodsFor: 'accessing' stamp: 'cmm 5/19/2018 17:12'!
+!MaClassIdManager methodsFor: 'accessing' stamp: 'jpb 5/13/2021 13:09:36'!
 classDefinitionsById: aDictionary 
 	classDefinitionsById _ aDictionary.
 	"One day I encountered a class in an external package whose class name was a WideString (with special characters in it).  To be able to use such class, Magma would need WideString in its minimumClasses (as this is the set of classes required to materialize the classDefinitionsById Dictionary, which has MaClassDefinitions as its values).
 	HOWEVER, some databases already have WideString incidentally from objects in their domain.  If this is the case, we must remove it from the minimumClasses to avoid an ambigous classId assignment!!"
-	aDictionary
-		detect:
-			[ : each | each anyOne className = #WideString ]
-		ifFound:
-			[ : defs | defs anyOne id = (minimumClasses indexOf: WideString) ifFalse: [ minimumClasses _ minimumClasses copyWithout: WideString ] ]
-		ifNone: [ "rebuildTransientClassMaps will end up putting it in, 'resulting in a dirty classDefinitionsById only upon opening." ].
+	
 	self rebuildTransientClassMaps! !
 
 !MaClassIdManager methodsFor: 'accessing' stamp: 'cmm 10/17/2004 22:39'!
@@ -1908,7 +1903,7 @@ bufferType
 calculateHeaderSizeUsing: aMaBufferPositionMap
 	^ aMaBufferPositionMap headerSizeForCompiledMethodBuffer! !
 
-!MaCompiledMethodBuffer methodsFor: 'private' stamp: 'cmm 5/5/2015 11:15'!
+!MaCompiledMethodBuffer methodsFor: 'private' stamp: 'jpb 5/13/2021 10:17:52'!
 headerForThisVm
 	"Header fields and number of bits:
 	Cog:							Spur:
@@ -1927,7 +1922,7 @@ headerForThisVm
 				ifFalse: 
 					[ "Spur-to-Cog header conversion."
 					|cogHeader numLits| 
-					(numLits_ headerVal bitAnd: 2r111111111111111) > 255 ifTrue: [ MaEnvironmentError signal: 'This image cannot materialize the CompiledMethod from Spur because it has more than 255 literals.' ].
+					(numLits _ headerVal bitAnd: 2r111111111111111) > 255 ifTrue: [ MaEnvironmentError signal: 'This image cannot materialize the CompiledMethod from Spur because it has more than 255 literals.' ].
 					"Rebuild Cog header starting with high-order bits.  Erase low-order 16 bits by shifting right, then back left only 8 because that's all there is for Cog."
 					cogHeader _ (headerVal bitShift: -17) bitShift: 8.
 					"Add in numLits to properly set the low-order 8 bits."
@@ -3598,11 +3593,12 @@ buffersMissingFromWholeWhere: aBlock
 			buffersMissingFromWholeWhere: aBlock
 			do: [ : eachOid : eachBuffer | stream nextPut: eachOid -> eachBuffer copyWithSameBuffer ] ]! !
 
-!MaSerializedGraphBuffer methodsFor: 'debugging' stamp: 'cmm 10/13/2014 21:34'!
+!MaSerializedGraphBuffer methodsFor: 'debugging' stamp: 'jpb 5/12/2021 21:52:07'!
 buffersMissingFromWholeWhere: conditionBlock do: twoArgBlock 
 	"Value twoArgBlock with an Association whose value is a buffer which references an oid for which there is no buffer and whose key is the oid which is unreferenced."
 	| oids |
-	oids _ PluggableSet integerSet.
+	oids _ Set new.
+	
 	self buffersDo:
 		[ : each | oids add: each oid ].
 	self buffersDo:
@@ -3840,18 +3836,16 @@ shouldTraverseNoBytes: anObject
 	cl isPointers ifFalse: [ ^ false ].
 	^ true! !
 
-!MaObjectGraphTraversalStrategy class methodsFor: 'private' stamp: 'cmm 5/28/2014 14:14'!
+!MaObjectGraphTraversalStrategy class methodsFor: 'private' stamp: 'jpb 5/13/2021 13:10:31'!
 shouldTraverseNoGlobals: anObject 
 	anObject == Smalltalk ifTrue: [ ^ false ].
 	anObject == Processor ifTrue: [ ^ false ].
 	anObject == Display ifTrue: [ ^ false ].
-	anObject == ActiveHand ifTrue: [ ^ false ].
-	anObject == ActiveWorld ifTrue: [ ^ false ].
+
 	anObject == Sensor ifTrue: [ ^ false ].
 	anObject == SourceFiles ifTrue: [ ^ false ].
 	anObject == SystemOrganization ifTrue: [ ^ false ].
-	anObject == TextConstants ifTrue: [ ^ false ].
-	anObject == World ifTrue: [ ^ false ].
+	
 	anObject isBehavior ifTrue: [ ^ false ].
 	anObject maIsEnvironment ifTrue: [ ^ false ].
 	^ true! !
