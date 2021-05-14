@@ -1,4 +1,4 @@
-'From Cuis 5.0 [latest update: #4579] on 14 May 2021 at 10:13:27 am'!
+'From Cuis 5.0 [latest update: #4579] on 14 May 2021 at 10:42:21 am'!
 'Description I provide several independent, special-purpose collection classes that seem to be generally useful.
 
 MaWeakIdentityKeyDictionary and MaWeakValueDictionary wrap a collection of their Smalltalk counterparts and keeps them all under 12-bits in size, thus minimizing the number of collisions due to Squeaks 12-bits identity hash.  These provide major improvement in the #removeKey: message.
@@ -62,7 +62,7 @@ Other features are:
 License: MIT
 Original Author: Chris Muller (cmm)
 Author: Josef Philip Bernhart (jpb)'!
-!provides: 'Ma-Collections' 1 11!
+!provides: 'Ma-Collections' 1 12!
 SystemOrganization addCategory: 'Ma-Collections'!
 SystemOrganization addCategory: 'Ma-Collections-Exceptions'!
 SystemOrganization addCategory: 'Ma-Collections-Tests'!
@@ -929,14 +929,10 @@ associationAt: key ifAbsent: aBlock
 	^ bucket ifNil: aBlock
 		ifNotNil: [ (bucket findKeyOrNil: key) ifNil: aBlock ]! !
 
-!MaDictionary methodsFor: 'private' stamp: 'sig 7/20/2007 12:37'!
-associationClass
-	^ MaAssociation! !
-
-!MaDictionary methodsFor: 'private' stamp: 'sig 7/19/2007 22:26'!
+!MaDictionary methodsFor: 'private' stamp: 'jpb 5/14/2021 10:32:22'!
 atIndex: index insertKey: key value: value
 	| newb |
-	newb _ self associationClass key: key value: value next: (array at: index).
+	newb _ self maAssociationClass key: key value: value next: (array at: index).
 	array at: index put: newb.
 	tally _ tally + 1.
 	self checkForOverflow.
@@ -994,6 +990,10 @@ keyHash: key
 !MaDictionary methodsFor: 'private' stamp: 'cmm 10/13/2014 21:24'!
 keyHash: key size: aSize
 	^ ((key hash \\ 1064164 * 1009) \\ aSize) + 1! !
+
+!MaDictionary methodsFor: 'private' stamp: 'jpb 5/14/2021 10:32:22'!
+maAssociationClass
+	^ MaAssociation! !
 
 !MaDictionary methodsFor: 'private' stamp: 'cmm 3/28/2010 11:51'!
 maxBuckets
@@ -1137,10 +1137,6 @@ initialize
 primes
 	^ Primes! !
 
-!MaIdentityDictionary methodsFor: 'as yet unclassified' stamp: 'cmm 6/22/2009 13:39'!
-associationClass
-	^ MaIdentityKeyAssociation ! !
-
 !MaIdentityDictionary methodsFor: 'as yet unclassified' stamp: 'cmm 6/22/2009 13:36'!
 at: key ifAbsent: aBlock
 	| bucket |
@@ -1175,6 +1171,10 @@ keyHash: key
 !MaIdentityDictionary methodsFor: 'as yet unclassified' stamp: 'cmm 6/22/2009 14:59'!
 keyHash: key size: aSize
 	^ (key identityHash \\ aSize) + 1! !
+
+!MaIdentityDictionary methodsFor: 'as yet unclassified' stamp: 'jpb 5/14/2021 10:32:22'!
+maAssociationClass
+	^ MaIdentityKeyAssociation ! !
 
 !MaIdentityDictionary methodsFor: 'as yet unclassified' stamp: 'cmm 6/22/2009 13:43'!
 removeKey: key ifAbsent: aBlock 
@@ -1247,12 +1247,6 @@ remove: anObject ifAbsent: aBlock
 		removeKey: anObject
 		ifAbsent: aBlock! !
 
-!MaWeakKeyDictionary methodsFor: 'as yet unclassified' stamp: 'sig 7/20/2007 12:38'!
-associationClass
-	^ MaWeakKeyAssociation 
-
-	! !
-
 !MaWeakKeyDictionary methodsFor: 'as yet unclassified' stamp: 'sig 7/25/2007 17:54'!
 at: key ifAbsent: aBlock
 	| bucket |
@@ -1322,6 +1316,12 @@ keysDo: aBlock
 	self associationsDo: [:association | 
 		association key ifNotNil:[aBlock value: association key]].! !
 
+!MaWeakKeyDictionary methodsFor: 'as yet unclassified' stamp: 'jpb 5/14/2021 10:32:22'!
+maAssociationClass
+	^ MaWeakKeyAssociation 
+
+	! !
+
 !MaWeakKeyDictionary methodsFor: 'as yet unclassified' stamp: 'sig 7/25/2007 18:02'!
 removeKey: key ifAbsent: aBlock 
 	"Remove key (and its associated value) from the receiver. If key is not in 
@@ -1346,10 +1346,6 @@ removeKey: key ifAbsent: aBlock
 		bucket _ next.
 	].
 	^ aBlock value! !
-
-!MaWeakIdentityKeyDictionary methodsFor: 'as yet unclassified' stamp: 'sig 7/20/2007 12:39'!
-associationClass
-	^ MaWeakIdentityKeyAssociation! !
 
 !MaWeakIdentityKeyDictionary methodsFor: 'as yet unclassified' stamp: 'sig 7/25/2007 17:56'!
 at: key ifAbsent: aBlock
@@ -1390,6 +1386,10 @@ keyHash: key
 keyHash: key size: aSize
 	^ (key identityHash \\ aSize) + 1! !
 
+!MaWeakIdentityKeyDictionary methodsFor: 'as yet unclassified' stamp: 'jpb 5/14/2021 10:32:22'!
+maAssociationClass
+	^ MaWeakIdentityKeyAssociation! !
+
 !MaWeakIdentityKeyDictionary methodsFor: 'as yet unclassified' stamp: 'sig 7/25/2007 18:01'!
 removeKey: key ifAbsent: aBlock 
 	"Remove key (and its associated value) from the receiver. If key is not in 
@@ -1415,8 +1415,8 @@ removeKey: key ifAbsent: aBlock
 	].
 	^ aBlock value! !
 
-!MaWeakValueDictionary methodsFor: 'as yet unclassified' stamp: 'sig 7/20/2007 12:38'!
-associationClass
+!MaWeakValueDictionary methodsFor: 'as yet unclassified' stamp: 'jpb 5/14/2021 10:32:22'!
+maAssociationClass
 	^ MaWeakValueAssociation! !
 
 !MaWeakValueDictionary methodsFor: 'as yet unclassified' stamp: 'sig 9/3/2007 15:38'!
@@ -7553,6 +7553,10 @@ supportsAutoCleaning
 !Dictionary methodsFor: '*ma-collections' stamp: 'cmm 10/19/2010 22:07'!
 finalizeValues
 	"For API compatibility with Weak-Dictionary's.  There have been cases where a pluggable Dictionary may be weak or strong."! !
+
+!Dictionary methodsFor: '*ma-collections' stamp: 'jpb 5/14/2021 10:42:06'!
+maAssociationClass
+	^Association ! !
 
 !WeakKeyDictionary methodsFor: '*ma-collections' stamp: 'cmm 5/6/2013 10:29'!
 finalizeValues: forceRehash

@@ -1,10 +1,10 @@
-'From Cuis 5.0 [latest update: #4579] on 13 May 2021 at 1:13:24 pm'!
+'From Cuis 5.0 [latest update: #4579] on 14 May 2021 at 10:42:25 am'!
 'Description Package containing the magma client implementation
 
 License: MIT
 Original Author: Chris Muller (cmm)
 Author: Josef Philip Bernhart (jpb)'!
-!provides: 'Magma-Client' 1 18!
+!provides: 'Magma-Client' 1 19!
 SystemOrganization addCategory: 'Magma-Client'!
 SystemOrganization addCategory: 'Magma-Client-Exceptions'!
 SystemOrganization addCategory: 'Magma-Client-MagmaCollections'!
@@ -4315,16 +4315,12 @@ associationAt: key ifPresent: presentBlock ifAbsent: absentBlock
 				ifNotNil:
 					[ : assoc | presentBlock value: assoc ] ]! !
 
-!MagmaPreallocatedDictionary methodsFor: 'private' stamp: 'cmm 11/2/2010 13:51'!
-associationClass
-	^ MaAssociation! !
-
-!MagmaPreallocatedDictionary methodsFor: 'private' stamp: 'cmm 10/13/2014 20:56'!
+!MagmaPreallocatedDictionary methodsFor: 'private' stamp: 'jpb 5/14/2021 10:32:22'!
 atIndex: index insertKey: key value: value
 	| currentBucket newBucket |
 	currentBucket _ self bucketAt: index.
 	currentBucket ifNotNil: [ collisions _ collisions + 1 ].
-	newBucket _ self associationClass key: key value: value next: (currentBucket).
+	newBucket _ self maAssociationClass key: key value: value next: (currentBucket).
 	array at: index put: newBucket.
 	tally increment: 1.
 	^ value! !
@@ -4346,6 +4342,10 @@ errorKeyNotFound: key
 !MagmaPreallocatedDictionary methodsFor: 'private' stamp: 'cmm 11/6/2010 19:13'!
 keyHash: key
 	^ (key hash \\ maxBuckets) + 1! !
+
+!MagmaPreallocatedDictionary methodsFor: 'private' stamp: 'jpb 5/14/2021 10:32:22'!
+maAssociationClass
+	^ MaAssociation! !
 
 !MagmaPreallocatedDictionary methodsFor: 'private' stamp: 'cmm 11/6/2010 18:52'!
 maxBuckets

@@ -1,4 +1,4 @@
-'From Cuis 5.0 [latest update: #4579] on 14 May 2021 at 10:13:24 am'!
+'From Cuis 5.0 [latest update: #4579] on 14 May 2021 at 10:42:23 am'!
 'Description I am a general object serialization and materialization framework.  Currently, I convert objects to ByteArrays and back.  I am used by both the "Ma client server" and "Magma" packages.  I offer a lot of flexibility in the way objects are serialized and materialized, even to the way the object graphs are traversed during serialization.
 
 The major class is MaObjectSerializer, see it for more information.  It utilizes a MaOidManager, a MaClassIdManager, and a MaObjectGraphTraversalStrategy to create a MaSerializedGraphBuffer, the final object that wraps the ByteArray.
@@ -7,7 +7,7 @@ The major class is MaObjectSerializer, see it for more information.  It utilizes
 License: MIT
 Original Author: Chris Muller (cmm)
 Author: Josef Philip Bernhart (jpb)'!
-!provides: 'Ma-Serializer-Core' 1 17!
+!provides: 'Ma-Serializer-Core' 1 18!
 !requires: 'Ma-Core' 1 1 nil!
 !requires: 'SOLHashTables' 1 4 nil!
 !requires: 'Ma-Statistics' 1 0 nil!
@@ -4856,18 +4856,20 @@ newSkeletonFor: aMaVariableObjectBuffer
 maBufferInstSize
 	^ (self size * 2) + "enough for other named instVars" self maInstSize - self class instSize "except tally and array"! !
 
-!Dictionary methodsFor: '*ma-serializer-core' stamp: 'cmm 9/16/2014 15:21'!
+!Dictionary methodsFor: '*ma-serializer-core' stamp: 'jpb 5/14/2021 10:38:34'!
 maEstablishPointerReferencesFor: aMaVariableObjectBuffer using: aMaObjectSerializer 
 	| transformer |
 	transformer _ [ : oid | aMaObjectSerializer objectWithOid: oid ].
 	1
 		to: aMaVariableObjectBuffer objectInstSize
 		by: 2
-		do:
-			[ : index | self maDirtyAdd:
-				(self associationClass
-					key: (transformer value: (aMaVariableObjectBuffer maInstVarAt: index))
-					value: (transformer value: (aMaVariableObjectBuffer maInstVarAt: index + 1))) ]! !
+		do: [ :index |
+			| newAssociation |
+			newAssociation _ self maAssociationClass
+				key: (transformer value: (aMaVariableObjectBuffer maInstVarAt: index))
+				value: (transformer value: (aMaVariableObjectBuffer maInstVarAt: index + 1)).
+						
+			self add: newAssociation ]! !
 
 !Dictionary methodsFor: '*ma-serializer-core' stamp: 'cmm 12/2/2004 17:29'!
 maGraphDo: aBlock using: aObjectTraversalStrategy path: path with: alreadyVisitedSet
