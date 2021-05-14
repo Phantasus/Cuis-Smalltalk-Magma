@@ -1,4 +1,4 @@
-'From Cuis 5.0 [latest update: #4579] on 13 May 2021 at 1:13:18 pm'!
+'From Cuis 5.0 [latest update: #4579] on 14 May 2021 at 10:13:24 am'!
 'Description I am a general object serialization and materialization framework.  Currently, I convert objects to ByteArrays and back.  I am used by both the "Ma client server" and "Magma" packages.  I offer a lot of flexibility in the way objects are serialized and materialized, even to the way the object graphs are traversed during serialization.
 
 The major class is MaObjectSerializer, see it for more information.  It utilizes a MaOidManager, a MaClassIdManager, and a MaObjectGraphTraversalStrategy to create a MaSerializedGraphBuffer, the final object that wraps the ByteArray.
@@ -7,7 +7,7 @@ The major class is MaObjectSerializer, see it for more information.  It utilizes
 License: MIT
 Original Author: Chris Muller (cmm)
 Author: Josef Philip Bernhart (jpb)'!
-!provides: 'Ma-Serializer-Core' 1 16!
+!provides: 'Ma-Serializer-Core' 1 17!
 !requires: 'Ma-Core' 1 1 nil!
 !requires: 'SOLHashTables' 1 4 nil!
 !requires: 'Ma-Statistics' 1 0 nil!
@@ -3195,11 +3195,9 @@ defaultWeakIdentityKeyDictionaryClass
 
 MaWeakIdentityKeyDictionary! !
 
-!MaObjectSerializerPreferences class methodsFor: 'special collections' stamp: 'cmm 6/14/2010 22:25'!
+!MaObjectSerializerPreferences class methodsFor: 'special collections' stamp: 'jpb 5/14/2021 10:10:48'!
 defaultWeakValueDictionaryClass
-	^ MaAutoWeakDictionary supportsAutoCleaning
-		ifTrue: [ MaAutoIdentityKeyWeakValueDictionary ]
-		ifFalse: [ MaWeakValueDictionary ]! !
+	^MaWeakValueDictionary! !
 
 !MaObjectSerializerPreferences class methodsFor: 'special collections' stamp: 'cmm 4/23/2011 16:56'!
 newWeakIdentityKeyDictionary
@@ -5064,10 +5062,10 @@ maUsesStandardStorage
 
 	^ false! !
 
-!HandMorph class methodsFor: '*ma-serializer-core' stamp: 'cmm 5/2/2005 10:15'!
+!HandMorph class methodsFor: '*ma-serializer-core' stamp: 'jpb 5/14/2021 09:49:29'!
 maMaterializeFromGraph: aByteArray using: aMaObjectSerializer
 
-	^ ActiveHand! !
+	^self activeHand ! !
 
 !PasteUpMorph methodsFor: '*ma-serializer-core' stamp: 'cmm 2/22/2005 12:49'!
 maTransientVariables

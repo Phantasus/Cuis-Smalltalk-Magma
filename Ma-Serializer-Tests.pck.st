@@ -1,8 +1,8 @@
-'From Cuis 5.0 [latest update: #4579] on 13 May 2021 at 1:13:20 pm'!
+'From Cuis 5.0 [latest update: #4579] on 14 May 2021 at 10:13:22 am'!
 'Description License: MIT
 Original author: Chris Muller
 Author: Josef Philip Bernhart'!
-!provides: 'Ma-Serializer-Tests' 1 2!
+!provides: 'Ma-Serializer-Tests' 1 3!
 !requires: 'Ma-Serializer-Core' 1 14 nil!
 SystemOrganization addCategory: 'Ma-Serializer-Tests'!
 
@@ -225,10 +225,10 @@ fractionSamples
 
 	^Array with: 3/4 with: 0-(1001/1000)! !
 
-!MaFixtureFactory methodsFor: 'private non-collection samples' stamp: 'cmm 11/25/2004 21:35'!
+!MaFixtureFactory methodsFor: 'private non-collection samples' stamp: 'jpb 5/14/2021 09:49:59'!
 globalSamples
 
-	^{ Transcript. Processor. Smalltalk. ActiveHand. Integer.  Integer class }! !
+	^{ Transcript. Processor. Smalltalk. self activeHand. Integer.  Integer class }! !
 
 !MaFixtureFactory methodsFor: 'private non-collection samples' stamp: 'cmm 6/17/2002 22:43'!
 largeIntegerSamples
@@ -752,7 +752,7 @@ maEquivalentForSerializationTest: aWriteStream using: alreadyComparedDictionary 
 	self size = aWriteStream size ifFalse: [^false].
 	^self contents = aWriteStream contents! !
 
-!HandMorph methodsFor: '*ma-serializer-tests' stamp: 'cmm 11/24/2004 10:54'!
+!HandMorph methodsFor: '*ma-serializer-tests' stamp: 'jpb 5/14/2021 09:48:48'!
 maEquivalentForSerializationTest: aHandMorph using: anIdentityKeyDictionary halt: aBoolean
-	^ self == ActiveHand! !
+	^ self == self activeHand! !
 MaFixtureFactory initialize!

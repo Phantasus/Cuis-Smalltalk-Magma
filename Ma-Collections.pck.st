@@ -1,4 +1,4 @@
-'From Cuis 5.0 [latest update: #4579] on 13 May 2021 at 12:59:25 pm'!
+'From Cuis 5.0 [latest update: #4579] on 14 May 2021 at 10:13:27 am'!
 'Description I provide several independent, special-purpose collection classes that seem to be generally useful.
 
 MaWeakIdentityKeyDictionary and MaWeakValueDictionary wrap a collection of their Smalltalk counterparts and keeps them all under 12-bits in size, thus minimizing the number of collisions due to Squeaks 12-bits identity hash.  These provide major improvement in the #removeKey: message.
@@ -62,7 +62,7 @@ Other features are:
 License: MIT
 Original Author: Chris Muller (cmm)
 Author: Josef Philip Bernhart (jpb)'!
-!provides: 'Ma-Collections' 1 10!
+!provides: 'Ma-Collections' 1 11!
 SystemOrganization addCategory: 'Ma-Collections'!
 SystemOrganization addCategory: 'Ma-Collections-Exceptions'!
 SystemOrganization addCategory: 'Ma-Collections-Tests'!
@@ -136,56 +136,6 @@ Dictionary subclass: #MaDictionary
 	category: 'Ma-Collections'!
 !classDefinition: 'MaDictionary class' category: 'Ma-Collections'!
 MaDictionary class
-	instanceVariableNames: ''!
-
-!classDefinition: #MaAutoWeakDictionary category: 'Ma-Collections'!
-MaDictionary subclass: #MaAutoWeakDictionary
-	instanceVariableNames: 'list preInitializedAssoc'
-	classVariableNames: 'IsSupported'
-	poolDictionaries: ''
-	category: 'Ma-Collections'!
-!classDefinition: 'MaAutoWeakDictionary class' category: 'Ma-Collections'!
-MaAutoWeakDictionary class
-	instanceVariableNames: ''!
-
-!classDefinition: #MaAutoIdentityKeyWeakValueDictionary category: 'Ma-Collections'!
-MaAutoWeakDictionary subclass: #MaAutoIdentityKeyWeakValueDictionary
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Ma-Collections'!
-!classDefinition: 'MaAutoIdentityKeyWeakValueDictionary class' category: 'Ma-Collections'!
-MaAutoIdentityKeyWeakValueDictionary class
-	instanceVariableNames: ''!
-
-!classDefinition: #MaAutoWeakKeyDictionary category: 'Ma-Collections'!
-MaAutoWeakDictionary subclass: #MaAutoWeakKeyDictionary
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Ma-Collections'!
-!classDefinition: 'MaAutoWeakKeyDictionary class' category: 'Ma-Collections'!
-MaAutoWeakKeyDictionary class
-	instanceVariableNames: ''!
-
-!classDefinition: #MaAutoWeakIdentityKeyDictionary category: 'Ma-Collections'!
-MaAutoWeakKeyDictionary subclass: #MaAutoWeakIdentityKeyDictionary
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Ma-Collections'!
-!classDefinition: 'MaAutoWeakIdentityKeyDictionary class' category: 'Ma-Collections'!
-MaAutoWeakIdentityKeyDictionary class
-	instanceVariableNames: ''!
-
-!classDefinition: #MaAutoWeakValueDictionary category: 'Ma-Collections'!
-MaAutoWeakDictionary subclass: #MaAutoWeakValueDictionary
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Ma-Collections'!
-!classDefinition: 'MaAutoWeakValueDictionary class' category: 'Ma-Collections'!
-MaAutoWeakValueDictionary class
 	instanceVariableNames: ''!
 
 !classDefinition: #MaIdentityDictionary category: 'Ma-Collections'!
@@ -732,14 +682,6 @@ Transcript cr; show: 'time to remove 300 from sd: ', ([ (r copyFrom: 1 to: 300) 
 Transcript cr; show: 'time to remove 300 from md: ', ([ (r copyFrom: 1 to: 300) do: [ :each | md removeKey: each ] ] timeToRun) printString.
 !
 
-!MaAutoWeakDictionary commentStamp: 'Igor.Stasenko 5/12/2010 19:07' prior: 0!
-I am a basic class for dictionaries which holding either keys or values weakly.
-I can auto-clean myself after garbage collection.
-
-I am using a special kind of associations , which appropriate for fast cleanup.
-I am not removing an existing association objects physically, but rather marking them as empty,
-so they can be reused later, when you want to add some more key/value pairs!
-
 !DateTree commentStamp: '<historical>' prior: 0!
 I provide a way to efficiently store and access date intervals. I am capable of answering the question, "What events lie within a given date range." !
 
@@ -816,11 +758,6 @@ storeOn: aStream
 	aStream nextPutAll: ' value: '.
 	self value storeOn: aStream.
 	aStream nextPut: $)! !
-
-!MaAutoWeakDictionary class methodsFor: 'initialize-release' stamp: 'cmm 6/14/2010 22:16'!
-startUp: resuming
-	"Reset the IsSupported bit because we don't know whether this VM supports it or not."
-	IsSupported _ nil! !
 
 !MaIntervalCollection methodsFor: 'copying' stamp: 'cmm 10/19/2005 10:05'!
 postCopy
@@ -1199,250 +1136,6 @@ initialize
 !MaDictionary class methodsFor: 'as yet unclassified' stamp: 'sig 7/19/2007 22:26'!
 primes
 	^ Primes! !
-
-!MaAutoWeakDictionary methodsFor: 'accessing' stamp: 'Igor.Stasenko 5/12/2010 22:30'!
-associationAt: key ifAbsent: aBlock 
-	
-	^ (array at: (self keyHash:key)) maFindKey: key ifAbsent: aBlock
-! !
-
-!MaAutoWeakDictionary methodsFor: 'accessing' stamp: 'Igor.Stasenko 9/24/2010 18:33'!
-at: key
-	| index asc |
-	index _ self keyHash: key.
-	asc _ (array at: index) maFindKey: key.
-	(asc isNil or: [ asc isFree ]) ifTrue: [ ^ self errorKeyNotFound: key ].
-	^ asc value! !
-
-!MaAutoWeakDictionary methodsFor: 'accessing' stamp: 'Igor.Stasenko 9/24/2010 18:32'!
-at: key ifAbsent: aBlock
-	| index asc |
-	index _ self keyHash: key.
-	asc _ (array at: index) maFindKey: key.
-	(asc isNil or: [ asc isFree ]) ifTrue: [ ^ aBlock value ].
-	^ asc value! !
-
-!MaAutoWeakDictionary methodsFor: 'accessing' stamp: 'Igor.Stasenko 9/24/2010 18:37'!
-at: key ifAbsentPut: aBlock
-	| index asc val |
-	index _ self keyHash: key.
-	
-	asc _ (array at: index) maFindKey: key.
-	
-	asc ifNil: [ ^ self atIndex: index insertKey: key value: aBlock value ].
-	asc isFree ifFalse: [ ^ asc value ].
-
-	val _ aBlock value.
-	asc
-		finList: list; 
-		key: key; 
-		value: val.
-	tally _ tally +1.
-	self checkForOverflow.
-	^ val
-! !
-
-!MaAutoWeakDictionary methodsFor: 'accessing' stamp: 'Igor.Stasenko 9/24/2010 18:28'!
-at: key put: value
-	| index asc |
-	index _ self keyHash: key.
-	
-	asc _ (array at: index) maFindKey: key.
-	asc ifNil: [ ^ self atIndex: index insertKey: key value: value ].
-	asc isFree ifFalse: [ asc value: value. ^ value ].
-
-	" fill the free association "	
-	asc
-		finList: list; 
-		key: key; 
-		value: value.
-	tally _ tally +1.
-	self checkForOverflow.
-	^ value
-! !
-
-!MaAutoWeakDictionary methodsFor: 'accessing' stamp: 'Igor.Stasenko 5/12/2010 22:18'!
-removeKey: key ifAbsent: aBlock 
-	"Remove key (and its associated value) from the receiver. If key is not in 
-	the receiver, answer the result of evaluating aBlock. Otherwise, answer 
-	the value externally named by key."
-	| bucket val |
-	
-	bucket _ (array at: (self keyHash: key)) maFindKey: key ifAbsent: [ ^ aBlock value ].
-	"we're not deleting the association, just clearing it out"
-	val _ bucket value.
-	bucket clear.
-	tally _ tally - 1. 
-	self checkForUnderflow.
-	^ val
-! !
-
-!MaAutoWeakDictionary methodsFor: 'enumerating' stamp: 'Igor.Stasenko 11/8/2010 00:05'!
-associationsDo: aBlock
-	self finalizeValues. "make sure we're clean before iterating"
-	array do: [ :b |
-		b ifNotNil: [ b do: aBlock ]
-	].
-! !
-
-!MaAutoWeakDictionary methodsFor: 'private' stamp: 'Igor.Stasenko 9/24/2010 17:33'!
-atIndex: index insertKey: key value: value
-	| newb |
-	newb _ preInitializedAssoc shallowCopy key: key value: value next: (array at: index).
-	array at: index put: newb.
-	tally _ tally + 1.
-	self checkForOverflow.
-	^ value
-
-	! !
-
-!MaAutoWeakDictionary methodsFor: 'private' stamp: 'Igor.Stasenko 5/12/2010 22:00'!
-rehash: newSize
-	| newArray index |
-	"rehash"
-	newArray _ Array new: newSize.
-	array do: [ :b | | next |
-		next _ b.
-		[ next notNil ] whileTrue: [  | nn |
-			nn _ next next.
-			"skip over free associations"
-			next isFree ifFalse: [
-				index _ self keyHash: next key size: newSize.
-				next next: (newArray at: index).
-				newArray at: index put: next.
-			].
-			next _ nn]
-	].
-	array _ newArray.! !
-
-!MaAutoWeakDictionary methodsFor: 'finalization' stamp: 'Igor.Stasenko 5/12/2010 23:59'!
-finalizeValues
-	
-	| asc |
-	
-	asc _ list swapWithNil.
-	[ asc notNil ] whileTrue: [ | next |
-		next _ asc finNext.
-		asc clear.
-		tally _ tally - 1.
-		asc _ next.
-	].
-
-! !
-
-!MaAutoWeakDictionary methodsFor: 'initialize-release' stamp: 'Igor.Stasenko 9/24/2010 17:30'!
-initialize
-
-	super initialize.
-	list _ WeakFinalizationList new.
-	preInitializedAssoc _ self associationClass new finList: list.! !
-
-!MaAutoWeakDictionary methodsFor: 'initialize-release' stamp: 'Igor.Stasenko 9/24/2010 17:39'!
-initialize: sz
-
-	super initialize: sz.
-	list _ WeakFinalizationList new.
-	preInitializedAssoc _ self associationClass new finList: list.! !
-
-!MaAutoWeakDictionary class methodsFor: 'initialize-release' stamp: 'jpb 5/11/2021 17:04:14'!
-initialize
-	super initialize.
-	"Smalltalk addToStartUpList: self"! !
-
-!MaAutoWeakDictionary class methodsFor: 'testing' stamp: 'cmm 7/18/2010 19:43'!
-determineIfSupported
-	"Answer whether this image can support auto-cleaning weak dictionary's.  This requires Igor's finalization enhancement produced in Q1/2010."
-	| weakFinalizationListClass weakFinalizerItem list item |
-	weakFinalizationListClass _ Smalltalk classNamed: #WeakFinalizationList.
-	weakFinalizerItem _ Smalltalk classNamed: #WeakFinalizerItem.
-	weakFinalizationListClass ifNil: [ ^ false ].
-	weakFinalizerItem ifNil: [ ^ false ].
-	list _ weakFinalizationListClass new.
-	item _ (Smalltalk classNamed: #WeakFinalizerItem) new
-		list: list
-		object: Object new
-		executor: nil.
-	list first isNil ifFalse: [ ^ false ].
-	item object notNil ifFalse: [ ^ false ].
-	Smalltalk garbageCollect.
-	item object isNil ifFalse: [ ^ false ].
-	list first == item ifFalse: [ ^ false ].
-	list first next == nil ifFalse: [ ^ false ].
-	^ true! !
-
-!MaAutoWeakDictionary class methodsFor: 'testing' stamp: 'cmm 6/14/2010 22:26'!
-isAutoCleaning
-	"Type-check.  Answer whether I am an auto-cleaning type of Dictionary.  Makers of instances may need to check their instances on startup.."
-	^ true! !
-
-!MaAutoWeakDictionary class methodsFor: 'testing' stamp: 'cmm 6/14/2010 22:24'!
-supportsAutoCleaning
-	"Answer whether this image can support auto-cleaning weak dictionary's.  This requires Igor's finalization enhancement produced in Q1/2010."
-	^ IsSupported ifNil: [ IsSupported _ self determineIfSupported ]! !
-
-!MaAutoIdentityKeyWeakValueDictionary methodsFor: 'as yet unclassified' stamp: 'Igor.Stasenko 5/12/2010 22:42'!
-associationClass
-	^ MaAutoIdentityKeyWeakValueAssociation! !
-
-!MaAutoIdentityKeyWeakValueDictionary methodsFor: 'as yet unclassified' stamp: 'Igor.Stasenko 5/12/2010 22:44'!
-keyHash: key
-	^ (key identityHash \\ array size) + 1! !
-
-!MaAutoIdentityKeyWeakValueDictionary methodsFor: 'as yet unclassified' stamp: 'Igor.Stasenko 5/13/2010 07:58'!
-keyHash: key size: aSize
-	^ (key identityHash \\ aSize) + 1! !
-
-!MaAutoWeakKeyDictionary methodsFor: 'as yet unclassified' stamp: 'Igor.Stasenko 5/12/2010 21:00'!
-associationClass
-	^ MaAutoWeakKeyAssociation! !
-
-!MaAutoWeakKeyDictionary methodsFor: 'as yet unclassified' stamp: 'Igor.Stasenko 9/24/2010 19:26'!
-finalizeValues
-	
-	| asc |
-	
-	self class supportsAutoCleaning ifFalse: [
-		"do the hard way, scan whole dictionary"
-		array do: [:e |
-			asc _ e.
-			[ asc notNil ] whileTrue: [ | next |
-				next _ asc next.
-				asc key ifNil: [ asc clear. tally _ tally - 1 ].
-				asc _ next ]
-		].
-		^ self.
-	].
-
-	asc _ list swapWithNil.
-	[ asc notNil ] whileTrue: [ | next |
-		next _ asc finNext.
-		asc clear.
-		tally _ tally - 1.
-		asc _ next.
-	].
-
-! !
-
-!MaAutoWeakKeyDictionary methodsFor: 'as yet unclassified' stamp: 'Igor.Stasenko 11/8/2010 00:33'!
-includesKey: aKey
-	aKey ifNil: [ ^ false ].
-	^ super includesKey: aKey! !
-
-!MaAutoWeakIdentityKeyDictionary methodsFor: 'as yet unclassified' stamp: 'Igor.Stasenko 5/12/2010 21:16'!
-associationClass
-	^ MaAutoWeakIdentityKeyAssociation! !
-
-!MaAutoWeakIdentityKeyDictionary methodsFor: 'as yet unclassified' stamp: 'Igor.Stasenko 5/12/2010 22:44'!
-keyHash: key
-	^ (key identityHash \\ array size) + 1! !
-
-!MaAutoWeakIdentityKeyDictionary methodsFor: 'as yet unclassified' stamp: 'Igor.Stasenko 5/13/2010 07:55'!
-keyHash: key size: aSize
-	^ (key identityHash \\ aSize) + 1! !
-
-!MaAutoWeakValueDictionary methodsFor: 'as yet unclassified' stamp: 'Igor.Stasenko 5/12/2010 21:15'!
-associationClass
-	^MaAutoWeakValueAssociation! !
 
 !MaIdentityDictionary methodsFor: 'as yet unclassified' stamp: 'cmm 6/22/2009 13:39'!
 associationClass
@@ -7825,12 +7518,11 @@ benchKnownClasses: operation size: collectionSize
 
 ! !
 
-!MaDictionaryBencher class methodsFor: 'as yet unclassified' stamp: 'Igor.Stasenko 9/24/2010 19:02'!
+!MaDictionaryBencher class methodsFor: 'as yet unclassified' stamp: 'jpb 5/14/2021 10:12:15'!
 knownClasses
 
 ^ { Dictionary. WeakKeyDictionary. WeakIdentityKeyDictionary. WeakValueDictionary.
- MaDictionary. MaWeakKeyDictionary. MaWeakIdentityKeyDictionary. MaWeakValueDictionary.
- MaAutoWeakKeyDictionary. MaAutoWeakIdentityKeyDictionary. MaAutoWeakValueDictionary. MaAutoIdentityKeyWeakValueDictionary } ! !
+ MaDictionary. MaWeakKeyDictionary. MaWeakIdentityKeyDictionary. MaWeakValueDictionary. } ! !
 
 !Object methodsFor: '*ma-collections-btree' stamp: 'avi 5/1/2005 14:10'!
 isTreeSet
@@ -7878,5 +7570,4 @@ asMaDictionary
 			put: value ].
 	^ answer! !
 MaDictionary initialize!
-MaAutoWeakDictionary initialize!
 MaHashIndexRecordConstants initialize!
