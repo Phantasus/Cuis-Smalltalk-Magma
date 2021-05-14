@@ -196,3 +196,25 @@ Chris Muller (cmm) and Tom Rushworth (tbr). As written above
 the sha256sum was:
 
 > 804482021f85744a93a41b80d900f3a086865187cc1130f4445c485ceca2d6d0
+
+
+# Authors of `Documentation/magma_file_format.pdf` (14. May 2021)
+
+This file describes the formats of the storage formats which magma uses,
+it dates to the 15th May 2006 and was written by:
+
+- AndrewGaylard
+- Brent Pinkney 
+- Mart-MariBreedtJohannesburg
+
+The sha256sum of that file is:
+
+> d079978b2984b28cc1f4feade4f2f1427743b77b5bfeacca3523be7d9a5aae7e
+
+and it was taken from the Squeak swiki from here:
+
+> https://wiki.squeak.org/squeak/uploads/2665/magma_file_format.pdf
+
+I (jpb) assume that by putting that into the Squeak wiki, it's either public
+domain, squeak license or MIT license, so it's ok to include it in
+documentation part of this port repository.
