@@ -1,8 +1,8 @@
-'From Cuis 5.0 [latest update: #4579] on 14 May 2021 at 10:13:22 am'!
+'From Cuis 5.0 [latest update: #4579] on 14 May 2021 at 10:49:40 am'!
 'Description License: MIT
-Original author: Chris Muller
-Author: Josef Philip Bernhart'!
-!provides: 'Ma-Serializer-Tests' 1 3!
+Original author: Chris Muller (cmm)
+Author: Josef Philip Bernhart (jpb)'!
+!provides: 'Ma-Serializer-Tests' 1 4!
 !requires: 'Ma-Serializer-Core' 1 14 nil!
 SystemOrganization addCategory: 'Ma-Serializer-Tests'!
 

@@ -1,10 +1,10 @@
-'From Cuis 5.0 [latest update: #4588] on 7 May 2021 at 12:05:03 am'!
+'From Cuis 5.0 [latest update: #4579] on 14 May 2021 at 10:49:42 am'!
 'Description Implements Split-Ordered Lists: Lock-Free Extensible Hash Tables (SOLHashTables)
 as described in the paper "Split-Ordered Lists: Lock-Free Extensible Hash Tables" by Ori Shalev and Nir Shavit, in the Journal of the ACM, Vol. 53, No. 3, May 2006, pp 379-405.
 
 License: MIT / Squeak License
 Original Authors: Chris Muller (cmm), Tom Rushworth (tbr)
-Author: Josef Philip Bernhart
+Author: Josef Philip Bernhart (jpb)
 
 
 Copyright (c) The individual, corporate, and institutional contributors who have collectively contributed elements to this software ("The Squeak Community"), 1996-2010 All rights reserved.
@@ -14,7 +14,7 @@ Permission is hereby granted, free of charge, to any person obtaining a copy of 
 The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.'!
-!provides: 'SOLHashTables' 1 4!
+!provides: 'SOLHashTables' 1 5!
 SystemOrganization addCategory: 'SOLHashTables-Tests'!
 SystemOrganization addCategory: 'SOLHashTables'!
 
