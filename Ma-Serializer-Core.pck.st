@@ -1,4 +1,4 @@
-'From Cuis 5.0 [latest update: #4579] on 14 May 2021 at 11:44:13 am'!
+'From Cuis 5.0 [latest update: #4579] on 14 May 2021 at 8:40:49 pm'!
 'Description I am a general object serialization and materialization framework.  Currently, I convert objects to ByteArrays and back.  I am used by both the "Ma client server" and "Magma" packages.  I offer a lot of flexibility in the way objects are serialized and materialized, even to the way the object graphs are traversed during serialization.
 
 The major class is MaObjectSerializer, see it for more information.  It utilizes a MaOidManager, a MaClassIdManager, and a MaObjectGraphTraversalStrategy to create a MaSerializedGraphBuffer, the final object that wraps the ByteArray.
@@ -7,7 +7,7 @@ The major class is MaObjectSerializer, see it for more information.  It utilizes
 License: MIT
 Original Author: Chris Muller (cmm)
 Author: Josef Philip Bernhart (jpb)'!
-!provides: 'Ma-Serializer-Core' 1 21!
+!provides: 'Ma-Serializer-Core' 1 22!
 !requires: 'Ma-Core' 1 1 nil!
 !requires: 'SOLHashTables' 1 4 nil!
 !requires: 'Ma-Statistics' 1 0 nil!
@@ -3515,6 +3515,27 @@ headerSize
 bufferSize
 	^ byteArray maUnsigned32At: 1! !
 
+!MaSerializedGraphBuffer methodsFor: 'accessing' stamp: 'jpb 5/14/2021 16:40:10'!
+bufferSizeDescription
+	| sign abs suffixes units foundSize |
+	foundSize _ self bufferSize.
+	sign _ foundSize negative ifTrue: ['-'] ifFalse: [ '' ].
+	abs _ foundSize abs.
+	suffixes _ {
+		'' "bytes".  'k'"ilobytes".
+		 'M'"egabytes". 'G'"igabytes".
+		 'T'"erabytes". 'P'"etabytes".
+		 'E'"xabytes". 'Z'"ettabytes".
+		 'Y'"ottabytes"
+	}.
+	
+	1 to: suffixes size do: [ :index |
+		units _ 1000 raisedTo: index.
+		units > abs
+			ifTrue: [ ^ sign , (abs / (units / 1000)) rounded asString , (suffixes at: index) ] ].
+	
+	^ sign , (abs/units) rounded , 'Y'! !
+
 !MaSerializedGraphBuffer methodsFor: 'accessing'!
 byteArray
 	"One ByteArray holds the entire graph of objects."
@@ -3664,7 +3685,7 @@ resetByteArray: aByteArray
 		resetBufferSize
 ! !
 
-!MaSerializedGraphBuffer methodsFor: 'printing' stamp: 'cmm 5/30/2013 17:08'!
+!MaSerializedGraphBuffer methodsFor: 'printing' stamp: 'jpb 5/14/2021 16:37:44'!
 maPrintAbbreviatedOn: aStream
 	super maPrintAbbreviatedOn: aStream.
 	byteArray notNil
@@ -3673,7 +3694,7 @@ maPrintAbbreviatedOn: aStream
 				nextPutAll: ' (';
 				maPrint: self objectCount;
 				nextPutAll: ' objects in ';
-				maPrint: self bufferSize asBytesDescription;
+				maPrint: self bufferSizeDescription;
 				nextPutAll: ' bytes)' ]! !
 
 !MaSerializedGraphBuffer class methodsFor: 'creation' stamp: 'cmm 5/1/2005 22:27'!
