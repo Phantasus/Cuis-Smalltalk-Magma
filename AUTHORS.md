@@ -203,9 +203,9 @@ the sha256sum was:
 This file describes the formats of the storage formats which magma uses,
 it dates to the 15th May 2006 and was written by:
 
-- AndrewGaylard
+- Andrew Gaylard
 - Brent Pinkney 
-- Mart-MariBreedtJohannesburg
+- Mart-Mari Breedt
 
 The sha256sum of that file is:
 
