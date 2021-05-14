@@ -1,10 +1,10 @@
-'From Cuis 5.0 [latest update: #4579] on 13 May 2021 at 1:13:28 pm'!
+'From Cuis 5.0 [latest update: #4579] on 14 May 2021 at 11:14:45 am'!
 'Description Magma core for server and client
 
 License: MIT
 Original author: Chris Muller (cmm)
 Author: Josef Philip Bernhart (jpb)'!
-!provides: 'Ma-Client-Server-Core' 1 25!
+!provides: 'Ma-Client-Server-Core' 1 26!
 !requires: 'Ma-Collections' 1 0 nil!
 !requires: 'Network-Kernel' 1 5 nil!
 !requires: 'Ma-Core' 1 1 nil!
@@ -3266,6 +3266,11 @@ initialize
 	super initialize.
 	
 	memoryHogs _ OrderedCollection new.! !
+
+!MaRegistry class methodsFor: 'as yet unclassified' stamp: 'jpb 5/14/2021 11:10:20'!
+isRunningSpur
+	"Returns true if this Smalltalk system supports the opensmalltalk-vm spur headers"
+	^Smalltalk isSpur ! !
 
 !MaRegistry class methodsFor: 'as yet unclassified' stamp: 'jpb 5/12/2021 14:19:38'!
 maDefaultMaxMemory

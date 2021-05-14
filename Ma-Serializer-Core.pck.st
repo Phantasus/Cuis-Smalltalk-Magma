@@ -1,4 +1,4 @@
-'From Cuis 5.0 [latest update: #4579] on 14 May 2021 at 10:42:23 am'!
+'From Cuis 5.0 [latest update: #4579] on 14 May 2021 at 11:44:13 am'!
 'Description I am a general object serialization and materialization framework.  Currently, I convert objects to ByteArrays and back.  I am used by both the "Ma client server" and "Magma" packages.  I offer a lot of flexibility in the way objects are serialized and materialized, even to the way the object graphs are traversed during serialization.
 
 The major class is MaObjectSerializer, see it for more information.  It utilizes a MaOidManager, a MaClassIdManager, and a MaObjectGraphTraversalStrategy to create a MaSerializedGraphBuffer, the final object that wraps the ByteArray.
@@ -7,7 +7,7 @@ The major class is MaObjectSerializer, see it for more information.  It utilizes
 License: MIT
 Original Author: Chris Muller (cmm)
 Author: Josef Philip Bernhart (jpb)'!
-!provides: 'Ma-Serializer-Core' 1 18!
+!provides: 'Ma-Serializer-Core' 1 21!
 !requires: 'Ma-Core' 1 1 nil!
 !requires: 'SOLHashTables' 1 4 nil!
 !requires: 'Ma-Statistics' 1 0 nil!
@@ -1903,7 +1903,7 @@ bufferType
 calculateHeaderSizeUsing: aMaBufferPositionMap
 	^ aMaBufferPositionMap headerSizeForCompiledMethodBuffer! !
 
-!MaCompiledMethodBuffer methodsFor: 'private' stamp: 'jpb 5/13/2021 10:17:52'!
+!MaCompiledMethodBuffer methodsFor: 'private' stamp: 'jpb 5/14/2021 11:43:47'!
 headerForThisVm
 	"Header fields and number of bits:
 	Cog:							Spur:
@@ -1917,7 +1917,7 @@ headerForThisVm
 	headerVal _ self longAt: self bufferPositionOfMethodHeader.
 	^ self spurHeader
 		ifTrue:
-			[ Smalltalk isRunningSpur
+			[ MaRegistry isRunningSpur
 				ifTrue: [headerVal]
 				ifFalse: 
 					[ "Spur-to-Cog header conversion."
@@ -1930,7 +1930,7 @@ headerForThisVm
 					"Finally, the 9 low-order bits in Cog are for primitive #.  We don't need to support CM's with primitives right now, so simply shift left."
 					cogHeader bitShift: 9 ] ]
 		ifFalse:
-			[ Smalltalk isRunningSpur
+			[ MaRegistry isRunningSpur
 				ifTrue:
 					[ "Cog-to-Spur header conversion."
 					| spurHeader numLits |
@@ -2036,12 +2036,12 @@ maPrintAbbreviatedOn: aStream
 		maPrintAttributes: #(#byteCodesPlusTrailerSize #bytes )
 		on: aStream! !
 
-!MaCompiledMethodBuffer methodsFor: 'building' stamp: 'cmm 11/13/2014 16:58'!
+!MaCompiledMethodBuffer methodsFor: 'building' stamp: 'jpb 5/14/2021 11:10:31'!
 captureEssentialAttributesFrom: aCompiledMethod
 	self
 		byteCodesPlusTrailerSize: aCompiledMethod maBytesSize ;
 		methodHeader: aCompiledMethod header ;
-		spurHeader: Smalltalk isRunningSpur! !
+		spurHeader: MaRegistry isRunningSpur! !
 
 !MaCompiledMethodBuffer methodsFor: 'building' stamp: 'cmm 7/30/2011 20:39'!
 populateBodyFor: aCompiledMethod using: aMaObjectSerializer 
@@ -2101,12 +2101,16 @@ populateHeaderFor: aMethodContextOrCompiledMethod using: aMaObjectSerializer
 		using: aMaObjectSerializer.
 	self captureEssentialAttributesFrom: aMethodContextOrCompiledMethod! !
 
-!MaMethodContextBuffer methodsFor: 'creation' stamp: 'jpb 5/7/2021 00:53:46'!
+!MaMethodContextBuffer methodsFor: 'creation' stamp: 'jpb 5/14/2021 11:42:38'!
 createObjectUsing: aMaObjectSerializer 
-	^ MethodContext basicNew:
-		(self largeFrame
-			ifTrue: [ CompiledMethod fullFrameSize ]
-			ifFalse: [ CompiledMethod smallFrameSize ])! !
+	^ MethodContext newForMethod: self.! !
+
+!MaMethodContextBuffer methodsFor: 'creation' stamp: 'jpb 5/14/2021 11:40:25'!
+frameSize
+	"Returns the frame size for #newForMethod: call in cuis"
+	^(self largeFrame
+		ifTrue: [ CompiledMethod fullFrameSize ]
+		ifFalse: [ CompiledMethod smallFrameSize ])! !
 
 !MaMethodContextBuffer methodsFor: 'access' stamp: 'cmm 8/4/2011 20:39'!
 largeFrame
@@ -4792,7 +4796,12 @@ maBufferInstSize
 
 	^ self size! !
 
-!Set methodsFor: '*ma-serializer-core' stamp: 'cmm 9/16/2014 18:18'!
+!Set methodsFor: '*ma-serializer-core' stamp: 'jpb 5/14/2021 11:14:37'!
+maDirtyAdd: newAssociation
+	"Hook for adding new associations to a collection, without signaling modified"
+	self add: newAssociation! !
+
+!Set methodsFor: '*ma-serializer-core' stamp: 'jpb 5/14/2021 11:12:46'!
 maEstablishPointerReferencesFor: aMaVariableObjectBuffer using: aMaObjectSerializer 
 	1
 		to: aMaVariableObjectBuffer objectInstSize
@@ -4856,7 +4865,7 @@ newSkeletonFor: aMaVariableObjectBuffer
 maBufferInstSize
 	^ (self size * 2) + "enough for other named instVars" self maInstSize - self class instSize "except tally and array"! !
 
-!Dictionary methodsFor: '*ma-serializer-core' stamp: 'jpb 5/14/2021 10:38:34'!
+!Dictionary methodsFor: '*ma-serializer-core' stamp: 'jpb 5/14/2021 11:12:17'!
 maEstablishPointerReferencesFor: aMaVariableObjectBuffer using: aMaObjectSerializer 
 	| transformer |
 	transformer _ [ : oid | aMaObjectSerializer objectWithOid: oid ].
@@ -4869,7 +4878,7 @@ maEstablishPointerReferencesFor: aMaVariableObjectBuffer using: aMaObjectSeriali
 				key: (transformer value: (aMaVariableObjectBuffer maInstVarAt: index))
 				value: (transformer value: (aMaVariableObjectBuffer maInstVarAt: index + 1)).
 						
-			self add: newAssociation ]! !
+			self maDirtyAdd: newAssociation ]! !
 
 !Dictionary methodsFor: '*ma-serializer-core' stamp: 'cmm 12/2/2004 17:29'!
 maGraphDo: aBlock using: aObjectTraversalStrategy path: path with: alreadyVisitedSet

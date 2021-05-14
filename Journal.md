@@ -9,6 +9,23 @@ entry is at the bottom. And people mention the author of the entry
 by his shortcut. Also people add their shortcuts to the list of
 authors at the end of the file.
 
+# 14. May 2021 (jpb)
+
+
+These tests need to finish in cuis, so that the basic magma
+functionality could maybe run:
+
+- `MaObjectSerializerTestCase`
+- `MaClientServerTestCase`
+
+In the morning I threw out calls to the globals (try to 
+minimize calls to globals folks!) `ActiveHand` and replaced
+it with the call `self activeHand` in Cuis. Also the
+`associationClass` calls which would return for a `Dictionary`
+in Squeak the storage class for the `Association` records within
+it, does not exist in Cuis.
+
+
 # 13. May 2021 (jpb)
 
 I don't see light at the end of the tunnel. Magma is so well
