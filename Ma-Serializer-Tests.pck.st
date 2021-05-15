@@ -1,8 +1,8 @@
-'From Cuis 5.0 [latest update: #4579] on 14 May 2021 at 10:49:40 am'!
+'From Cuis 5.0 [latest update: #4579] on 14 May 2021 at 10:26:03 pm'!
 'Description License: MIT
 Original author: Chris Muller (cmm)
 Author: Josef Philip Bernhart (jpb)'!
-!provides: 'Ma-Serializer-Tests' 1 4!
+!provides: 'Ma-Serializer-Tests' 1 5!
 !requires: 'Ma-Serializer-Core' 1 14 nil!
 SystemOrganization addCategory: 'Ma-Serializer-Tests'!
 
@@ -38,12 +38,10 @@ MaTestMailingAddress class
 	instanceVariableNames: ''!
 
 
-!MaFixtureFactory methodsFor: 'private accessing' stamp: 'cmm 12/17/2008 19:38'!
+!MaFixtureFactory methodsFor: 'as yet unclassified' stamp: 'jpb 5/14/2021 22:13:25'!
 methodsInCategory: aString 
-	^ MaBehaviorFinder new
-		addClass: self class ;
-		selectMethodsInCategory: aString ;
-		methods! !
+	^(self class methodsInCategory: aString) collect: [:methodSymbol | 
+		MethodReference class: self class selector: methodSymbol ].! !
 
 !MaObjectSerializerTestCase methodsFor: 'as yet unclassified' stamp: 'cmm 8/4/2011 11:26'!
 testBlocks
@@ -193,21 +191,25 @@ byteArraySamples
 		with: (0 to: 255) asByteArray
 ! !
 
-!MaFixtureFactory methodsFor: 'private non-collection samples' stamp: 'cmm 7/11/2002 00:23'!
+!MaFixtureFactory methodsFor: 'private non-collection samples' stamp: 'jpb 5/14/2021 22:17:08'!
 characterSamples
 
-	^Character allCharacters! !
+	^String streamContents: [:stringStream | 
+		(0 to: 255) do: [:v | stringStream nextPut: (Character numericValue: v) ]]! !
 
 !MaFixtureFactory methodsFor: 'private non-collection samples' stamp: 'cmm 10/28/2004 22:26'!
 classSamples
 
 	^ Collection withAllSubclasses asArray! !
 
-!MaFixtureFactory methodsFor: 'private non-collection samples' stamp: 'cmm 8/29/2011 20:16'!
+!MaFixtureFactory methodsFor: 'private non-collection samples' stamp: 'jpb 5/14/2021 22:20:07'!
 colorSamples
+	| paleBuff |
+	paleBuff _ Color r:  1.0 g: 0.98 b: 0.92.
+	
 	^ Array
-		with: Color paleBuff slightlyDarker
-		with: (Color paleBuff slightlyDarker alpha: 0.5)! !
+		with: paleBuff slightlyDarker
+		with: (paleBuff slightlyDarker alpha: 0.5)! !
 
 !MaFixtureFactory methodsFor: 'private non-collection samples' stamp: 'cmm 11/26/2004 13:17'!
 exceptionSamples
@@ -271,13 +273,6 @@ readWriteStreamSamples
 		with: (ReadWriteStream on: #('chris' 'paula'))
 ! !
 
-!MaFixtureFactory methodsFor: 'private non-collection samples' stamp: 'cmm 8/27/2008 14:54'!
-scaledDecimalSamples
-	^ { 
-		((13 / 11) asScaledDecimal: 6).
-		((11 / 13) asFloat asScaledDecimal)
-	 }! !
-
 !MaFixtureFactory methodsFor: 'private non-collection samples' stamp: 'cmm 6/17/2002 22:43'!
 smallIntegerSamples
 
@@ -287,14 +282,6 @@ smallIntegerSamples
 		with: 0
 		with: 1111
 ! !
-
-!MaFixtureFactory methodsFor: 'private non-collection samples' stamp: 'cmm 8/13/2009 14:39'!
-soundSamples
-| classGetter |
-classGetter _ [ : name |  (Smalltalk classNamed: #PluckedSound) ifNotNilDo: [ : theClass | theClass default ]. ].
-^#(PluckedSound Speaker)  collect:
-[ : eachClassName |
-	classGetter value: eachClassName ]! !
 
 !MaFixtureFactory methodsFor: 'private non-collection samples' stamp: 'cmm 6/17/2002 22:43'!
 stringSamples
@@ -433,14 +420,18 @@ bagSamples
 		with: (Bag new addAll: (self allNonCollectionSamples copyWithout: nil); yourself) ;
 		with: (Bag new add: 'a small bag' withOccurrences: 9999999999; yourself)! !
 
-!MaFixtureFactory methodsFor: 'private collection samples' stamp: 'cmm 2/14/2005 10:23'!
+!MaFixtureFactory methodsFor: 'private collection samples' stamp: 'jpb 5/14/2021 22:24:09'!
 dictionarySamples
 
-	| populatedDictionary |
+	| populatedDictionary possibleSamples |
 
 	populatedDictionary _ Dictionary new.
 	"CompiledMethods were getting their #hash changing somewhere that I could not figure out.  Omit them from the test and BE WARNED about persisting them in a Set or keys of a Dictionary."
-	(self allNonCollectionSamples copyWithoutAll: { nil }, (self allNonCollectionSamples select: [ : each | each isCompiledMethod ])) do:
+
+	possibleSamples _ 	(self allNonCollectionSamples copyWithoutAll: { nil } ,
+		(self allNonCollectionSamples select: [ : each | each is: #CompiledMethod ])).
+	
+	possibleSamples do:
 		[ :each |
 		populatedDictionary
 			at: each
@@ -489,11 +480,6 @@ sortedCollectionSamples
 				addAll: sentence asUppercase substrings;
 				yourself)
 ! !
-
-!MaFixtureFactory methodsFor: 'private collection samples' stamp: 'cmm 2/3/2005 23:36'!
-specialGlobalCollections
-
-	^ { TextConstants at: #DefaultTabsArray.  TextConstants at: #DefaultMarginTabsArray }! !
 
 !MaFixtureFactory methodsFor: 'initialize-release' stamp: 'cmm 8/1/2011 15:14'!
 initialize

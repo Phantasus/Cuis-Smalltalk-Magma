@@ -1,4 +1,4 @@
-'From Cuis 5.0 [latest update: #4579] on 14 May 2021 at 8:40:49 pm'!
+'From Cuis 5.0 [latest update: #4579] on 14 May 2021 at 10:26:02 pm'!
 'Description I am a general object serialization and materialization framework.  Currently, I convert objects to ByteArrays and back.  I am used by both the "Ma client server" and "Magma" packages.  I offer a lot of flexibility in the way objects are serialized and materialized, even to the way the object graphs are traversed during serialization.
 
 The major class is MaObjectSerializer, see it for more information.  It utilizes a MaOidManager, a MaClassIdManager, and a MaObjectGraphTraversalStrategy to create a MaSerializedGraphBuffer, the final object that wraps the ByteArray.
@@ -7,7 +7,7 @@ The major class is MaObjectSerializer, see it for more information.  It utilizes
 License: MIT
 Original Author: Chris Muller (cmm)
 Author: Josef Philip Bernhart (jpb)'!
-!provides: 'Ma-Serializer-Core' 1 22!
+!provides: 'Ma-Serializer-Core' 1 23!
 !requires: 'Ma-Core' 1 1 nil!
 !requires: 'SOLHashTables' 1 4 nil!
 !requires: 'Ma-Statistics' 1 0 nil!
@@ -3269,7 +3269,7 @@ newOidMinimum
 
 	^66541! !
 
-!MaOidCalculator class methodsFor: 'atomics' stamp: 'cmm 12/3/2014 10:56'!
+!MaOidCalculator class methodsFor: 'atomics' stamp: 'jpb 5/14/2021 22:25:35'!
 objectWithOid: anInteger ifNone: aBlock 
 	anInteger == OidForNil ifTrue: [ ^ nil ].
 	anInteger == OidForFalse ifTrue: [ ^ false ].
@@ -3282,7 +3282,7 @@ objectWithOid: anInteger ifNone: aBlock
 		and: LastSmallIntegerOid) ifTrue: [ ^ self integerFromOid: anInteger ].
 	(anInteger
 		between: FirstCharacterOid
-		and: LastCharacterOid) ifTrue: [ ^ Character value: anInteger - FirstCharacterOid ].
+		and: LastCharacterOid) ifTrue: [ ^ Character numericValue: anInteger - FirstCharacterOid ].
 	^ aBlock value! !
 
 !MaOidCalculator class methodsFor: 'atomics' stamp: 'cmm 12/3/2014 10:40'!
