@@ -1,4 +1,4 @@
-'From Cuis 5.0 [latest update: #4579] on 14 May 2021 at 10:26:02 pm'!
+'From Cuis 5.0 [latest update: #4579] on 16 May 2021 at 3:20:17 pm'!
 'Description I am a general object serialization and materialization framework.  Currently, I convert objects to ByteArrays and back.  I am used by both the "Ma client server" and "Magma" packages.  I offer a lot of flexibility in the way objects are serialized and materialized, even to the way the object graphs are traversed during serialization.
 
 The major class is MaObjectSerializer, see it for more information.  It utilizes a MaOidManager, a MaClassIdManager, and a MaObjectGraphTraversalStrategy to create a MaSerializedGraphBuffer, the final object that wraps the ByteArray.
@@ -7,7 +7,7 @@ The major class is MaObjectSerializer, see it for more information.  It utilizes
 License: MIT
 Original Author: Chris Muller (cmm)
 Author: Josef Philip Bernhart (jpb)'!
-!provides: 'Ma-Serializer-Core' 1 23!
+!provides: 'Ma-Serializer-Core' 1 25!
 !requires: 'Ma-Core' 1 1 nil!
 !requires: 'SOLHashTables' 1 4 nil!
 !requires: 'Ma-Statistics' 1 0 nil!
@@ -284,6 +284,16 @@ Object subclass: #MaObjectGraphTraversalStrategy
 MaObjectGraphTraversalStrategy class
 	instanceVariableNames: ''!
 
+!classDefinition: #MaObjectMaterializer category: 'Ma-Serializer-Core'!
+Object subclass: #MaObjectMaterializer
+	instanceVariableNames: 'serializer skeletons rootObject'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Ma-Serializer-Core'!
+!classDefinition: 'MaObjectMaterializer class' category: 'Ma-Serializer-Core'!
+MaObjectMaterializer class
+	instanceVariableNames: ''!
+
 !classDefinition: #MaMinimalObject category: 'Ma-Serializer-Core'!
 ProtoObject subclass: #MaMinimalObject
 	instanceVariableNames: ''
@@ -450,6 +460,9 @@ atomics | chars | new objects          |    user objects             | Floats | 
 
 !MaSerializedGraphBuffer commentStamp: '<historical>' prior: 0!
 I represent a serialized graph of objects.  Normally entire graphs are serialized but a #toCreateProxies: block may be specified for materialization so that the graph will be terminated with proxy objects.!
+
+!MaObjectMaterializer commentStamp: '<historical>' prior: 0!
+Helper object to abstract the materialization process using an MaObjectSerializer!
 
 !MaMinimalObject commentStamp: 'cmm 1/13/2005 14:25' prior: 0!
 I am the main superclass for objects with a minimal api.  I am meant to have just enough api to be able to develop and debug.!
@@ -2457,61 +2470,6 @@ classFor: anObject
 
 	^ anObject maSerializationClass! !
 
-!MaObjectSerializer methodsFor: 'private' stamp: 'cmm 9/20/2014 16:02'!
-materializeGraphDo: twoArgBlock 
-	"Materialize as much as the object in the receivers byteArray as possible.  For each object *materialized*, value twoArgBlock [ : eachObject : eachBuffer | ].  twoArgBlock is not valued for objects encountered in the materialized graph if they were already present in the receivers oidManager, that way we know when objects are exactly materialized."
-	| skeletons rootObject |
-	skeletons _ OrderedCollection new: 48.
-	rootObject _ nil.
-	self beBusy.
-	[ self graphBuffer buffersDo:
-		[ : each | | object |
-		object _ self
-			objectWithOid: each oid
-			ifFound:
-				[ : foundObj | (foundObj maIsMutatingProxy and: [ foundObj maRealObjectIsReified not ]) ifTrue:
-					[ skeletons add:
-						(Association
-							key:
-								(self
-									newSkeletonFor: each
-									fromProxy: foundObj)
-							value: each copyWithSameBuffer) ].
-				foundObj ]
-			ifAbsent:
-				[ | newObject |
-				skeletons add:
-					(Association
-						key:
-							(newObject _ self
-								newSkeletonFor: each
-								fromProxy: nil)
-						value: each copyWithSameBuffer).
-				newObject ].
-		rootObject ifNil: [ rootObject _ object ] ] ] ensure:
-		[ | hashedCollections |
-		hashedCollections _ OrderedCollection new.
-		skeletons do:
-			[ : eachAssociation | | eachObject eachBuffer |
-			eachObject _ eachAssociation key.
-			eachBuffer _ eachAssociation value.
-			eachObject realObjectIfMutatingProxy maIsHashedCollection ifTrue: [ hashedCollections add: eachAssociation ].
-			eachBuffer
-				establishReferencesFrom: eachObject realObjectIfMutatingProxy
-				using: self ].
-		hashedCollections do:
-			[ : eachAssociation | eachAssociation key realObjectIfMutatingProxy rehash ] ].
-	skeletons do:
-		[ : eachAssociation | | eachFullyFormedObject eachBuffer |
-		eachFullyFormedObject _ eachAssociation key.
-		eachBuffer _ eachAssociation value.
-		eachFullyFormedObject maWantsPostMaterialization ifTrue: [ self postMaterialize: eachFullyFormedObject ].
-		twoArgBlock
-			value: eachFullyFormedObject
-			value: eachBuffer ].
-	self beBored.
-	^ rootObject! !
-
 !MaObjectSerializer methodsFor: 'private' stamp: 'cmm 5/6/2013 14:43'!
 newSkeletonFor: aMaObjectBuffer fromProxy: aMaMutatingProxy 
 	| skel |
@@ -3042,6 +3000,16 @@ materializeGraph: aByteArray do: twoArgBlock
 			[ self
 				byteArray: aByteArray;
 				materializeGraphDo: twoArgBlock ]! !
+
+!MaObjectSerializer methodsFor: 'materializing' stamp: 'jpb 5/16/2021 12:25:21'!
+materializeGraphDo: twoArgBlock 
+	"Materialize as much as the object in the receivers byteArray as possible.  For each object *materialized*, value twoArgBlock [ : eachObject : eachBuffer | ].  twoArgBlock is not valued for objects encountered in the materialized graph if they were already present in the receivers oidManager, that way we know when objects are exactly materialized."
+
+	| materializer |
+	materializer _ MaObjectMaterializer new.
+	materializer serializer: self.
+	
+	^materializer materializeGraphDo: twoArgBlock ! !
 
 !MaObjectSerializer class methodsFor: 'debugging' stamp: 'cmm 4/19/2009 20:52'!
 fileIn: aDirectoryEntryFile 
@@ -3872,6 +3840,101 @@ shouldTraverseNoGlobals: anObject
 	anObject isBehavior ifTrue: [ ^ false ].
 	anObject maIsEnvironment ifTrue: [ ^ false ].
 	^ true! !
+
+!MaObjectMaterializer methodsFor: 'as yet unclassified' stamp: 'jpb 5/16/2021 11:49:27'!
+initialize
+	skeletons _ OrderedCollection new: 48.
+	rootObject _ nil.! !
+
+!MaObjectMaterializer methodsFor: 'as yet unclassified' stamp: 'jpb 5/16/2021 15:19:38'!
+materializeGraphDo: twoArgBlock 
+	"Materialize as much as the object in the receivers byteArray as possible.  For each object *materialized*, value twoArgBlock [ : eachObject : eachBuffer | ].  twoArgBlock is not valued for objects encountered in the materialized graph if they were already present in the receivers oidManager, that way we know when objects are exactly materialized."
+	serializer beBusy.
+	
+	[ serializer graphBuffer buffersDo: 	[ :each | 
+		| object |
+		object _ self materializeNextObjectWithBuffer: each.
+		rootObject ifNil: [ rootObject _ object ] ] 
+	] ensure: 	[ self rebuildDictionaryObjects  ].
+
+	skeletons do: [ :eachAssociation | 
+		| eachFullyFormedObject eachBuffer |
+		eachFullyFormedObject _ eachAssociation key.
+		eachBuffer _ eachAssociation value.
+		eachFullyFormedObject maWantsPostMaterialization
+			ifTrue: [ serializer postMaterialize: eachFullyFormedObject ].
+			
+		twoArgBlock
+			value: eachFullyFormedObject
+			value: eachBuffer ].
+	
+	serializer beBored.
+	
+	^ rootObject! !
+
+!MaObjectMaterializer methodsFor: 'as yet unclassified' stamp: 'jpb 5/16/2021 12:47:09'!
+materializeNextObjectWithBuffer: each
+	^serializer
+		objectWithOid: each oid
+		ifFound: [ :foundObj | self storeFoundObject: foundObj withBuffer: each ]
+		ifAbsent: [ self storeAbsentObjectWithBuffer: each ]! !
+
+!MaObjectMaterializer methodsFor: 'as yet unclassified' stamp: 'jpb 5/16/2021 15:19:52'!
+rebuildDictionaryObjects
+	"Rebuild dictionary objects keys/values and rehashes the serializer"
+	| hashedCollections |
+	
+	hashedCollections _ OrderedCollection new.
+	skeletons do: [ :eachAssociation |
+		 | eachObject eachBuffer |
+		eachObject _ eachAssociation key.
+		eachBuffer _ eachAssociation value.
+		eachObject realObjectIfMutatingProxy maIsHashedCollection
+				ifTrue: [ hashedCollections add: eachAssociation ].
+		
+		eachBuffer
+			establishReferencesFrom: eachObject realObjectIfMutatingProxy
+			using: serializer ].
+		
+	hashedCollections do: [ :eachAssociation |
+		eachAssociation key realObjectIfMutatingProxy rehash ]! !
+
+!MaObjectMaterializer methodsFor: 'as yet unclassified' stamp: 'jpb 5/16/2021 12:24:20'!
+serializer: newSerializer
+	serializer _ newSerializer ! !
+
+!MaObjectMaterializer methodsFor: 'as yet unclassified' stamp: 'jpb 5/16/2021 13:25:36'!
+storeAbsentObjectWithBuffer: each
+	 | newObject newAssociation |
+	
+	newObject _ serializer
+		newSkeletonFor: each
+		fromProxy: nil.
+	
+	newAssociation _ Association
+			key: newObject
+			value: each copyWithSameBuffer.
+	
+	skeletons add: newAssociation.
+
+	^newObject! !
+
+!MaObjectMaterializer methodsFor: 'as yet unclassified' stamp: 'jpb 5/16/2021 13:21:11'!
+storeFoundObject: foundObj withBuffer: each
+	(foundObj maIsMutatingProxy and: [ foundObj maRealObjectIsReified not ])
+		ifTrue: [
+			| newAssociation newKey |
+			newKey _ serializer
+				newSkeletonFor: each
+				fromProxy: foundObj.
+			
+			newAssociation _ Association
+				key: newKey
+				value: each copyWithSameBuffer.
+							
+			skeletons add: newAssociation ].
+	
+	^foundObj 	! !
 
 !MaMinimalObject methodsFor: 'printing' stamp: 'kph 7/14/2007 05:48'!
 asExplorerString
@@ -4817,10 +4880,12 @@ maBufferInstSize
 
 	^ self size! !
 
-!Set methodsFor: '*ma-serializer-core' stamp: 'jpb 5/14/2021 11:14:37'!
+!Set methodsFor: '*ma-serializer-core' stamp: 'jpb 5/16/2021 15:05:20'!
 maDirtyAdd: newAssociation
-	"Hook for adding new associations to a collection, without signaling modified"
-	self add: newAssociation! !
+	"When materializing a HashedCollection (Name of parent class in Squeak), we cannot depend on hash calculations being valid until all other objects have been materialized."
+	array
+		at: (tally _ tally + 1)
+		put: newAssociation! !
 
 !Set methodsFor: '*ma-serializer-core' stamp: 'jpb 5/14/2021 11:12:46'!
 maEstablishPointerReferencesFor: aMaVariableObjectBuffer using: aMaObjectSerializer 
@@ -4886,9 +4951,10 @@ newSkeletonFor: aMaVariableObjectBuffer
 maBufferInstSize
 	^ (self size * 2) + "enough for other named instVars" self maInstSize - self class instSize "except tally and array"! !
 
-!Dictionary methodsFor: '*ma-serializer-core' stamp: 'jpb 5/14/2021 11:12:17'!
+!Dictionary methodsFor: '*ma-serializer-core' stamp: 'jpb 5/16/2021 12:28:14'!
 maEstablishPointerReferencesFor: aMaVariableObjectBuffer using: aMaObjectSerializer 
 	| transformer |
+	
 	transformer _ [ : oid | aMaObjectSerializer objectWithOid: oid ].
 	1
 		to: aMaVariableObjectBuffer objectInstSize
