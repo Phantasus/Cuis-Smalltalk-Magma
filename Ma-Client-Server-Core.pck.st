@@ -1,10 +1,10 @@
-'From Cuis 5.0 [latest update: #4579] on 14 May 2021 at 11:14:45 am'!
+'From Cuis 5.0 [latest update: #4579] on 16 May 2021 at 9:54:16 pm'!
 'Description Magma core for server and client
 
 License: MIT
 Original author: Chris Muller (cmm)
 Author: Josef Philip Bernhart (jpb)'!
-!provides: 'Ma-Client-Server-Core' 1 26!
+!provides: 'Ma-Client-Server-Core' 1 28!
 !requires: 'Ma-Collections' 1 0 nil!
 !requires: 'Network-Kernel' 1 5 nil!
 !requires: 'Ma-Core' 1 1 nil!
@@ -3248,6 +3248,27 @@ checkUuidPlugin
 		ifFalse: [ self error: 'UUID broken - please delete UUIDPlugin and restart this image.' ].
 		
 	^true! !
+
+!MaRegistry class methodsFor: 'as yet unclassified' stamp: 'jpb 5/16/2021 21:54:00'!
+findConnectionUserId
+	"Asks the user for a user id to connect to magma database"
+	| defaultUserId |
+	defaultUserId _ 'unnamed'.
+
+	 ^Smalltalk isHeadless 
+		ifTrue: [ defaultUserId ]
+		ifFalse: [
+			| newUserId |
+			newUserId _ ''.
+			[ newUserId isEmpty ]
+				whileTrue: [ 
+					newUserId _ StringRequestMorph
+					 	request: 'Enter a name to connect under.'
+						initialAnswer: defaultUserId 
+						orCancel: [ '' ] ].
+		
+			MagmaUser id: newUserId 
+		] ! !
 
 !MaRegistry class methodsFor: 'as yet unclassified' stamp: 'jpb 5/12/2021 11:25:51'!
 findMillisecondsSince: lastTime

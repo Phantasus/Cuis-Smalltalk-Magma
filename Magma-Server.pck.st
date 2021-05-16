@@ -1,10 +1,10 @@
-'From Cuis 5.0 [latest update: #4579] on 13 May 2021 at 1:13:31 pm'!
+'From Cuis 5.0 [latest update: #4579] on 16 May 2021 at 10:03:06 pm'!
 'Description Package containing the magma server implementation
 
 License: MIT
 Original Author: Chris Muller (cmm)
 Author: Josef Philip Bernhart (jpb)'!
-!provides: 'Magma-Server' 1 27!
+!provides: 'Magma-Server' 1 30!
 !requires: 'Ma-Client-Server-Core' 1 3 nil!
 !requires: 'Ma-Statistics' 1 0 nil!
 SystemOrganization addCategory: 'Magma-Server'!
@@ -5480,14 +5480,13 @@ initializeSystemReadStrategy
 
 	repository initializeSystemReadStrategyUsing: self serverSerializer classIdManager! !
 
-!MagmaRepositoryController methodsFor: 'private' stamp: 'jpb 5/12/2021 21:44:33'!
+!MagmaRepositoryController methodsFor: 'private' stamp: 'jpb 5/16/2021 22:02:29'!
 materializeClassDefinitions
 	"This is needed because, when opening the repository, the default classes do not include MagmaRepositoryDefinition, which is delivered as part of any session-connection.  When the system-session attempts to connect, it tries to read the repository-definition but can't because it can't get a proper read-strategy for it."
-	self halt.
+	
 	[ session loadClassDefinitionsFrom: repository classDefinitionsByteArray ]
-		on: Error
-		do:
-			[ : err | MagmaCorruptionError signal: err messageText ]! !
+	on: Error
+	do: [ :err | MagmaCorruptionError signal: err messageText ]! !
 
 !MagmaRepositoryController methodsFor: 'private' stamp: 'cmm 11/7/2008 14:32'!
 newSessionFor: aMaRepositoryConnectionRequest sessionId: aUuid 
@@ -5560,7 +5559,7 @@ primClose
 		repository close.
 		self removeOpenIndicator ]! !
 
-!MagmaRepositoryController methodsFor: 'private' stamp: 'jpb 5/12/2021 15:44:06'!
+!MagmaRepositoryController methodsFor: 'private' stamp: 'jpb 5/16/2021 20:18:46'!
 privateOpen: aMagmaLocalLocation 
 	self isOpen ifTrue: 
 		[ MagmaUserError signal: 'Repository ' , aMagmaLocalLocation asString , ' is already open.' ].

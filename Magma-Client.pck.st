@@ -1,10 +1,10 @@
-'From Cuis 5.0 [latest update: #4579] on 14 May 2021 at 10:42:25 am'!
+'From Cuis 5.0 [latest update: #4579] on 16 May 2021 at 10:03:03 pm'!
 'Description Package containing the magma client implementation
 
 License: MIT
 Original Author: Chris Muller (cmm)
 Author: Josef Philip Bernhart (jpb)'!
-!provides: 'Magma-Client' 1 19!
+!provides: 'Magma-Client' 1 22!
 SystemOrganization addCategory: 'Magma-Client'!
 SystemOrganization addCategory: 'Magma-Client-Exceptions'!
 SystemOrganization addCategory: 'Magma-Client-MagmaCollections'!
@@ -2409,14 +2409,10 @@ signalMaterializedObject: anObject
 		materializedObject: anObject;
 		signal! !
 
-!MagmaUserRequiredNotification methodsFor: 'as yet unclassified' stamp: 'cmm 11/13/2013 20:40'!
+!MagmaUserRequiredNotification methodsFor: 'as yet unclassified' stamp: 'jpb 5/16/2021 21:40:03'!
 defaultAction
 	"The user did not listen for this notification.  For now, bail them out by offering them an opportunity to create one on the fly."
-	self resume: (session user ifNil: 
-			[ Smalltalk isHeadless 
-				ifTrue: [ 'unnamed' ]
-				ifFalse: 
-					[ MagmaUser id: (UIManager default request: 'Enter a name to connect under.') ] ])! !
+	self resume: (session user ifNil: [ MaRegistry findConnectionUserId ])! !
 
 !MagmaUserRequiredNotification methodsFor: 'as yet unclassified' stamp: 'cmm 3/13/2005 18:07'!
 session: aMagmaSession
@@ -2790,10 +2786,10 @@ initialize
 		debug: false ;
 		showStatusViaCursor: true! !
 
-!MagmaPreferences class methodsFor: 'mouse cursor' stamp: 'cmm 6/17/2009 09:50'!
+!MagmaPreferences class methodsFor: 'mouse cursor' stamp: 'jpb 5/16/2021 21:54:48'!
 readCursor
 	^ ShowStatusViaCursor 
-		ifTrue: [ Cursor read ]
+		ifTrue: [ Cursor readCursor ]
 		ifFalse: [ self ]! !
 
 !MagmaPreferences class methodsFor: 'mouse cursor' stamp: 'cmm 6/17/2009 09:44'!
@@ -5263,12 +5259,12 @@ materializeAnchorFrom: aMaReadResult
 
 	^ self materializeObject: aMaReadResult byteArray! !
 
-!MagmaSession methodsFor: 'private' stamp: 'cmm 5/16/2013 10:27'!
+!MagmaSession methodsFor: 'private' stamp: 'jpb 5/16/2021 21:11:15'!
 materializeObject: aByteArray 
 	"aByteArray is a MaGraphBuffer retrieved from the server.  Construct its object graph, noting each node in my serializer, linking up with previously materialized nodes by oid as appropriate."
 	"When not using WriteBarrier, postMats won't cause objects to be dirty, so let's not allow them to be when using WriteBarrier."
-	^ transaction suspendWriteBarrierModifiedsWhile: 
-		[ 
+	
+	^ transaction suspendWriteBarrierModifiedsWhile: [ 
 		[ serializer 
 			materializeGraph: aByteArray
 			do: 
@@ -5276,14 +5272,15 @@ materializeObject: aByteArray
 				transaction 
 					markRead: eachObject realObjectIfMutatingProxy
 					using: eachBuffer ]
-		"Handle MagmaSessionRequest to handle domains that reference the session directly." ] 
-			on: MagmaSessionRequest
-			do: [ : req | req handleAndResumeUsing: self ] ]! !
+		"Handle MagmaSessionRequest to handle domains that reference the session directly." 
+	] 
+	on: MagmaSessionRequest
+	do: [ : req | req handleAndResumeUsing: self ] ]! !
 
-!MagmaSession methodsFor: 'private' stamp: 'cmm 5/7/2008 17:03'!
+!MagmaSession methodsFor: 'private' stamp: 'jpb 5/16/2021 22:00:44'!
 materializeObjectsIn: aMaCollectionSegment 
 	self statistics clientSideMcPageReadsTimeHistory addValue: (Time millisecondsToRun: 
-			[ aMaCollectionSegment objects doWithIndex: 
+			[ aMaCollectionSegment objects withIndexDo: 
 				[ : eachHashAndBuffer : index | 
 				eachHashAndBuffer isVariableBinding 
 					ifTrue: 
@@ -13815,8 +13812,9 @@ captureOldHashesFor: anObject
 						(eachIndex indexHashesFor: anObject)
 					 } ] ] ]! !
 
-!MaTransaction methodsFor: 'building' stamp: 'cmm 11/12/2011 12:06'!
+!MaTransaction methodsFor: 'building' stamp: 'jpb 5/16/2021 21:12:33'!
 markRead: anObject using: aMaObjectBuffer 
+
 	(session immutabilityStrategy
 		isImmutable: anObject
 		using: self) ifTrue: [ ^ anObject ].
