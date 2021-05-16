@@ -9,6 +9,43 @@ entry is at the bottom. And people mention the author of the entry
 by his shortcut. Also people add their shortcuts to the list of
 authors at the end of the file.
 
+# 16. May 2021 (jpb)
+
+Finally I fixed the `testNestedHashedCollections` test of the
+object serializer tests. Which now makes these all pass.
+
+The reason was my removal/change of the `maDirtyAdd:` method,
+which is an ugly hack to the internals of a Set/Dictionary.
+
+With it new associations (for a Dictionary) are appended
+without any checks. Doing that leaves the Dictionary in an
+error state temporarily until the keys are corrected by
+doing a `rehash` on the dictionary.
+
+I refactored the object materialization into a new class,
+which is an interactor, it uses a serializer to deserialize
+objects. It was added, because I could not understand the
+way the materialization process works.
+
+The materialization process works roughly the following way:
+
+1. A list of "object buffers" are read, which are records
+   in the on-disk-file which contain object information like
+   object id and how many references are held, etc.
+2. These object buffers are read into an ordered collection of unfinished
+   materializations, in the source code they are called `skeletons`.
+   They are stored in there as associations, the keys are the
+   materialized objects and the value is the original object buffer.
+3. When all objects were read into the list of `skeletons`, then
+   the references to other objects are traversed and looked up and fixed.
+   If the object is a `Set` or a `Dictionary`, then they are added to
+   a list of items to be rehashed at the end of traversal, which
+   fixes any key errors in Dictionaries, so that objects can be used
+   as keys.
+4. Then the post materialization hooks are run on each object, which
+   want's them.
+   
+
 # 14. May 2021 (jpb)
 
 
